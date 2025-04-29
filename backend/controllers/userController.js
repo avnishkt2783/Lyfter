@@ -14,10 +14,10 @@ export const registerUser = async (req, res) => {
       return res.status(400).json({ message: "Email already registered!" });
     }
 
-    const existingUserName = await User.findOne({ where: { fullName } });
-    if (existingUserName) {
-      return res.status(400).json({ message: "Name already registered!" });
-    }
+    // const existingUserName = await User.findOne({ where: { fullName } });
+    // if (existingUserName) {
+    //   return res.status(400).json({ message: "Name already registered!" });
+    // }
 
     const existingUserPhone = await User.findOne({ where: { phoneNo } });
     if (existingUserPhone) {
@@ -30,6 +30,7 @@ export const registerUser = async (req, res) => {
     const user = await User.create({
       fullName,
       gender,
+
       email,
       phoneNo,
       password : hashedPassword,
@@ -64,3 +65,28 @@ export const registerUser = async (req, res) => {
 //     res.status(500).json({ message: "Login failed. Try again." });
 //   }
 // };
+
+
+// Login User Controller
+export const loginUser = async (req, res) => {
+  const { email, password } = req.body;
+
+  try {
+    const user = await User.findOne({ where: { email } });
+
+    if (!user) {
+      return res.status(404).json({ message: "User not found!" });
+    }
+
+    // Compare the entered password with the stored password
+    const isPasswordCorrect = await bcrypt.compare(password, user.password);
+    if (!isPasswordCorrect) {
+      return res.status(400).json({ message: "Incorrect password!" });
+    }
+
+    res.status(200).json({ message: "Login successful!", user });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: "Login failed. Try again." });
+  }
+};
