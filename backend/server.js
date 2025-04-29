@@ -1,30 +1,33 @@
 import express from "express";
+import bodyParser from "body-parser";
 import cors from "cors";
+
+import userRoutes from "./routes/userRoutes.js";
+
+import sequelize from "./config/db.js"; 
+// import "./models/user/user.js"; 
+// import auth from "./models/auth/auth.js";
+
+import authenticate from './middleware/authenticate.js';
+
 import dotenv from "dotenv";
-
-import sequelize from "./config/db.js"; // Sequelize DB connection
-import userRoutes from "./routes/userRoutes.js"; // User-related routes
-
-// Import models to register them with Sequelize
-import "./models/user/user.js"; 
-
 dotenv.config();
 
 const app = express();
-
-// Middleware
 app.use(cors());
-app.use(express.json()); // To parse JSON request body
+app.use(bodyParser.urlencoded({extended:true}));
+app.use(express.static("public"));
+app.use(bodyParser.json());
 
-// Routes
-app.use('/api', userRoutes); // All user routes will start from /api/users
+app.use(express.json()); 
+app.use(authenticate);
+app.use('/api', userRoutes); 
 
-// Connect to Database and Start Server
-sequelize.sync({ alter: true }) // alter:true for development - auto updates table structure if changed
+sequelize.sync({ alter: true })
   .then(() => {
     console.log("✅ MySQL Database connected successfully!");
 
-    const PORT = process.env.PORT || 3000;
+    const PORT = process.env.BACKEND_PORT || 3000;
     app.listen(PORT, () => {
       console.log(`🚀 Server running at http://localhost:${PORT}`);
     });

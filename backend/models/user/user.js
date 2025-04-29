@@ -9,8 +9,7 @@ const user = sequelize.define('user', {
     },
     fullName: {
         type: DataTypes.STRING,
-        allowNull: false,
-        // unique: true
+        allowNull: false
     },
     gender: {
         type: DataTypes.STRING,
@@ -32,11 +31,13 @@ const user = sequelize.define('user', {
     },
     age: {
         type: DataTypes.INTEGER,
-        // allowNull: true
+        allowNull: true,
+        defaultValue: null
     },
     address: {
         type: DataTypes.STRING,
-        // allowNull: false
+        allowNull: true,
+        defaultValue: null
     },
     isLoggedIn: {
         type: DataTypes.BOOLEAN,
@@ -44,8 +45,7 @@ const user = sequelize.define('user', {
         defaultValue: false
     }
 }, {
-    freezeTableName: true
-    
+    freezeTableName: true    
 });
 
 
