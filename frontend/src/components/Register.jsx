@@ -1,9 +1,9 @@
 import React, { useState } from "react";
-import { useNavigate } from "react-router-dom"; // Import useNavigate for redirection
+import { useNavigate, Link} from "react-router-dom";
 import axios from "axios";
 
 const Register = () => {
-  const navigate = useNavigate(); // Initialize the navigate hook
+  const navigate = useNavigate();
 
   const [formData, setFormData] = useState({
     fullName: "",
@@ -16,6 +16,7 @@ const Register = () => {
 
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
+  // const [user, setUser] = useState(null);
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -58,119 +59,71 @@ const Register = () => {
 
         // Redirect to home page after successful registration
         setTimeout(() => {
-          navigate("/"); // Redirect to home page
-        },1000); // Delay for success message visibility
+          navigate('/dashboard');
+        }); 
+
+
       } else {
         setError(result.message || "Registration failed");
         setSuccess("");
       }
     } catch (error) {
       console.error("Error:", error);
-      
-      // Check if backend has specific error messages
-      if (error.response && error.response.data) {
-        const message = error.response.data.message;
-        
-        // Handle specific error messages
-        if (message && message.includes("email")) {
-          setError("Email already exists");
-        } else if (message && message.includes("phone")) {
-          setError("Phone number already exists");
-        } else {
-          setError(message || "Something went wrong!");
-        }
-      } else {
-        setError("Something went wrong!");
-      }
+      setError(error?.response?.data?.message || "Something went wrong!");
       setSuccess("");
     }
-  };
-
-  // Back to Home Button function
-  const goHome = () => {
-    navigate("/"); // Manually navigate to the home page
   };
 
   return (
     <div style={{ maxWidth: "400px", margin: "0 auto", padding: "20px" }}>
       <h2>Register</h2>
-      {error && <p style={{ color: "red" }}>{error}</p>}
-      {success && <p style={{ color: "green" }}>{success}</p>}
+      
 
       <form onSubmit={handleSubmit}>
         <div>
           <label>Full Name:</label>
-          <input
-            type="text"
-            name="fullName"
-            value={formData.fullName}
-            onChange={handleChange}
-            required
-          />
+          <input type="text" name="fullName" value={formData.fullName} onChange={handleChange} required/>
         </div>
+
         <div>
           <label>Gender:</label>
-          <select
-            name="gender"
-            value={formData.gender}
-            onChange={handleChange}
-            required
-          >
+          <select name="gender" value={formData.gender} onChange={handleChange} required>
             <option value="">Select Gender</option>
             <option value="Male">Male</option>
             <option value="Female">Female</option>
             <option value="Other">Other</option>
           </select>
         </div>
+
         <div>
           <label>Email:</label>
-          <input
-            type="email"
-            name="email"
-            value={formData.email}
-            onChange={handleChange}
-            required
-          />
+          <input type="email" name="email" value={formData.email} onChange={handleChange} required/>
         </div>
+
         <div>
           <label>Phone No.:</label>
-          <input
-            type="text"
-            name="phoneNo"
-            value={formData.phoneNo}
-            onChange={handleChange}
-            required
-          />
+          <input type="text" name="phoneNo" value={formData.phoneNo} onChange={handleChange} required/>
         </div>
+
         <div>
           <label>Password:</label>
-          <input
-            type="password"
-            name="password"
-            value={formData.password}
-            onChange={handleChange}
-            required
-          />
+          <input type="password" name="password" value={formData.password} onChange={handleChange} required/>
         </div>
+
         <div>
           <label>Confirm Password:</label>
-          <input
-            type="password"
-            name="confirmPassword"
-            value={formData.confirmPassword}
-            onChange={handleChange}
-            required
-          />
+          <input type="password" name="confirmPassword" value={formData.confirmPassword} onChange={handleChange} required/>
         </div>
-        <button type="submit" style={{ marginTop: "10px" }}>
-          Register
-        </button>
+
+        <button type="submit" style={{ marginTop: "10px" }}>Register</button>
+         {/* Add a Back Button */}
+      <button onClick={() => navigate('/')} style={{ marginTop: '20px', backgroundColor: '#4CAF50', color: 'white', padding: '10px 20px', border: 'none', cursor: 'pointer' }}>Back to Home</button>
+      <p>Already Registered : <Link to="/login">Login</Link></p>
+
       </form>
 
-      {/* Back to Home Button */}
-      <button onClick={goHome} style={{ marginTop: "10px", display: "block" }}>
-        Back to Home
-      </button>
+      {error && <p style={{ color: "red" }}>{error}</p>}
+      {success && <p style={{ color: "green" }}>{success}</p>}
     </div>
   );
 };

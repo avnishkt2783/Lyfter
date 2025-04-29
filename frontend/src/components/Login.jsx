@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { useNavigate } from "react-router-dom"; // Import useNavigate
+import { useNavigate, Link } from "react-router-dom"; // Import useNavigate
 import axios from "axios";
 
 const Login = () => {
@@ -30,8 +30,8 @@ const Login = () => {
         setError("");
         // Redirect to the home page after successful login
         setTimeout(() => {
-          navigate("/"); // Redirect to home page
-        }, 1000); // Delay for success message visibility
+          navigate("/dashboard"); // Redirect to home page
+        }); 
       } else {
         setError(result.message || "Login failed");
         setSuccess("");
@@ -43,47 +43,33 @@ const Login = () => {
     }
   };
 
-  // Back to Home Button function
-  const goHome = () => {
-    navigate("/"); // Manually navigate to the home page
-  };
-
   return (
     <div style={{ maxWidth: "400px", margin: "0 auto", padding: "20px" }}>
       <h2>Login</h2>
-      {error && <p style={{ color: "red" }}>{error}</p>}
-      {success && <p style={{ color: "green" }}>{success}</p>}
+      
 
       <form onSubmit={handleSubmit}>
         <div>
-          <label>Email:</label>
-          <input
-            type="email"
-            name="email"
-            value={formData.email}
-            onChange={handleChange}
-            required
-          />
+        <label>Email:</label>
+          <input type="email" name="email" value={formData.email} onChange={handleChange} required/>
         </div>
         <div>
           <label>Password:</label>
-          <input
-            type="password"
-            name="password"
-            value={formData.password}
-            onChange={handleChange}
-            required
-          />
+          <input type="password" name="password" value={formData.password} onChange={handleChange} required/>
         </div>
         <button type="submit" style={{ marginTop: "10px" }}>
           Login
         </button>
-      </form>
-
       {/* Back to Home Button */}
-      <button onClick={goHome} style={{ marginTop: "10px", display: "block" }}>
+      <button onClick= {() => navigate("/")} style={{ marginTop: "10px", display: "block" }}>
         Back to Home
       </button>
+
+      <p>New User : <Link to="/register">Register</Link></p>
+      </form>
+
+      {error && <p style={{ color: "red" }}>{error}</p>}
+      {success && <p style={{ color: "green" }}>{success}</p>}
     </div>
   );
 };
