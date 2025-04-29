@@ -5,4 +5,4 @@ const sequelize = new Sequelize('lyfter', 'root', 'root', {
     dialect: 'mysql',
 })
 
-export default sequelize
+export default sequelize
