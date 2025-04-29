@@ -59,7 +59,7 @@ const Register = () => {
         // Redirect to home page after successful registration
         setTimeout(() => {
           navigate("/"); // Redirect to home page
-        }, 2000); // Delay for success message visibility
+        },1000); // Delay for success message visibility
       } else {
         setError(result.message || "Registration failed");
         setSuccess("");
@@ -84,6 +84,11 @@ const Register = () => {
       }
       setSuccess("");
     }
+  };
+
+  // Back to Home Button function
+  const goHome = () => {
+    navigate("/"); // Manually navigate to the home page
   };
 
   return (
@@ -161,6 +166,11 @@ const Register = () => {
           Register
         </button>
       </form>
+
+      {/* Back to Home Button */}
+      <button onClick={goHome} style={{ marginTop: "10px", display: "block" }}>
+        Back to Home
+      </button>
     </div>
   );
 };
