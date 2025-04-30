@@ -102,3 +102,24 @@ export const loginUser = async (req, res) => {
     res.status(500).json({ message: "Login failed. Try again." });
   }
 };
+
+
+export const getProfile = async (req, res) => {
+  try {
+    const userId = req.user.userId;
+
+    const user = await User.findOne({
+      where: { userId },
+      attributes: ["userId", "fullName", "email", "phoneNo", "age", "address"],
+    });
+
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    res.json(user);
+  } catch (err) {
+    console.error("Error fetching profile:", err);
+    res.status(500).json({ message: "Internal server error" });
+  }
+};
