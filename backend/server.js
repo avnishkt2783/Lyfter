@@ -5,8 +5,8 @@ import cors from "cors";
 import userRoutes from "./routes/userRoutes.js";
 
 import sequelize from "./config/db.js"; 
-// import "./models/user/user.js"; 
-// import auth from "./models/auth/auth.js";
+import "./models/user/user.js"; 
+import "./models/auth/auth.js";
 
 import authenticate from './middleware/authenticate.js';
 
@@ -14,6 +14,7 @@ import dotenv from "dotenv";
 dotenv.config();
 
 const app = express();
+
 app.use(cors());
 app.use(bodyParser.urlencoded({extended:true}));
 app.use(express.static("public"));

@@ -103,7 +103,7 @@ export const loginUser = async (req, res) => {
 };
 
 export const logoutUser = async (req, res) => {
-  const { email } = req.body;
+  const { email } = req.params;
 
   if(!email) {
     return res.status(400).json({ message: 'Email is required'})
