@@ -57,7 +57,6 @@ export const registerUser = async (req, res) => {
   }
 };
 
-// Login User Controller
 export const loginUser = async (req, res) => {
   const { email, password } = req.body;
 
@@ -103,7 +102,6 @@ export const loginUser = async (req, res) => {
   }
 };
 
-
 export const getProfile = async (req, res) => {
   try {
     const userId = req.user.userId;
@@ -121,5 +119,35 @@ export const getProfile = async (req, res) => {
   } catch (err) {
     console.error("Error fetching profile:", err);
     res.status(500).json({ message: "Internal server error" });
+  }
+};
+
+export const logoutUser = async (req, res) => {
+  const { email } = req.params;
+
+  if(!email) {
+    return res.status(400).json({ message: 'Email is required'})
+  }
+
+  try {
+    const user = await User.findOne({ where: { email } });
+
+    if (!user) {
+      return res.status(404).json({ message: "Server error during logout!" });
+    }
+
+    await Auth.destroy({
+      where: { email: user.email }
+    });
+
+    user.isLoggedIn = false;
+    await user.save();
+
+    res.status(200).json({ message: 'Logout Successful. Token Deleted.'});
+
+  } 
+  catch (error) {
+    console.error('Error during logout:', err);
+    res.status(500).json({ message: 'Server error during logout.' })  
   }
 };
