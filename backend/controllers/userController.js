@@ -57,7 +57,6 @@ export const registerUser = async (req, res) => {
   }
 };
 
-// Login User Controller
 export const loginUser = async (req, res) => {
   const { email, password } = req.body;
 
@@ -102,3 +101,33 @@ export const loginUser = async (req, res) => {
     res.status(500).json({ message: "Login failed. Try again." });
   }
 };
+
+export const logoutUser = async (req, res) => {
+  const { email } = req.body;
+
+  if(!email) {
+    return res.status(400).json({ message: 'Email is required'})
+  }
+
+  try {
+    const user = await User.findOne({ where: { email } });
+
+    if (!user) {
+      return res.status(404).json({ message: "Server error during logout!" });
+    }
+
+    await Auth.destroy({
+      where: { email: user.email }
+    });
+
+    user.isLoggedIn = false;
+    await user.save();
+
+    res.status(200).json({ message: 'Logout Successful. Token Deleted.'});
+
+  } 
+  catch (error) {
+    console.error('Error during logout:', err);
+    res.status(500).json({ message: 'Server error during logout.' })  
+  }
+}
