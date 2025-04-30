@@ -125,6 +125,7 @@ export const getProfile = async (req, res) => {
 export const logoutUser = async (req, res) => {
   const { email } = req.params;
 
+
   if(!email) {
     return res.status(400).json({ message: 'Email is required'})
   }
@@ -136,8 +137,13 @@ export const logoutUser = async (req, res) => {
       return res.status(404).json({ message: "Server error during logout!" });
     }
 
-    await Auth.destroy({
-      where: { email: user.email }
+    // await Auth.destroy({
+    //   where: { email: user.email }
+    // });
+
+     // Delete the Auth token using userId instead of email
+     await Auth.destroy({
+      where: { userId: user.userId }
     });
 
     user.isLoggedIn = false;
@@ -147,7 +153,7 @@ export const logoutUser = async (req, res) => {
 
   } 
   catch (error) {
-    console.error('Error during logout:', err);
+    console.error('Error during logout:', error);
     res.status(500).json({ message: 'Server error during logout.' })  
   }
 };

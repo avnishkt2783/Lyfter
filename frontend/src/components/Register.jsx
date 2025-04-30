@@ -42,10 +42,11 @@ const Register = () => {
 
     try {
       const response = await axios.post(`${apiURL}/register`, dataToSend);
-      console.log(response);
+
+      const { token } = response.data;
+      login(token);
 
       const result = response.data;
-      console.log(result);
 
       if (response.status === 201) {
         setSuccess("Registration successful!");
