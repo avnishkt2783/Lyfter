@@ -7,16 +7,18 @@ import Register from "./components/Register";
 import Dashboard from "./components/Dashboard";
 import Footer from "./components/Footer";
 import Profile from "./components/Profile";
+import LogoutButton from "./components/LogoutButton";
 
 import RequireAuth from "./utils/RequireAuth";
+
 
 import 'bootstrap/dist/css/bootstrap.min.css';
 import 'bootstrap/dist/js/bootstrap.bundle.min.js';
 
 import "./App.css";
-import LogoutButton from "./components/LogoutButton";
 
 function App() {
+
   return (
     <>
       <div className="d-flex flex-column min-vh-100">

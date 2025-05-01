@@ -1,17 +1,17 @@
 import React from "react";
-import {
-  FaFacebookF,
-  FaInstagram,
-  FaTwitter,
-  FaLinkedin,
-  FaGithub,
-} from "react-icons/fa";
+import { FaFacebookF, FaInstagram, FaTwitter, FaLinkedin, FaGithub} from "react-icons/fa";
+
+import { useTheme } from "./ThemeContext";
 
 import "./Footer.css";
 
 const Footer = () => {
+
+  const { theme } = useTheme();
+  const isDark = theme === "dark";
+
   return (
-    <footer className="bg-dark text-white pt-5 pb-3 mt-5">
+    <footer className={`pt-5 pb-3 mt-5 ${isDark ? "bg-dark text-white" : "bg-light text-dark"}`}>
       <div className="container text-center">
         <h5 className="fw-bold mb-4">Follow Us</h5>
         <div className="d-flex justify-content-center gap-4 fs-4 social-icons">
@@ -33,7 +33,7 @@ const Footer = () => {
         </div>
       </div>
 
-      <div className="text-center mt-4 pt-3 border-top text-white small">
+      <div className={`text-center mt-4 pt-3 border-top small ${isDark ? "text-white border-light" : "text-dark border-dark"}`}>
         © {new Date().getFullYear()} Lyfter. All rights reserved. | Made with ❤ by Lyfter Team
       </div>
     </footer>
