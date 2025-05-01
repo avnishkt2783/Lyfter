@@ -32,7 +32,7 @@ const Login = () => {
 
       const result = response.data;
 
-      if (response.status === 201) {
+      if (response.status === 200) {
         setSuccess(result.message);
         setError("");
         setFormData({

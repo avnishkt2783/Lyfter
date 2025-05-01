@@ -89,7 +89,7 @@ export const loginUser = async (req, res) => {
     user.isLoggedIn = true;
     await user.save();
 
-    res.status(201).json({ 
+    res.status(200).json({ 
       message: "Logged in successfully!", 
       userId: user.userId,
       fullName: user.fullName ,
@@ -110,15 +110,25 @@ export const getProfile = async (req, res) => {
     const userId = req.user.userId;
 
     const user = await User.findOne({
-      where: { userId },
-      attributes: ["userId", "fullName", "email", "phoneNo", "age", "address"],
+      where: { userId }
     });
 
     if (!user) {
       return res.status(404).json({ message: "User not found" });
     }
 
-    res.json(user);
+    let age = null;
+    if (user.dob) {
+      const birthDate = new Date(user.dob);
+      const today = new Date();
+      age = today.getFullYear() - birthDate.getFullYear();
+      const m = today.getMonth() - birthDate.getMonth();
+      if (m < 0 || (m === 0 && today.getDate() < birthDate.getDate())) {
+        age--;
+      }
+    }
+
+    res.json({ ...user.toJSON(), age });
   } catch (err) {
     console.error("Error fetching profile:", err);
     res.status(500).json({ message: "Internal server error" });
@@ -126,37 +136,94 @@ export const getProfile = async (req, res) => {
 };
 
 export const logoutUser = async (req, res) => {
-  const { email } = req.params;
-
-
-  if(!email) {
-    return res.status(400).json({ message: 'Email is required'})
+  const authHeader = req.headers.authorization;
+  if (!authHeader) {
+    return res.status(400).json({ message: 'Authorization header required' });
   }
 
+  const token = authHeader.split(" ")[1];
   try {
-    const user = await User.findOne({ where: { email } });
+    const decoded = jwt.verify(token, process.env.JWT_SECRET_KEY);
+    const user = await User.findOne({ where: { userId: decoded.userId } });
 
     if (!user) {
-      return res.status(404).json({ message: "Server error during logout!" });
+      return res.status(404).json({ message: "User not found!" });
     }
 
-    // await Auth.destroy({
-    //   where: { email: user.email }
-    // });
-
-     // Delete the Auth token using userId instead of email
-     await Auth.destroy({
-      where: { userId: user.userId }
-    });
+    await Auth.destroy({ where: { token } });
 
     user.isLoggedIn = false;
     await user.save();
 
-    res.status(200).json({ message: 'Logout Successful. Token Deleted.'});
-
-  } 
-  catch (error) {
-    console.error('Error during logout:', error);
-    res.status(500).json({ message: 'Server error during logout.' })  
+    res.status(200).json({ message: 'Logout Successful. Token Deleted.' });
+  } catch (error) {
+    console.error('Logout error:', error);
+    res.status(401).json({ message: 'Invalid or expired token' });
   }
 };
+
+export const updateProfile = async (req, res) => {
+  const userId = req.user.userId;
+
+  try {
+    const user = await User.findByPk(userId);
+    if (!user) return res.status(404).json({ message: "User not found" });
+
+    const {
+      fullName,
+      phoneNo,
+      dob, // Received from frontend
+      addressAddress,
+      addressCity,
+      addressState,
+      addressPincode,
+      addressCountry,
+    } = req.body;
+
+    // Check if dob is a Date object, if not, try to parse it
+    const currentDob = user.dob ? new Date(user.dob) : null; // Ensure dob is a Date object
+
+    // Prevent changing DOB if already set
+    if (currentDob && dob && currentDob.toISOString().split("T")[0] !== dob) {
+      return res.status(400).json({ message: "DOB is already set and cannot be changed" });
+    }
+
+    const profileImgPath = req.file ? `/uploads/${req.file.filename}` : user.profileImg;
+
+    // Update the address
+    const updatedAddress = {
+      address: addressAddress,
+      city: addressCity,
+      state: addressState,
+      pincode: addressPincode,
+      country: addressCountry,
+    };
+
+    // Ensure DOB is only updated if not already set
+    const updatedDob = currentDob || (dob ? new Date(dob) : null); // If dob is provided, convert it to a Date object
+
+    // Update the profile
+    await user.update({
+      fullName,
+      phoneNo,
+      dob: updatedDob, // Store the Date object if it's set
+      profileImg: profileImgPath,
+      address: updatedAddress,
+    });
+
+    // Send back the updated profile data
+    res.status(200).json({
+      message: "Profile updated successfully",
+      profileImageUrl: profileImgPath,
+      fullName: user.fullName,
+      email: user.email,
+      phoneNo: user.phoneNo,
+      dob: updatedDob,
+      address: updatedAddress,
+    });
+  } catch (error) {
+    console.error("Error updating profile:", error);
+    res.status(500).json({ message: "Failed to update profile" });
+  }
+};
+
