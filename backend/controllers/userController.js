@@ -42,6 +42,9 @@ export const registerUser = async (req, res) => {
       token: token,
     });
 
+    user.isLoggedIn = true;
+    await user.save();
+
     res.status(201).json({ 
       message: "User registered successfully!", 
       userId: user.userId,

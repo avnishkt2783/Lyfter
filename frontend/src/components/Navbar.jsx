@@ -13,7 +13,8 @@ const Navbar = () => {
     <>
       <nav className="navbar navbar-expand-lg navbar-dark bg-dark px-3">
           <Link className="navbar-brand d-flex align-items-center" to="/">
-            <img src="lyfter_logo.png" alt="Logo" height="40" className="me-2"/>
+            <img src="lyfter_text_white.png" alt="Logo" height="40" className="me-2"/>
+
           </Link>
 
           <button className="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarContent" aria-controls="navbarContent" aria-expanded="false" aria-label="Toggle navigation">
@@ -36,7 +37,7 @@ const Navbar = () => {
               </li>
               <li className="nav-item">
                 <Link className="nav-link" to="/profile">
-                  <img src="profile.png" alt="Profile" className="rounded-circle" height="35" width="35" style={{ objectFit: "cover" }} />
+                  <img src="default.jpg" alt="Profile" className="rounded-circle" height="35" width="35" style={{ objectFit: "cover" }} />
                 </Link>
               </li>
             </>
