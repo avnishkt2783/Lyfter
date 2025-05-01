@@ -73,11 +73,15 @@ const Register = () => {
   };
 
   return (
-    <div style={{ maxWidth: "400px", margin: "0 auto", padding: "20px" }}>
-      <h2>Register</h2>
+    <div className="container py-5">
+       <div className="row justify-content-center">
+       <div className="col-md-6">
+       <div className="card shadow-sm border-0">
+    <div className="card-body p-4">
+      <h2 className="mb-4 text-center">Register</h2>
       <form onSubmit={handleSubmit}>
-        <div>
-          <label>Full Name:</label>
+        <div className="mb-3">
+          <label className="form-label">Full Name:</label>
           <input
             type="text"
             name="fullName"
@@ -86,7 +90,7 @@ const Register = () => {
             required
           />
         </div>
-        <div>
+        <div className="mb-3">
           <label>Gender:</label>
           <select
             name="gender"
@@ -94,14 +98,14 @@ const Register = () => {
             onChange={handleChange}
             required
           >
-            <option value="">Select Gender</option>
+            <option value="">Select Gender</option> 
             <option value="Male">Male</option>
             <option value="Female">Female</option>
             <option value="Other">Other</option>
           </select>
         </div>
-        <div>
-          <label>Email:</label>
+        <div className="mb-3">
+          <label className="form-label">Email:</label>
           <input
             type="email"
             name="email"
@@ -110,8 +114,8 @@ const Register = () => {
             required
           />
         </div>
-        <div>
-          <label>Phone No.:</label>
+        <div className="mb-3">
+          <label className="form-label">Phone No.:</label>
           <input
             type="text"
             name="phoneNo"
@@ -120,8 +124,8 @@ const Register = () => {
             required
           />
         </div>
-        <div>
-          <label>Password:</label>
+        <div className="mb-3"> 
+          <label className="form-label">Password:</label>
           <input
             type="password"
             name="password"
@@ -130,8 +134,8 @@ const Register = () => {
             required
           />
         </div>
-        <div>
-          <label>Confirm Password:</label>
+        <div className="mb-3">
+          <label className="form-label">Confirm Password:</label>
           <input
             type="password"
             name="confirmPassword"
@@ -164,6 +168,10 @@ const Register = () => {
 
       {error && <p style={{ color: "red" }}>{error}</p>}
       {success && <p style={{ color: "green" }}>{success}</p>}
+    </div>
+    </div>
+    </div>
+    </div>
     </div>
   );
 };

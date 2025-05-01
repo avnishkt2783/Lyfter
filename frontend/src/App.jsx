@@ -10,21 +10,32 @@ import Profile from "./components/Profile";
 
 import RequireAuth from "./utils/RequireAuth";
 
+import 'bootstrap/dist/css/bootstrap.min.css';
+import 'bootstrap/dist/js/bootstrap.bundle.min.js';
+
+import "./App.css";
+import LogoutButton from "./components/LogoutButton";
+
 function App() {
   return (
     <>
+      <div className="d-flex flex-column min-vh-100">
       <Navbar />
-      <Routes>
-        <Route path="/" element={<Landing />} />
-        <Route path="/login" element={<Login />} />
-        <Route path="/register" element={<Register />} />
+      <main className="flex-grow-1">
+        <Routes>
+          <Route path="/" element={<Landing />} />
+          <Route path="/login" element={<Login />} />
+          <Route path="/register" element={<Register />} />
+          <Route path="/logout" element={<LogoutButton />} />
 
-        <Route element={<RequireAuth />}>
-          <Route path="/dashboard" element={<Dashboard />} />
-          <Route path="/profile" element={<Profile />} />
-        </Route>
-      </Routes>
+          <Route element={<RequireAuth />}>
+            <Route path="/dashboard" element={<Dashboard />} />
+            <Route path="/profile" element={<Profile />} />
+          </Route>
+        </Routes>
+      </main>
       <Footer />
+    </div>
     </>
   );
 }
