@@ -1,9 +1,11 @@
 import axios from "axios";
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { useAuth } from "../AuthContext";
+import { useTheme } from "./ThemeContext"; 
 
 const Register = () => {
+ 
   const apiURL = import.meta.env.VITE_API_URL;
   const navigate = useNavigate();
 
@@ -24,6 +26,8 @@ const Register = () => {
   };
 
   const { login } = useAuth();
+  const { theme } = useTheme(); 
+  const isDark = theme === "dark";
 
   // const validateForm = () => {
   //   // REGEX
@@ -76,7 +80,7 @@ const Register = () => {
     <div className="container py-5">
        <div className="row justify-content-center">
        <div className="col-md-6">
-       <div className="card shadow-sm border-0">
+       <div className={`card ${isDark ? "bg-dark text-white" : "bg-light text-dark"} shadow border-0`}>
     <div className="card-body p-4">
       <h2 className="mb-4 text-center">Register</h2>
       <form onSubmit={handleSubmit}>
@@ -84,6 +88,7 @@ const Register = () => {
           <label className="form-label">Full Name:</label>
           <input
             type="text"
+            className={`form-control ${isDark ? "bg-secondary text-white" : "bg-white text-dark"} border-0`}
             name="fullName"
             value={formData.fullName}
             onChange={handleChange}
@@ -91,8 +96,9 @@ const Register = () => {
           />
         </div>
         <div className="mb-3">
-          <label>Gender:</label>
+          <label className="form-label">Gender:</label>
           <select
+          className={`form-control ${isDark ? "bg-secondary text-white" : "bg-white text-dark"} border-0`}
             name="gender"
             value={formData.gender}
             onChange={handleChange}
@@ -108,6 +114,7 @@ const Register = () => {
           <label className="form-label">Email:</label>
           <input
             type="email"
+            className={`form-control ${isDark ? "bg-secondary text-white" : "bg-white text-dark"} border-0`}
             name="email"
             value={formData.email}
             onChange={handleChange}
@@ -118,6 +125,7 @@ const Register = () => {
           <label className="form-label">Phone No.:</label>
           <input
             type="text"
+            className={`form-control ${isDark ? "bg-secondary text-white" : "bg-white text-dark"} border-0`}
             name="phoneNo"
             value={formData.phoneNo}
             onChange={handleChange}
@@ -128,6 +136,7 @@ const Register = () => {
           <label className="form-label">Password:</label>
           <input
             type="password"
+            className={`form-control ${isDark ? "bg-secondary text-white" : "bg-white text-dark"} border-0`}
             name="password"
             value={formData.password}
             onChange={handleChange}
@@ -138,36 +147,38 @@ const Register = () => {
           <label className="form-label">Confirm Password:</label>
           <input
             type="password"
+            className={`form-control ${isDark ? "bg-secondary text-white" : "bg-white text-dark"} border-0`}
             name="confirmPassword"
             value={formData.confirmPassword}
             onChange={handleChange}
             required
           />
         </div>
-        <button type="submit" style={{ marginTop: "10px" }}>
-          Register
-        </button>
+        <div className="d-grid">
+                <button type="submit" className="btn btn-primary">
+                  Register
+                </button>
+              </div>
 
-        <button
-          onClick={() => navigate("/dashboard")}
-          style={{
-            marginTop: "20px",
-            backgroundColor: "#4CAF50",
-            color: "white",
-            padding: "10px 20px",
-            border: "none",
-            cursor: "pointer",
-          }}
-        >
-          Back to Home
-        </button>
-        <p>
-          Already Registered : <Link to="/login">Login</Link>
-        </p>
       </form>
 
-      {error && <p style={{ color: "red" }}>{error}</p>}
-      {success && <p style={{ color: "green" }}>{success}</p>}
+      <div className="text-center mt-3">
+              <p>
+                Already registered?{" "}
+                <Link to="/login" className={`text-decoration-none ${isDark ? "text-info" : "text-primary"}`}>
+                  Login here
+                </Link>
+              </p>
+              <button
+                onClick={() => navigate("/")}
+                className={`btn mt-2 ${isDark ? "btn-outline-light" : "btn-outline-dark"}`}
+              >
+                Back to Home
+              </button>
+            </div>
+
+            {error && <div className="alert alert-danger mt-3">{error}</div>}
+            {success && <div className="alert alert-success mt-3">{success}</div>}
     </div>
     </div>
     </div>

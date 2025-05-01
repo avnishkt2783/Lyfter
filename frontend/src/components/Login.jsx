@@ -1,7 +1,8 @@
 import axios from "axios";
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { useAuth } from "../AuthContext";
+import { useTheme } from "./ThemeContext";
 
 const Login = () => {
   const apiURL = import.meta.env.VITE_API_URL;
@@ -16,6 +17,8 @@ const Login = () => {
   const [success, setSuccess] = useState("");
 
   const { login } = useAuth();
+  const { theme } = useTheme();
+  const isDark = theme === "dark";
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -53,55 +56,80 @@ const Login = () => {
   };
 
   return (
-    <div style={{ maxWidth: "400px", margin: "0 auto", padding: "20px" }}>
-      <h2>Login</h2>
+    <div className="container py-5">
+      <div className="row justify-content-center">
+        <div className="col-md-6">
+          <div
+            className={`card ${
+              isDark ? "bg-dark text-white" : "bg-light text-dark"
+            } shadow border-0`}
+          >
+            <div className="card-body p-4">
+              <h2 className="mb-4 text-center">Login</h2>
 
-      <form onSubmit={handleSubmit}>
-        <div>
-          <label>Email:</label>
-          <input
-            type="email"
-            name="email"
-            value={formData.email}
-            onChange={handleChange}
-            required
-          />
+              <form onSubmit={handleSubmit}>
+                <div className="mb-3">
+                  <label className="form-label">Email:</label>
+                  <input
+                    type="email"
+                    className={`form-control ${
+                      isDark ? "bg-secondary text-white" : "bg-white text-dark"
+                    } border-0`}
+                    name="email"
+                    value={formData.email}
+                    onChange={handleChange}
+                    required
+                  />
+                </div>
+                <div className="mb-3">
+                  <label className="form-label">Password:</label>
+                  <input
+                    type="password"
+                    className={`form-control ${
+                      isDark ? "bg-secondary text-white" : "bg-white text-dark"
+                    } border-0`}
+                    name="password"
+                    value={formData.password}
+                    onChange={handleChange}
+                    required
+                  />
+                </div>
+                <div className="d-grid">
+                  <button type="submit" className="btn btn-primary">
+                    Login
+                  </button>
+                </div>
+              </form>
+              <div className="text-center mt-3">
+                <p>
+                  New User?{" "}
+                  <Link
+                    to="/register"
+                    className={`text-decoration-none ${
+                      isDark ? "text-info" : "text-primary"
+                    }`}
+                  >
+                    Register here
+                  </Link>
+                </p>
+                <button
+                  onClick={() => navigate("/")}
+                  className={`btn mt-2 ${
+                    isDark ? "btn-outline-light" : "btn-outline-dark"
+                  }`}
+                >
+                  Back to Home
+                </button>
+              </div>
+
+              {error && <div className="alert alert-danger mt-3">{error}</div>}
+              {success && (
+                <div className="alert alert-success mt-3">{success}</div>
+              )}
+            </div>
+          </div>
         </div>
-        <div>
-          <label>Password:</label>
-          <input
-            type="password"
-            name="password"
-            value={formData.password}
-            onChange={handleChange}
-            required
-          />
-        </div>
-        <button type="submit" style={{ marginTop: "10px" }}>
-          Login
-        </button>
-        {/* Add a Back Button */}
-        <button
-          onClick={() => navigate("/dashboard")}
-          style={{
-            marginTop: "20px",
-            backgroundColor: "#4CAF50",
-            color: "white",
-            padding: "10px 20px",
-            border: "none",
-            cursor: "pointer",
-          }}
-        >
-          Back to Home
-        </button>
-
-        <p>
-          New User : <Link to="/register">Register</Link>
-        </p>
-      </form>
-
-      {error && <p style={{ color: "red" }}>{error}</p>}
-      {success && <p style={{ color: "green" }}>{success}</p>}
+      </div>
     </div>
   );
 };

@@ -1,20 +1,25 @@
 import { Link } from "react-router-dom";
 import { useAuth } from "../AuthContext";
+import { useTheme } from "./ThemeContext";
 
 import LogoutButton from "./LogoutButton";
+import ThemeToggle from "./ThemeToggle";
 
 import "./Navbar.css";
 
 const Navbar = () => {
 
   const { token } = useAuth();
+  const {theme , toggleTheme} = useTheme();
+
+ 
+  const isDark = theme === "dark";
 
   return (
     <>
-      <nav className="navbar navbar-expand-lg navbar-dark bg-dark px-3">
+      <nav className={`navbar navbar-expand-lg ${isDark ? "navbar-dark bg-dark" : "navbar-light bg-light"} px-3`}>
           <Link className="navbar-brand d-flex align-items-center" to="/">
-            <img src="lyfter_text_white.png" alt="Logo" height="40" className="me-2"/>
-
+            <img src={isDark ? "lyfter_text_white.png" : "lyfter_text_black.png"} alt="Logo" height="40" className="me-2"/>
           </Link>
 
           <button className="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarContent" aria-controls="navbarContent" aria-expanded="false" aria-label="Toggle navigation">
@@ -22,7 +27,11 @@ const Navbar = () => {
       </button>
 
         <div className="collapse navbar-collapse justify-content-end" id="navbarContent">
+        
         <ul className="navbar-nav align-items-center">
+          <li className="nav-item me-2">
+         <ThemeToggle/>
+          </li>
           <li className="nav-item">
             <Link className="nav-link" to="/dashboard">Dashboard</Link>
           </li>
