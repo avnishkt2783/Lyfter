@@ -1,6 +1,6 @@
 // components/LogoutButton.jsx
 import { useAuth } from "../AuthContext";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 import axios from "axios";
 
 const LogoutButton = ({ className }) => {
@@ -25,7 +25,7 @@ const apiURL = import.meta.env.VITE_API_URL;
    
   };
 
-  return <a id="logoutBtn" className={className} onClick={handleLogout}>Logout</a>;
+  return <Link to="/login" id="logoutBtn" className={className} onClick={handleLogout}>Logout</Link>;
 };
 
 export default LogoutButton;

@@ -10,8 +10,10 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@popperjs/core": "^2.11.8",
     "@react-google-maps/api": "^2.20.6",
     "axios": "^1.9.0",
+    "bootstrap": "^5.3.5",
     "dotenv": "^16.5.0",
     "jwt-decode": "^4.0.0",
     "react": "^19.0.0",
