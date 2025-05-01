@@ -12,7 +12,7 @@ const Navbar = () => {
       <nav>
         <div>
           <Link to="/">
-            <img src="lyfter_logo.png" />
+            <img src="lyfter_text_white.png" />
           </Link>
         </div>
         <div>
@@ -22,7 +22,7 @@ const Navbar = () => {
           {token ? (
             <>
             <LogoutButton />
-            <Link to="/profile"><img src="profile.png" /></Link>
+            <Link to="/profile"><img height="30px" src="default.jpg" /></Link>
             </>
           ) : (
             <Link to="/login">Login</Link> 
