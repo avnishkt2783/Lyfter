@@ -12,6 +12,8 @@ const GoogleMapView = () => {
   const selectingPointRef = useRef(null);
   const [startMarker, setStartMarker] = useState(null);
   const [endMarker, setEndMarker] = useState(null);
+  const startMarkerRef = useRef(null);
+const endMarkerRef = useRef(null);
 
   const [currentLocationMarker, setCurrentLocationMarker] = useState(null);
 
@@ -45,79 +47,76 @@ const GoogleMapView = () => {
               lng: position.coords.longitude,
             };
             setStartCoords(origin);
-
+  
             const mapInstance = new window.google.maps.Map(mapRef.current, {
               zoom: 14,
               center: origin,
             });
-
+  
             const renderer = new window.google.maps.DirectionsRenderer();
             renderer.setMap(mapInstance);
             setMap(mapInstance);
             setDirectionsRenderer(renderer);
-
-            // Set current location marker
+  
             const currentLocationMarker = new window.google.maps.Marker({
               position: origin,
               map: mapInstance,
               label: "You",
             });
             setCurrentLocationMarker(currentLocationMarker);
-
+  
             mapInstance.addListener("click", (e) => {
               const selectedType = selectingPointRef.current;
               if (!selectedType) return;
-
+  
               const geocoder = new window.google.maps.Geocoder();
               geocoder.geocode({ location: e.latLng }, (results, status) => {
                 if (status === "OK" && results[0]) {
                   const address = results[0].formatted_address;
-
-                  if (selectedType === "start") {
-                    setStartLocation(address);
-                    setUseCurrentLocation(false);
-                    setStartCoords(e.latLng);
-                  } else if (selectedType === "end") {
-                    setDestination(address);
-                  }
-
-                  // Remove and place marker based on type
+  
                   const markerOptions = {
                     position: e.latLng,
                     map: mapInstance,
                     icon: ICONS[selectedType],
                     label: selectedType === "start" ? "A" : "B",
                   };
-
+  
                   if (selectedType === "start") {
-                    if (startMarker) startMarker.setMap(null);
-                    const marker = new window.google.maps.Marker(markerOptions);
-                    setStartMarker(marker);
-                  } else if (selectedType === "end") {
-                    if (endMarker) endMarker.setMap(null);
-                    const marker = new window.google.maps.Marker(markerOptions);
-                    setEndMarker(marker);
-                  }
+                    setStartLocation(address);
+  setUseCurrentLocation(false);
+  setStartCoords(e.latLng);
 
-                  setSelectingPointType(null);
-                  selectingPointRef.current = null;
+  if (startMarkerRef.current) {
+    startMarkerRef.current.setMap(null);
+  }
+
+  const marker = new window.google.maps.Marker(markerOptions);
+  startMarkerRef.current = marker;
+  setStartMarker(marker); // ✅ Sync with state
+                  } else if (selectedType === "end") {
+                    setDestination(address);
+
+  if (endMarkerRef.current) {
+    endMarkerRef.current.setMap(null);
+  }
+
+  const marker = new window.google.maps.Marker(markerOptions);
+  endMarkerRef.current = marker;
+  setEndMarker(marker); // ✅ Sync with state
+                  }
                 } else {
                   alert("Failed to get address from map click.");
                 }
               });
             });
-
-            // Setup Autocomplete for start and destination input
+  
+            // Autocomplete
             const startInput = document.getElementById("start-location");
-            const destinationInput = document.getElementById(
-              "destination-location"
-            );
-
-            const startAutocomplete =
-              new window.google.maps.places.Autocomplete(startInput);
-            const destinationAutocomplete =
-              new window.google.maps.places.Autocomplete(destinationInput);
-
+            const destinationInput = document.getElementById("destination-location");
+  
+            const startAutocomplete = new window.google.maps.places.Autocomplete(startInput);
+            const destinationAutocomplete = new window.google.maps.places.Autocomplete(destinationInput);
+  
             startAutocomplete.addListener("place_changed", () => {
               const place = startAutocomplete.getPlace();
               if (place.geometry) {
@@ -125,7 +124,7 @@ const GoogleMapView = () => {
                 setStartLocation(place.formatted_address);
               }
             });
-
+  
             destinationAutocomplete.addListener("place_changed", () => {
               const place = destinationAutocomplete.getPlace();
               if (place.geometry) {
@@ -143,7 +142,7 @@ const GoogleMapView = () => {
         alert("Failed to load Google Maps script.");
       });
   }, []);
-
+  
   const handleDirections = () => {
     if (!map || !destination || !directionsRenderer) return;
 
@@ -204,9 +203,9 @@ const GoogleMapView = () => {
       setEndMarker(null);
     }
 
-    // if (!useCurrentLocation && currentLocationMarker) {
-    //   currentLocationMarker.setMap(null);
-    // }
+    if (!useCurrentLocation && currentLocationMarker) {
+      currentLocationMarker.setMap(null);
+    }
 
     setStartLocation("Current Location");
     setDestination("");
@@ -215,10 +214,22 @@ const GoogleMapView = () => {
   };
 
   const handleSelectFromMap = (type) => {
+    // Remove the previous marker of this type immediately
+    if (type === "start" && startMarkerRef.current) {
+      startMarkerRef.current.setMap(null);
+      startMarkerRef.current = null;
+      setStartMarker(null);
+    }
+    
+    if (type === "end" && endMarker) {
+      endMarker.setMap(null);
+      setEndMarker(null);
+    }
+  
     setSelectingPointType(type);
     selectingPointRef.current = type;
-    // alert(`Click on the map to set the ${type} location`);
   };
+  
 
   const handleUseCurrentLocation = () => {
     navigator.geolocation.getCurrentPosition(
