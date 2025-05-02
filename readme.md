@@ -8,7 +8,7 @@
 - [ ] Google Maps Extra buttons Removal.
 - [X] Google Maps REMOVE alert('something');
 - [ ] Google Maps Light and Dark theme Toggle.
-
+- [ ] Store the theme of user and show, light or dark based on that.
 - [ ] On dashboard, create two buttons for request a ride and offer a ride.
 - [ ] Matching Logic : Two map path, subset testing/creating, what is the distance, etc.
 - [ ] Driver UI and Functionality.
