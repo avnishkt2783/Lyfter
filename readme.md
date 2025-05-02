@@ -4,7 +4,7 @@
 ## ✅ Project Tasks
 
 ### Work to be done.
-- [ ] Hamburger Closed Right Alignment.
+- [X] Hamburger Closed Right Alignment, and Light-Dark toggle position fix.
 - [ ] Google Maps Extra buttons Removal.
 - [ ] Google Maps REMOVE alert('something');
 - [ ] Google Maps Light and Dark theme Toggle.
