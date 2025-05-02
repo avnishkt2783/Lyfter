@@ -4,6 +4,7 @@ import cors from "cors";
 import path from 'path';
 
 import userRoutes from "./routes/userRoutes.js";
+import rideRoutes from './routes/rideRoutes.js';
 
 import sequelize from "./config/db.js"; 
 import "./models/user/user.js"; 
@@ -27,7 +28,9 @@ app.use(bodyParser.json());
 
 app.use(express.json()); 
 app.use(authenticate);
+
 app.use('/api', userRoutes); 
+app.use('/api/rides', rideRoutes);
 
 sequelize.sync({ alter: true })
   .then(() => {

@@ -83,6 +83,8 @@ const endMarkerRef = useRef(null);
   
                   if (selectedType === "start") {
                     setStartLocation(address);
+
+                    localStorage.setItem("startLocation", address); //changes
   setUseCurrentLocation(false);
   setStartCoords(e.latLng);
 
@@ -95,6 +97,7 @@ const endMarkerRef = useRef(null);
   setStartMarker(marker); // ✅ Sync with state
                   } else if (selectedType === "end") {
                     setDestination(address);
+                    localStorage.setItem("destination", address); // changes
 
   if (endMarkerRef.current) {
     endMarkerRef.current.setMap(null);
@@ -122,6 +125,7 @@ const endMarkerRef = useRef(null);
               if (place.geometry) {
                 setStartCoords(place.geometry.location);
                 setStartLocation(place.formatted_address);
+                localStorage.setItem("startLocation", place.formatted_address);//changes
               }
             });
   
@@ -129,6 +133,8 @@ const endMarkerRef = useRef(null);
               const place = destinationAutocomplete.getPlace();
               if (place.geometry) {
                 setDestination(place.formatted_address);
+
+                localStorage.setItem("destination", place.formatted_address);//changes
               }
             });
           },
@@ -241,6 +247,7 @@ const endMarkerRef = useRef(null);
         setStartCoords(origin);
         setUseCurrentLocation(true);
         setStartLocation("Current Location");
+        localStorage.setItem("startLocation", "Current Location");//changes
 
         // Remove previous "A" marker if exists and update current location
         if (currentLocationMarker) {
