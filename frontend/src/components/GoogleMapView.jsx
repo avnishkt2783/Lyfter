@@ -204,9 +204,9 @@ const GoogleMapView = () => {
       setEndMarker(null);
     }
 
-    if (!useCurrentLocation && currentLocationMarker) {
-      currentLocationMarker.setMap(null);
-    }
+    // if (!useCurrentLocation && currentLocationMarker) {
+    //   currentLocationMarker.setMap(null);
+    // }
 
     setStartLocation("Current Location");
     setDestination("");
@@ -217,7 +217,7 @@ const GoogleMapView = () => {
   const handleSelectFromMap = (type) => {
     setSelectingPointType(type);
     selectingPointRef.current = type;
-    alert(`Click on the map to set the ${type} location`);
+    // alert(`Click on the map to set the ${type} location`);
   };
 
   const handleUseCurrentLocation = () => {
