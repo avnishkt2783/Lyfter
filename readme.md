@@ -40,7 +40,9 @@ A full-stack ride-sharing platform that allows users to request and offer rides,
 📁 **Project Directory Structure**
 
 `Lyfter/`
+
 `├── backend/                        # Backend (Node.js + Express + Sequelize)`
+
 `│   ├── config/`
 │   │   └── db.js                   # Database configuration
 │   ├── controllers/
