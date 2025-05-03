@@ -9,9 +9,8 @@ const RideDetails = () => {
   const [fare, setFare] = useState("");
   const [departureTime, setDepartureTime] = useState("");
 
-    // Editable fields
-    const [name, setName] = useState("");
-    const [phone, setPhone] = useState("");
+  const [name, setName] = useState("");
+  const [phone, setPhone] = useState("");
 
   const startLocation = localStorage.getItem("startLocation");
   const destination = localStorage.getItem("destination");
@@ -24,9 +23,7 @@ const RideDetails = () => {
       headers: { Authorization: `Bearer ${token}` },
     })
     .then((res) => {
-        setUser(res.data);
-        
-      // If fullName or phoneNo exists, set them in editable state
+      setUser(res.data);
       if (res.data.fullName) setName(res.data.fullName);
       if (res.data.phoneNo) setPhone(res.data.phoneNo);
     })

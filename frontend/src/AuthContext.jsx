@@ -5,42 +5,45 @@ const AuthContext = createContext();
 
 export const AuthProvider = ({ children }) => {
   const [token, setToken] = useState(localStorage.getItem("token"));
-
-  const [user, setUser] = useState(() => {
-    const savedToken = localStorage.getItem("token");
-    if (!savedToken) return null;
-
-    try {
-      const decoded = jwtDecode(savedToken);
-      console.log("Decoded user:", decoded);
-      return decoded;
-    } catch (err) {
-      console.error("Invalid token:", err);
-      localStorage.removeItem("token");
-      return null;
-    }
-  });
+  const [user, setUser] = useState(null);
+  const [theme, setTheme] = useState(localStorage.getItem("theme")); 
 
   useEffect(() => {
     if (token) {
-      localStorage.setItem("token", token);
-      setUser(jwtDecode(token));
+      localStorage.setItem("token", token); 
+
+      try {
+        const decoded = jwtDecode(token);
+        setUser(decoded);
+
+        const userTheme = decoded.theme;
+        setTheme(userTheme);
+      } catch (err) {
+        console.error("Invalid token:", err);
+        localStorage.removeItem("token");
+        setUser(null);
+      }
     } else {
       localStorage.removeItem("token");
       setUser(null);
     }
   }, [token]);
 
-  const login = (token) => {
-    setToken(token);
+  const login = (newToken) => {
+    setToken(newToken);
   };
 
   const logout = () => {
     setToken(null);
   };
 
+  const updateTheme = (newTheme) => {
+    setTheme(newTheme); 
+    localStorage.setItem("theme", newTheme); 
+  };
+
   return (
-    <AuthContext.Provider value={{ token, user, login, logout }}>
+    <AuthContext.Provider value={{ token, user, theme, login, logout, updateTheme }}>
       {children}
     </AuthContext.Provider>
   );
