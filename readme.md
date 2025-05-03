@@ -37,62 +37,60 @@ A full-stack ride-sharing platform that allows users to request and offer rides,
 
 ---
 
-## 📁 Project Directory Structure
-
+<details> <summary>📁 Project Directory Structure</summary>
 Lyfter/
-│
-├── backend/ # Backend (Node.js + Express + Sequelize)
-│ ├── config/ # Database configuration
-│ │ └── db.js
-│ ├── controllers/ # Route handler logic
-│ │ ├── rideController.js
-│ │ └── userController.js
-│ ├── middleware/ # Express middleware
-│ │ ├── authenticate.js
-│ │ └── upload.js
-│ ├── models/ # Sequelize models organized by domain
-│ │ ├── auth/
-│ │ │ └── auth.js
-│ │ ├── driver/
-│ │ │ └── driver.js
-│ │ ├── passenger/
-│ │ │ └── passenger.js
-│ │ ├── ride/
-│ │ │ └── ride.js
-│ │ └── user/
-│ │ └── user.js
-│ ├── routes/ # Route declarations
-│ │ ├── rideRoutes.js
-│ │ └── userRoutes.js
-│ ├── .env # Environment configuration
-│ ├── package.json
-│ └── server.js # Entry point of the backend app
-│
-├── frontend/ # Frontend (React + Vite)
-│ ├── src/
-│ │ ├── assets/ # Static images/assets
-│ │ ├── components/ # Reusable React components
-│ │ │ ├── Dashboard.jsx
-│ │ │ ├── Footer.jsx / Footer.css
-│ │ │ ├── GoogleMapView.jsx
-│ │ │ ├── Landing.jsx
-│ │ │ ├── Login.jsx / LogoutButton.jsx / Register.jsx
-│ │ │ ├── Navbar.jsx / Navbar.css
-│ │ │ ├── Profile.jsx
-│ │ │ ├── RideDetails.jsx
-│ │ │ ├── ThemeToggle.jsx / ThemeToggle.css
-│ │ ├── utils/ # Contexts and app-level logic
-│ │ │ ├── App.jsx / App.css
-│ │ │ ├── index.css
-│ │ │ ├── main.jsx
-│ │ │ ├── AuthContext.jsx
-│ │ │ └── ThemeContext.jsx
-│ ├── index.html # Root HTML template
-│ ├── .env # Environment configuration
-│ ├── package.json
-│ ├── README.md # Vite + React Readme
-│ └── vite.config.js # Vite bundler config
-└── readme.md # this is what you are reading now.
+├── backend/                        # Backend (Node.js + Express + Sequelize)
+│   ├── config/
+│   │   └── db.js                   # Database configuration
+│   ├── controllers/
+│   │   ├── rideController.js       # Ride-related logic
+│   │   └── userController.js       # User-related logic
+│   ├── middleware/
+│   │   ├── authenticate.js         # Auth middleware
+│   │   └── upload.js               # Image upload handler
+│   ├── models/                     # Sequelize models (by domain)
+│   │   ├── auth/
+│   │   │   └── auth.js
+│   │   ├── driver/
+│   │   │   └── driver.js
+│   │   ├── passenger/
+│   │   │   └── passenger.js
+│   │   ├── ride/
+│   │   │   └── ride.js
+│   │   └── user/
+│   │       └── user.js
+│   ├── routes/
+│   │   ├── rideRoutes.js
+│   │   └── userRoutes.js
+│   ├── .env                        # Environment variables
+│   ├── package.json
+│   └── server.js                   # Entry point for backend
+├── frontend/                       # Frontend (React + Vite)
+│   ├── src/
+│   │   ├── assets/                 # Static assets
+│   │   ├── components/             # React components
+│   │   │   ├── Dashboard.jsx
+│   │   │   ├── Footer.jsx / Footer.css
+│   │   │   ├── GoogleMapView.jsx
+│   │   │   ├── Landing.jsx
+│   │   │   ├── Login.jsx / LogoutButton.jsx / Register.jsx
+│   │   │   ├── Navbar.jsx / Navbar.css
+│   │   │   ├── Profile.jsx
+│   │   │   ├── RideDetails.jsx
+│   │   │   ├── ThemeToggle.jsx / ThemeToggle.css
+│   │   ├── utils/                  # Contexts and global logic
+│   │   │   ├── App.jsx / App.css
+│   │   │   ├── index.css
+│   │   │   ├── main.jsx
+│   │   │   ├── AuthContext.jsx
+│   │   │   └── ThemeContext.jsx
+│   ├── index.html                  # Root HTML
+│   ├── .env
+│   ├── package.json
+│   ├── README.md
+│   └── vite.config.js              # Vite bundler config
+└── README.md                       # This file
+</details>
 
 ---
 
