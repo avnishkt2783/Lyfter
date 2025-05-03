@@ -102,14 +102,10 @@ Lyfter/
 - **Cloud Services:** [To be integrated — image hosting, payments, etc.]
 
 ---
-### 👥 Project Partners
+| Name           | GitHub                                                                                                                           | LinkedIn                                                                                                                                    |
+| -------------- | -------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------- |
+| Arobh Kumar    | [![GitHub](https://img.shields.io/badge/GitHub-@Arobh-181717?logo=github\&style=flat)](https://github.com/Arobh)                 | [![LinkedIn](https://img.shields.io/badge/LinkedIn-arobh-blue?logo=linkedin\&style=flat)](https://linkedin.com/in/arobh)                    |
+| Avnish Kumar   | [![GitHub](https://img.shields.io/badge/GitHub-@avnishkt2783-181717?logo=github\&style=flat)](https://github.com/avnishkt2783)   | [![LinkedIn](https://img.shields.io/badge/LinkedIn-avnishkt2783-blue?logo=linkedin\&style=flat)](https://linkedin.com/in/avnishkt2783)      |
+| Simran Sahiwal | [![GitHub](https://img.shields.io/badge/GitHub-@simransahiwal-181717?logo=github\&style=flat)](https://github.com/simransahiwal) | [![LinkedIn](https://img.shields.io/badge/LinkedIn-simran--sahiwal-blue?logo=linkedin\&style=flat)](https://linkedin.com/in/simran-sahiwal) |
 
-Meet the amazing team behind **Lyfter**:
-
-| Name           | GitHub                                         | LinkedIn                                                   |
-|----------------|------------------------------------------------|------------------------------------------------------------|
-| Arobh Kumar    | [@Arobh](https://github.com/Arobh)             | [linkedin.com/in/arobh](https://linkedin.com/in/arobh)     |
-| Avnish Kumar   | [@avnishkt2783](https://github.com/avnishkt2783) | [linkedin.com/in/avnishkt2783](https://linkedin.com/in/avnishkt2783) |
-| Simran Sahiwal | [@simransahiwal](https://github.com/simransahiwal) | [linkedin.com/in/simran-sahiwal](https://linkedin.com/in/simran-sahiwal) |
-
-
+---
