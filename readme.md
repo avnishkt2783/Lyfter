@@ -37,8 +37,9 @@ A full-stack ride-sharing platform that allows users to request and offer rides,
 
 ---
 
-<details> <summary>📁 Project Directory Structure</summary>
-Lyfter/
+📁 **Project Directory Structure**
+
+`Lyfter/
 ├── backend/                        # Backend (Node.js + Express + Sequelize)
 │   ├── config/
 │   │   └── db.js                   # Database configuration
@@ -89,8 +90,8 @@ Lyfter/
 │   ├── package.json
 │   ├── README.md
 │   └── vite.config.js              # Vite bundler config
-└── README.md                       # This file
-</details>
+└── README.md                       # This file`
+
 
 ---
 
