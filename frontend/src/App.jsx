@@ -16,6 +16,7 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 import 'bootstrap/dist/js/bootstrap.bundle.min.js';
 
 import "./App.css";
+import RideDetails from "./components/RideDetails";
 
 function App() {
 
@@ -33,6 +34,7 @@ function App() {
           <Route element={<RequireAuth />}>
             <Route path="/dashboard" element={<Dashboard />} />
             <Route path="/profile" element={<Profile />} />
+            <Route path="/ridedetails" element={<RideDetails />}/>
           </Route>
         </Routes>
       </main>
