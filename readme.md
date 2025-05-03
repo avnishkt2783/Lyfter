@@ -36,8 +36,8 @@ A full-stack ride-sharing platform that allows users to request and offer rides,
 - [x] Google Maps: Remove `alert('something')`.
 
 ---
-
-<details> <summary>📁 Project Directory Structure</summary>
+📁 **Project Directory Structure**
+```
 Lyfter/
 ├── backend/                        # Backend (Node.js + Express + Sequelize)
 │   ├── config/
@@ -89,9 +89,8 @@ Lyfter/
 │   ├── package.json
 │   ├── README.md
 │   └── vite.config.js              # Vite bundler config
-└── README.md                       # This file
-</details>
-
+└── README.md                       # This file`
+```
 ---
 
 ## ⚙️ Technologies Used
@@ -103,14 +102,10 @@ Lyfter/
 - **Cloud Services:** [To be integrated — image hosting, payments, etc.]
 
 ---
-### 👥 Project Partners
+| Name               | GitHub                                                                                                                                              | LinkedIn                                                                                                                                                       |
+| ------------------ | --------------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Arobh Kumar**    | [![GitHub](https://img.shields.io/badge/@Arobh-181717?style=for-the-badge\&logo=github\&logoColor=white)](https://github.com/Arobh)                 | [![LinkedIn](https://img.shields.io/badge/arobh-0A66C2?style=for-the-badge\&logo=linkedin\&logoColor=white)](https://linkedin.com/in/arobh)                    |
+| **Avnish Kumar**   | [![GitHub](https://img.shields.io/badge/@avnishkt2783-181717?style=for-the-badge\&logo=github\&logoColor=white)](https://github.com/avnishkt2783)   | [![LinkedIn](https://img.shields.io/badge/avnishkt2783-0A66C2?style=for-the-badge\&logo=linkedin\&logoColor=white)](https://linkedin.com/in/avnishkt2783)      |
+| **Simran Sahiwal** | [![GitHub](https://img.shields.io/badge/@simransahiwal-181717?style=for-the-badge\&logo=github\&logoColor=white)](https://github.com/simransahiwal) | [![LinkedIn](https://img.shields.io/badge/simran--sahiwal-0A66C2?style=for-the-badge\&logo=linkedin\&logoColor=white)](https://linkedin.com/in/simran-sahiwal) |
 
-Meet the amazing team behind **Lyfter**:
-
-| Name           | GitHub                                         | LinkedIn                                                   |
-|----------------|------------------------------------------------|------------------------------------------------------------|
-| Arobh Kumar    | [@Arobh](https://github.com/Arobh)             | [linkedin.com/in/arobh](https://linkedin.com/in/arobh)     |
-| Avnish Kumar   | [@avnishkt2783](https://github.com/avnishkt2783) | [linkedin.com/in/avnishkt2783](https://linkedin.com/in/avnishkt2783) |
-| Simran Sahiwal | [@simransahiwal](https://github.com/simransahiwal) | [linkedin.com/in/simran-sahiwal](https://linkedin.com/in/simran-sahiwal) |
-
-
+---
