@@ -76,7 +76,7 @@ export const loginUser = async (req, res) => {
     }
 
     const token = jwt.sign(
-      {userId: user.userId, fullName: user.fullName, email: user.email, phoneNo: user.phoneNo},
+      {userId: user.userId, fullName: user.fullName, email: user.email, phoneNo: user.phoneNo, theme: user.theme},
       process.env.JWT_SECRET_KEY,
       { expiresIn: process.env.TOKEN_EXPIRY || "1h"}
     );
@@ -95,6 +95,7 @@ export const loginUser = async (req, res) => {
       fullName: user.fullName ,
       email: user.email,
       phoneNo: user.phoneNo,
+      theme: user.theme,
       token
     });
 
@@ -180,17 +181,14 @@ export const updateProfile = async (req, res) => {
       addressCountry,
     } = req.body;
 
-    // Check if dob is a Date object, if not, try to parse it
-    const currentDob = user.dob ? new Date(user.dob) : null; // Ensure dob is a Date object
+    const currentDob = user.dob ? new Date(user.dob) : null; 
 
-    // Prevent changing DOB if already set
     if (currentDob && dob && currentDob.toISOString().split("T")[0] !== dob) {
       return res.status(400).json({ message: "DOB is already set and cannot be changed" });
     }
 
     const profileImgPath = req.file ? `/uploads/${req.file.filename}` : user.profileImg;
 
-    // Update the address
     const updatedAddress = {
       address: addressAddress,
       city: addressCity,
@@ -199,19 +197,16 @@ export const updateProfile = async (req, res) => {
       country: addressCountry,
     };
 
-    // Ensure DOB is only updated if not already set
-    const updatedDob = currentDob || (dob ? new Date(dob) : null); // If dob is provided, convert it to a Date object
+    const updatedDob = currentDob || (dob ? new Date(dob) : null); 
 
-    // Update the profile
     await user.update({
       fullName,
       phoneNo,
-      dob: updatedDob, // Store the Date object if it's set
+      dob: updatedDob,
       profileImg: profileImgPath,
       address: updatedAddress,
     });
 
-    // Send back the updated profile data
     res.status(200).json({
       message: "Profile updated successfully",
       profileImageUrl: profileImgPath,
@@ -227,3 +222,24 @@ export const updateProfile = async (req, res) => {
   }
 };
 
+export const updateTheme = async (req, res) => {
+  const userId = req.user.userId; 
+  const { theme } = req.body;
+
+  if (!theme) {
+    return res.status(400).json({ message: "Theme is required" });
+  }
+
+  try {
+    const updatedUser = await User.update({ theme }, { where: { userId } });
+
+    if (updatedUser[0] === 0) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    res.status(200).json({ message: "Theme updated successfully" });
+  } catch (error) {
+    console.error("Error updating theme:", error);
+    res.status(500).json({ message: "Failed to update theme" });
+  }
+};

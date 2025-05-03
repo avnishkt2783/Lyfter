@@ -1,6 +1,6 @@
 import { Link } from "react-router-dom";
 import { useAuth } from "../AuthContext";
-import { useTheme } from "./ThemeContext";
+import { useTheme } from "../ThemeContext";
 
 import LogoutButton from "./LogoutButton";
 import ThemeToggle from "./ThemeToggle";

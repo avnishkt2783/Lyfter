@@ -1,4 +1,3 @@
-// components/LogoutButton.jsx
 import { useAuth } from "../AuthContext";
 import { useNavigate, Link } from "react-router-dom";
 import axios from "axios";
@@ -24,8 +23,8 @@ const LogoutButton = ({ className }) => {
         );
       }
 
-      logout(); // clears token & user from state and localStorage
-      navigate("/login"); // redirects to login page
+      logout();
+      navigate("/login"); 
     } catch (error) {
       console.error("Logout failed:", error);
     }

@@ -94,10 +94,10 @@ const endMarkerRef = useRef(null);
 
   const marker = new window.google.maps.Marker(markerOptions);
   startMarkerRef.current = marker;
-  setStartMarker(marker); // ✅ Sync with state
+  setStartMarker(marker); 
                   } else if (selectedType === "end") {
                     setDestination(address);
-                    localStorage.setItem("destination", address); // changes
+                    localStorage.setItem("destination", address);
 
   if (endMarkerRef.current) {
     endMarkerRef.current.setMap(null);
@@ -105,7 +105,7 @@ const endMarkerRef = useRef(null);
 
   const marker = new window.google.maps.Marker(markerOptions);
   endMarkerRef.current = marker;
-  setEndMarker(marker); // ✅ Sync with state
+  setEndMarker(marker); 
                   }
                 } else {
                   alert("Failed to get address from map click.");
@@ -113,7 +113,6 @@ const endMarkerRef = useRef(null);
               });
             });
   
-            // Autocomplete
             const startInput = document.getElementById("start-location");
             const destinationInput = document.getElementById("destination-location");
   
@@ -125,7 +124,7 @@ const endMarkerRef = useRef(null);
               if (place.geometry) {
                 setStartCoords(place.geometry.location);
                 setStartLocation(place.formatted_address);
-                localStorage.setItem("startLocation", place.formatted_address);//changes
+                localStorage.setItem("startLocation", place.formatted_address);
               }
             });
   
@@ -134,7 +133,7 @@ const endMarkerRef = useRef(null);
               if (place.geometry) {
                 setDestination(place.formatted_address);
 
-                localStorage.setItem("destination", place.formatted_address);//changes
+                localStorage.setItem("destination", place.formatted_address);
               }
             });
           },
@@ -220,7 +219,6 @@ const endMarkerRef = useRef(null);
   };
 
   const handleSelectFromMap = (type) => {
-    // Remove the previous marker of this type immediately
     if (type === "start" && startMarkerRef.current) {
       startMarkerRef.current.setMap(null);
       startMarkerRef.current = null;
@@ -247,9 +245,8 @@ const endMarkerRef = useRef(null);
         setStartCoords(origin);
         setUseCurrentLocation(true);
         setStartLocation("Current Location");
-        localStorage.setItem("startLocation", "Current Location");//changes
+        localStorage.setItem("startLocation", "Current Location");
 
-        // Remove previous "A" marker if exists and update current location
         if (currentLocationMarker) {
           currentLocationMarker.setPosition(origin);
         }
@@ -257,10 +254,6 @@ const endMarkerRef = useRef(null);
         if (startMarker) {
           startMarker.setMap(null);
           setStartMarker(null);
-        }
-        if (endMarker) {
-          endMarker.setMap(null);
-          setEndMarker(null);
         }
       },
       (error) => {

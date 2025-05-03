@@ -2,7 +2,7 @@ import axios from "axios";
 import React, { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { useAuth } from "../AuthContext";
-import { useTheme } from "./ThemeContext";
+import { useTheme } from "../ThemeContext";
 
 const Login = () => {
   const apiURL = import.meta.env.VITE_API_URL;
@@ -17,7 +17,10 @@ const Login = () => {
   const [success, setSuccess] = useState("");
 
   const { login } = useAuth();
-  const { theme } = useTheme();
+
+  console.log("Theme context:", useTheme());
+  const { theme, toggleTheme } = useTheme(); 
+
   const isDark = theme === "dark";
 
   const handleChange = (e) => {
@@ -30,8 +33,14 @@ const Login = () => {
     try {
       const response = await axios.post(`${apiURL}/login`, formData);
 
-      const { token } = response.data;
+      const { token, theme } = response.data;
       login(token);
+
+      if (theme) {
+        toggleTheme(theme); 
+      } else {
+        toggleTheme('dark'); 
+      }
 
       const result = response.data;
 
