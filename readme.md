@@ -36,15 +36,11 @@ A full-stack ride-sharing platform that allows users to request and offer rides,
 - [x] Google Maps: Remove `alert('something')`.
 
 ---
-
 📁 **Project Directory Structure**
-
+```
 Lyfter/
-
 ├── backend/                        # Backend (Node.js + Express + Sequelize)
-
 │   ├── config/
-
 │   │   └── db.js                   # Database configuration
 │   ├── controllers/
 │   │   ├── rideController.js       # Ride-related logic
@@ -94,8 +90,7 @@ Lyfter/
 │   ├── README.md
 │   └── vite.config.js              # Vite bundler config
 └── README.md                       # This file`
-
-
+```
 ---
 
 ## ⚙️ Technologies Used
