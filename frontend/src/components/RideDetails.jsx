@@ -93,13 +93,24 @@ const RideDetails = () => {
           />
         </div>
         <div>
-          <label>Mode of Transport:</label>
-          <select value={mode} onChange={(e) => setMode(e.target.value)}>
-            <option value="Car">Car</option>
-            <option value="Bike">Bike</option>
-            <option value="Auto">Auto</option>
-          </select>
+        <label>Mode of Transport:</label>
+        <input
+          type="text"
+          value={mode}
+          onChange={(e) => setMode(e.target.value)}
+          required
+        />
         </div>
+        
+        <div>
+        <label>Start Location:</label>
+        <input type="text" value={startLocation} readOnly />
+        </div>
+        <div>
+        <label>Destination:</label>
+        <input type="text" value={destination} readOnly />
+        </div>
+        
         <div>
           <label>Seats Available:</label>
           <input
