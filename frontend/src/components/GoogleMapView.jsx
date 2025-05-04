@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from "react";
-import { useTheme } from "./ThemeContext";
+import { useTheme } from "../ThemeContext";
 import { darkMapStyle, lightMapStyle } from "../utils/MapStyles";
 
 const GoogleMapView = () => {
@@ -96,6 +96,7 @@ const GoogleMapView = () => {
 
                   if (selectedType === "start") {
                     setStartLocation(address);
+                    localStorage.setItem("startLocation", address);
 
                     setUseCurrentLocation(false);
                     setStartCoords(e.latLng);
@@ -237,6 +238,8 @@ const GoogleMapView = () => {
       currentLocationMarker.setMap(null);
     }
 
+    localStorage.removeItem("startLocation");
+    localStorage.removeItem("destination");
     setStartLocation("Current Location");
     setDestination("");
     setUseCurrentLocation(true);
