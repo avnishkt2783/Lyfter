@@ -1,8 +1,6 @@
 import React from "react";
 import { FaFacebookF, FaInstagram, FaTwitter, FaLinkedin, FaGithub} from "react-icons/fa";
-
-import { useTheme } from "./ThemeContext";
-
+import { useTheme } from "../ThemeContext";
 import "./Footer.css";
 
 const Footer = () => {

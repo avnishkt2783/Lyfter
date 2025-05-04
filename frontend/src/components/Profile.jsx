@@ -2,7 +2,6 @@ import React, { useEffect, useState } from "react";
 import axios from "axios";
 import { useAuth } from "../AuthContext";
 
-// Helper function to calculate age from date of birth
 const calculateAge = (dob) => {
   const birthDate = new Date(dob);
   const today = new Date();
@@ -10,7 +9,6 @@ const calculateAge = (dob) => {
   const month = today.getMonth();
   const day = today.getDate();
 
-  // If the birth date hasn't occurred yet this year, subtract 1 year
   if (month < birthDate.getMonth() || (month === birthDate.getMonth() && day < birthDate.getDate())) {
     age--;
   }
@@ -176,8 +174,8 @@ const Profile = () => {
             name="dob"
             value={formData.dob || ""}
             onChange={handleChange}
-            disabled={!!profile.dob} // Disable DOB input if already set
-            required={!profile.dob} // Make it required only if DOB is not set
+            disabled={!!profile.dob} 
+            required={!profile.dob} 
           />
         </label>
 

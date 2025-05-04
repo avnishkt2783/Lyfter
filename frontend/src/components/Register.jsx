@@ -2,7 +2,7 @@ import axios from "axios";
 import React, { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { useAuth } from "../AuthContext";
-import { useTheme } from "./ThemeContext"; 
+import { useTheme } from "../ThemeContext"; 
 
 const Register = () => {
  

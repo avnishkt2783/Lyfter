@@ -47,6 +47,11 @@ const User = sequelize.define("user", {
     allowNull: false,
     defaultValue: false,
   },
+  theme: {
+    type: DataTypes.STRING,
+    allowNull: true,  
+    defaultValue: "dark",
+  },
 }, {
   freezeTableName: true,
 });
