@@ -52,17 +52,17 @@ const GoogleMapView = () => {
             };
             setStartCoords(origin);
 
-            const isDark = theme === "dark"; // ✅
+            const isDark = theme === "dark"; 
 
             const mapInstance = new window.google.maps.Map(mapRef.current, {
               zoom: 14,
               center: origin,
-              styles: isDark ? darkMapStyle : lightMapStyle, // ✅ Theme-based style
-              streetViewControl: false,       // ❌ Hides Pegman (Street View)
-              fullscreenControl: false,       // ❌ Optional: Hides fullscreen button
-              mapTypeControl: true,          // ❌ Optional: Hides map/satellite toggle
-              zoomControl: true,              // ✅ Keeps zoom buttons
-              scaleControl: false,             // ✅ Optional: shows scale at bottom
+              styles: isDark ? darkMapStyle : lightMapStyle, 
+              streetViewControl: false,       
+              fullscreenControl: false,       
+              mapTypeControl: true,         
+              zoomControl: true,             
+              scaleControl: false,         
             });
             
 
@@ -96,8 +96,10 @@ const GoogleMapView = () => {
 
                   if (selectedType === "start") {
                     setStartLocation(address);
+
                     setUseCurrentLocation(false);
                     setStartCoords(e.latLng);
+
 
                     if (startMarkerRef.current) {
                       startMarkerRef.current.setMap(null);
@@ -105,9 +107,11 @@ const GoogleMapView = () => {
 
                     const marker = new window.google.maps.Marker(markerOptions);
                     startMarkerRef.current = marker;
-                    setStartMarker(marker); // ✅ Sync with state
+                    setStartMarker(marker);
+
                   } else if (selectedType === "end") {
                     setDestination(address);
+                    localStorage.setItem("destination", address);
 
                     if (endMarkerRef.current) {
                       endMarkerRef.current.setMap(null);
@@ -115,7 +119,8 @@ const GoogleMapView = () => {
 
                     const marker = new window.google.maps.Marker(markerOptions);
                     endMarkerRef.current = marker;
-                    setEndMarker(marker); // ✅ Sync with state
+                    setEndMarker(marker); 
+
                   }
                 } else {
                   alert("Failed to get address from map click.");
@@ -129,7 +134,6 @@ const GoogleMapView = () => {
               });
             }
 
-            // Autocomplete
             const startInput = document.getElementById("start-location");
             const destinationInput = document.getElementById(
               "destination-location"
@@ -145,6 +149,7 @@ const GoogleMapView = () => {
               if (place.geometry) {
                 setStartCoords(place.geometry.location);
                 setStartLocation(place.formatted_address);
+                localStorage.setItem("startLocation", place.formatted_address);
               }
             });
 
@@ -152,6 +157,8 @@ const GoogleMapView = () => {
               const place = destinationAutocomplete.getPlace();
               if (place.geometry) {
                 setDestination(place.formatted_address);
+
+                localStorage.setItem("destination", place.formatted_address);
               }
             });
           },
@@ -237,7 +244,6 @@ const GoogleMapView = () => {
   };
 
   const handleSelectFromMap = (type) => {
-    // Remove the previous marker of this type immediately
     if (type === "start" && startMarkerRef.current) {
       startMarkerRef.current.setMap(null);
       startMarkerRef.current = null;
@@ -263,8 +269,8 @@ const GoogleMapView = () => {
         setStartCoords(origin);
         setUseCurrentLocation(true);
         setStartLocation("Current Location");
+        localStorage.setItem("startLocation", "Current Location");
 
-        // Remove previous "A" marker if exists and update current location
         if (currentLocationMarker) {
           currentLocationMarker.setPosition(origin);
         }
@@ -272,10 +278,6 @@ const GoogleMapView = () => {
         if (startMarker) {
           startMarker.setMap(null);
           setStartMarker(null);
-        }
-        if (endMarker) {
-          endMarker.setMap(null);
-          setEndMarker(null);
         }
       },
       (error) => {

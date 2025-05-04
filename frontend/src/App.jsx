@@ -1,4 +1,6 @@
+import React, { useEffect } from 'react';
 import { Route, Routes } from "react-router-dom";
+import { useTheme } from './ThemeContext';
 
 import Navbar from "./components/Navbar";
 import Landing from "./components/Landing";
@@ -8,9 +10,8 @@ import Dashboard from "./components/Dashboard";
 import Footer from "./components/Footer";
 import Profile from "./components/Profile";
 import LogoutButton from "./components/LogoutButton";
-
 import RequireAuth from "./utils/RequireAuth";
-
+import RideDetails from "./components/RideDetails";
 
 import 'bootstrap/dist/css/bootstrap.min.css';
 import 'bootstrap/dist/js/bootstrap.bundle.min.js';
@@ -18,10 +19,16 @@ import 'bootstrap/dist/js/bootstrap.bundle.min.js';
 import "./App.css";
 
 function App() {
+  const { theme, toggleTheme } = useTheme();
+
+  useEffect(() => {
+    const storedTheme = localStorage.getItem("theme") || "dark";
+    document.body.classList.add(storedTheme);
+    toggleTheme(storedTheme);
+  }, []);
 
   return (
-    <>
-      <div className="d-flex flex-column min-vh-100">
+    <div className="d-flex flex-column min-vh-100">
       <Navbar />
       <main className="flex-grow-1">
         <Routes>
@@ -33,12 +40,12 @@ function App() {
           <Route element={<RequireAuth />}>
             <Route path="/dashboard" element={<Dashboard />} />
             <Route path="/profile" element={<Profile />} />
+            <Route path="/ridedetails" element={<RideDetails />} />
           </Route>
         </Routes>
       </main>
       <Footer />
     </div>
-    </>
   );
 }
 
