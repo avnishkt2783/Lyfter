@@ -4,8 +4,12 @@ import { darkMapStyle, lightMapStyle } from "../utils/MapStyles";
 
 const GoogleMapView = () => {
   const mapRef = useRef(null);
-  const [startLocation, setStartLocation] = useState("Current Location");
-  const [destination, setDestination] = useState("");
+  
+  // const [startLocation, setStartLocation] = useState("Current Location");
+  // const [destination, setDestination] = useState("");
+  const [startLocation, setStartLocation] = useState(() => localStorage.getItem('startLocation') || "Current Location");
+  const [destination, setDestination] = useState(() => localStorage.getItem('destination') || "");
+
   const [map, setMap] = useState(null);
   const [directionsRenderer, setDirectionsRenderer] = useState(null);
   const [useCurrentLocation, setUseCurrentLocation] = useState(true);
@@ -77,6 +81,7 @@ const GoogleMapView = () => {
               label: "You",
             });
             setCurrentLocationMarker(currentLocationMarker);
+            localStorage.setItem("startLocation", "Current Location");
 
             mapInstance.addListener("click", (e) => {
               const selectedType = selectingPointRef.current;
@@ -234,9 +239,10 @@ const GoogleMapView = () => {
       setEndMarker(null);
     }
 
-    if (!useCurrentLocation && currentLocationMarker) {
-      currentLocationMarker.setMap(null);
-    }
+// DO NOT UNCOMMENT THIS CODE    
+    // if (!useCurrentLocation && currentLocationMarker) {
+    //   currentLocationMarker.setMap(null);
+    // }
 
     localStorage.removeItem("startLocation");
     localStorage.removeItem("destination");
