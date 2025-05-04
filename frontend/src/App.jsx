@@ -18,6 +18,10 @@ import 'bootstrap/dist/js/bootstrap.bundle.min.js';
 
 import "./App.css";
 
+import RideDetails from "./components/RideDetails";
+import PassengerDetails from "./components/PassengerDetails";
+
+
 function App() {
   const { theme, toggleTheme } = useTheme();
 
@@ -40,7 +44,8 @@ function App() {
           <Route element={<RequireAuth />}>
             <Route path="/dashboard" element={<Dashboard />} />
             <Route path="/profile" element={<Profile />} />
-            <Route path="/ridedetails" element={<RideDetails />} />
+            <Route path="/ridedetails" element={<RideDetails />}/>
+            <Route path="/passengerdetails" element={<PassengerDetails/>}/>
           </Route>
         </Routes>
       </main>
