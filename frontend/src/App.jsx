@@ -11,7 +11,6 @@ import Footer from "./components/Footer";
 import Profile from "./components/Profile";
 import LogoutButton from "./components/LogoutButton";
 import RequireAuth from "./utils/RequireAuth";
-import RideDetails from "./components/RideDetails";
 
 import 'bootstrap/dist/css/bootstrap.min.css';
 import 'bootstrap/dist/js/bootstrap.bundle.min.js';

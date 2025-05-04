@@ -8,8 +8,7 @@ A full-stack ride-sharing platform that allows users to request and offer rides,
 
 ### 🔧 Work in progress...
 
-- [ ] Google Maps Extra buttons removal.
-- [ ] Google Maps light and dark theme toggle.
+- [ ] Google Maps light and dark theme toggle (FIX REQUIRED).
 - [ ] On dashboard, create two buttons for **Request a Ride** and **Offer a Ride** and add functionality.
 - [ ] Matching Logic: map path matching, subset testing, distance comparison.
 - [ ] Driver UI and functionality.
@@ -30,6 +29,7 @@ A full-stack ride-sharing platform that allows users to request and offer rides,
 ---
 
 ### ☑️ Completed tasks
+- [x] Google Maps Extra buttons removal.
 - [x] Store the theme of user and show appropriate theme on load.
 - [x] Google Maps bug (multiple clicks on "select on map" creates duplicate pins) FIX.
 - [x] Hamburger Closed Right Alignment, and Light-Dark toggle position fix.
