@@ -1,0 +1,116 @@
+# 🚗 Lyfter
+
+A full-stack ride-sharing platform that allows users to request and offer rides, with real-time maps, light/dark mode, and secure authentication.
+
+---
+
+## ✅ Project Tasks
+
+### 🔧 Work in progress...
+
+- [ ] Consistent UI & UX Building.
+- [ ] Matching Logic: map path matching, subset testing, distance comparison.
+- [ ] Driver UI and functionality.
+- [ ] Ride booking system.
+- [ ] Notifications and messaging between driver and passenger.
+- [ ] Live tracking of rides.
+- [ ] Payment integration.
+- [ ] Rating and review system.
+- [ ] Favicon for LYFTER, remove VITE logo.
+- [ ] LYFTER per alphabet vehicle symbol. (stylised banner for marketing)
+- [ ] Wheels Loading Animation (for better UX) {if possible}
+
+---
+
+### ⏳ Work to be done *later*
+
+- [ ] Forgot password functionality and OTP Verification through email.
+- [ ] Admin panel for driver verification and system management.
+- [ ] Automatically delete old image when a new profile image is uploaded.
+
+---
+
+### ☑️ Completed tasks
+- [x] Addition of Auto marking of location route in Google Maps.
+- [x] Google Maps Extra buttons removal.
+- [x] Google Maps light and dark theme toggle.
+- [x] On dashboard, create two buttons for **Request a Ride** and **Offer a Ride** and add functionality.
+- [x] Store the theme of user and show appropriate theme on load.
+- [x] Google Maps bug (multiple clicks on "select on map" creates duplicate pins) FIX.
+- [x] Hamburger Closed Right Alignment, and Light-Dark toggle position fix.
+- [x] Google Maps: Remove `alert('something')`.
+
+---
+📁 **Project Directory Structure**
+```
+Lyfter/
+├── backend/                        # Backend (Node.js + Express + Sequelize)
+│   ├── config/
+│   │   └── db.js                   # Database configuration
+│   ├── controllers/
+│   │   ├── rideController.js       # Ride-related logic
+│   │   └── userController.js       # User-related logic
+│   ├── middleware/
+│   │   ├── authenticate.js         # Auth middleware
+│   │   └── upload.js               # Image upload handler
+│   ├── models/                     # Sequelize models (by domain)
+│   │   ├── auth/
+│   │   │   └── auth.js
+│   │   ├── driver/
+│   │   │   └── driver.js
+│   │   ├── passenger/
+│   │   │   └── passenger.js
+│   │   ├── ride/
+│   │   │   └── ride.js
+│   │   └── user/
+│   │       └── user.js
+│   ├── routes/
+│   │   ├── rideRoutes.js
+│   │   └── userRoutes.js
+│   ├── .env                        # Environment variables
+│   ├── package.json
+│   └── server.js                   # Entry point for backend
+├── frontend/                       # Frontend (React + Vite)
+│   ├── src/
+│   │   ├── assets/                 # Static assets
+│   │   ├── components/             # React components
+│   │   │   ├── Dashboard.jsx
+│   │   │   ├── Footer.jsx / Footer.css
+│   │   │   ├── GoogleMapView.jsx
+│   │   │   ├── Landing.jsx
+│   │   │   ├── Login.jsx / LogoutButton.jsx / Register.jsx
+│   │   │   ├── Navbar.jsx / Navbar.css
+│   │   │   ├── Profile.jsx
+│   │   │   ├── RideDetails.jsx
+│   │   │   ├── ThemeToggle.jsx / ThemeToggle.css
+│   │   ├── utils/                  # Contexts and global logic
+│   │   │   ├── App.jsx / App.css
+│   │   │   ├── index.css
+│   │   │   ├── main.jsx
+│   │   │   ├── AuthContext.jsx
+│   │   │   └── ThemeContext.jsx
+│   ├── index.html                  # Root HTML
+│   ├── .env
+│   ├── package.json
+│   ├── README.md
+│   └── vite.config.js              # Vite bundler config
+└── README.md                       # This file`
+```
+---
+
+## ⚙️ Technologies Used
+
+- **Frontend:** React, Vite, Bootstrap, React Router
+- **Backend:** Node.js, Express, Sequelize, JWT
+- **Database:** MySQL / PostgreSQL (via Sequelize)
+- **Maps:** Google Maps JavaScript API
+- **Cloud Services:** [To be integrated — image hosting, payments, etc.]
+
+---
+| Name               | GitHub                                                                                                                                              | LinkedIn                                                                                                                                                       |
+| ------------------ | --------------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Arobh Kumar**    | [![GitHub](https://img.shields.io/badge/@Arobh-181717?style=for-the-badge\&logo=github\&logoColor=white)](https://github.com/Arobh)                 | [![LinkedIn](https://img.shields.io/badge/arobh-0A66C2?style=for-the-badge\&logo=linkedin\&logoColor=white)](https://linkedin.com/in/arobh)                    |
+| **Avnish Kumar**   | [![GitHub](https://img.shields.io/badge/@avnishkt2783-181717?style=for-the-badge\&logo=github\&logoColor=white)](https://github.com/avnishkt2783)   | [![LinkedIn](https://img.shields.io/badge/avnishkt2783-0A66C2?style=for-the-badge\&logo=linkedin\&logoColor=white)](https://linkedin.com/in/avnishkt2783)      |
+| **Simran Sahiwal** | [![GitHub](https://img.shields.io/badge/@simransahiwal-181717?style=for-the-badge\&logo=github\&logoColor=white)](https://github.com/simransahiwal) | [![LinkedIn](https://img.shields.io/badge/simran--sahiwal-0A66C2?style=for-the-badge\&logo=linkedin\&logoColor=white)](https://linkedin.com/in/simran-sahiwal) |
+
+---
