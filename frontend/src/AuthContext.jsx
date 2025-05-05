@@ -40,6 +40,9 @@ export const AuthProvider = ({ children }) => {
     setToken(null);
     localStorage.removeItem("startLocation");
     localStorage.removeItem("destination");
+    localStorage.removeItem("startLocationCoordinatesA");
+    localStorage.removeItem("destinationCoordinatesB");
+    localStorage.removeItem("routePath");
   };
 
   const updateTheme = (newTheme) => {

@@ -12,8 +12,10 @@ const RideDetails = () => {
   const [name, setName] = useState("");
   const [phone, setPhone] = useState("");
 
-  const startLocation = localStorage.getItem("startLocation");
-  const destination = localStorage.getItem("destination");
+  const startLocation = localStorage.getItem("startLocationCoordinatesA");
+  const destination = localStorage.getItem("destinationCoordinatesB");
+  const startLocationText = localStorage.getItem("startLocation");
+  const destinationText = localStorage.getItem("destination");
 
   const apiURL = import.meta.env.VITE_API_URL;
   const { token } = useAuth();
@@ -41,8 +43,8 @@ const RideDetails = () => {
     try {
       const rideData = {
         userId: user.userId,
-        name,
-        phone,
+        // name,
+        // phone,
         mode,
         startLocation,
         destination,
@@ -101,11 +103,11 @@ const RideDetails = () => {
         
         <div>
         <label>Start Location:</label>
-        <input type="text" value={startLocation} readOnly />
+        <input type="text" value={startLocationText} disabled />
         </div>
         <div>
         <label>Destination:</label>
-        <input type="text" value={destination} readOnly />
+        <input type="text" value={destinationText} disabled />
         </div>
         
         <div>
