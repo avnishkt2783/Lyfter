@@ -1,7 +1,7 @@
 
 import React, { useEffect, useRef, useState, useContext } from "react";
-import { darkMapStyle, lightMapStyle } from "../utils/MapStyles"; // assuming styles are in same file/folder
-import { ThemeContext, useTheme } from "../ThemeContext"; // adjust path if needed
+import { darkMapStyle, lightMapStyle } from "../utils/MapStyles"; 
+import { ThemeContext, useTheme } from "../ThemeContext"; 
 
 const GoogleMapView = () => {
   const mapRef = useRef(null);
@@ -81,8 +81,11 @@ const GoogleMapView = () => {
 
           mapInstance.addListener("click", (e) => {
             const selectedType = selectingPointRef.current;
-            if (!selectedType) return;
+            // console.log(e.latLng); //changes
+            // console.log(e.latLng.lat()); //changes
+            // console.log(e.latLng.lng()); //changes
 
+            if (!selectedType) return;
             const geocoder = new window.google.maps.Geocoder();
             geocoder.geocode({ location: e.latLng }, (results, status) => {
               if (status === "OK" && results[0]) {
@@ -98,7 +101,16 @@ const GoogleMapView = () => {
                 if (selectedType === "start") {
                   setStartLocation(address);
                   localStorage.setItem("startLocation", address);
+                  
+                  var startLocationCoordinatesA = {
+                    lat: e.latLng.lat(),
+                    lng: e.latLng.lng()
+                  };
 
+                  localStorage.setItem("startLocationCoordinatesA", JSON.stringify(startLocationCoordinatesA));
+                  // const storedCoords = JSON.parse(localStorage.getItem("startLocationCoordinatesA"));
+                  // console.log(storedCoords.lng + " OBJECKTTTTT startLocationCoordinatesA");
+                  
                   setUseCurrentLocation(false);
                   setStartCoords(e.latLng);
 
@@ -115,6 +127,13 @@ const GoogleMapView = () => {
                   } else {
                     setDestination(address);
                     localStorage.setItem("destination", address);
+                                      
+                    var destinationCoordinatesB = {
+                    lat: e.latLng.lat(),
+                    lng: e.latLng.lng()
+                  };
+                  
+                  localStorage.setItem("destinationCoordinatesB", JSON.stringify(destinationCoordinatesB));
 
                     if (endMarkerRef.current) {
                       endMarkerRef.current.setMap(null);
@@ -149,6 +168,14 @@ const GoogleMapView = () => {
               setStartLocation(place.formatted_address);
               setUseCurrentLocation(false);
               localStorage.setItem("startLocation", place.formatted_address);
+
+              var startLocationCoordinatesA = {
+                lat: place.geometry.location.lat(),
+                lng: place.geometry.location.lng()
+              };
+              
+              localStorage.setItem("startLocationCoordinatesA", JSON.stringify(startLocationCoordinatesA));
+              
             }
           });
 
@@ -157,13 +184,21 @@ const GoogleMapView = () => {
             if (place.geometry) {
               setDestination(place.formatted_address);
               localStorage.setItem("destination", place.formatted_address);
+
+              var destinationCoordinatesB = {
+                lat: place.geometry.location.lat(),
+                lng: place.geometry.location.lng()
+              };
+              
+              localStorage.setItem("destinationCoordinatesB", JSON.stringify(destinationCoordinatesB));
             }
           });
 
+//DO NOT DELETE ... ⚠️⚠️⚠️
           // If using current location, set startCoords
-          if (useCurrentLocation) {
-            setStartCoords(origin);
-          }
+          // if (useCurrentLocation) {
+          //   setStartCoords(origin);
+          // }
         };
 
         navigator.geolocation.getCurrentPosition(
@@ -219,22 +254,55 @@ const GoogleMapView = () => {
         (response, status) => {
           if (status === "OK") {
             directionsRenderer.setDirections(response);
+            // Save the polyline path or route steps
+          const route = response.routes[0];
+          const path = route.overview_path.map(coord => ({
+            lat: coord.lat(),
+            lng: coord.lng(),
+          }));
+          localStorage.setItem("routePath", JSON.stringify(path));
+
+//DO NOT DELETE ... ⚠️⚠️⚠️
+          // Optional: Save full steps
+          // const steps = route.legs[0].steps.map(step => ({
+          //   instruction: step.instructions,
+          //   distance: step.distance.text,
+          //   duration: step.duration.text,
+          //   start_location: {
+          //     lat: step.start_location.lat(),
+          //     lng: step.start_location.lng(),
+          //   },
+          //   end_location: {
+          //     lat: step.end_location.lat(),
+          //     lng: step.end_location.lng(),
+          //   },
+          // }));
+          // localStorage.setItem("routeSteps", JSON.stringify(steps));
           } else {
-            alert("Directions failed: " + status);
+            // alert("Directions failed: " + status);
+            console.error("Directions failed:", status);
           }
         }
       );
     };
-
     if (useCurrentLocation && startCoords) {
       geocodeAndRoute(startCoords);
-    } else {
+     
+    } else{
+     
       const geocoder = new window.google.maps.Geocoder();
       geocoder.geocode({ address: startLocation }, (results, status) => {
+        console.log(useCurrentLocation);
+        console.log(startCoords);
+        console.log(status)
         if (status === "OK") {
           geocodeAndRoute(results[0].geometry.location);
         } else {
-          alert("Geocoding failed: " + status);
+          // alert("Geocoding failed: " + status);
+          console.log(useCurrentLocation);
+          console.log(startCoords);
+          console.log(status)
+          console.error("Geocoding failed:", status);
         }
       });
     }
@@ -260,6 +328,8 @@ const GoogleMapView = () => {
 
     localStorage.removeItem("startLocation");
     localStorage.removeItem("destination");
+    localStorage.removeItem("startLocationCoordinatesA");
+    localStorage.removeItem("destinationCoordinatesB");
     setStartLocation("");
     setDestination("");
     setUseCurrentLocation(false);
@@ -289,10 +359,18 @@ const GoogleMapView = () => {
           lat: position.coords.latitude,
           lng: position.coords.longitude,
         };
+        // console.log(origin.lat);
+        // console.log(origin.lng);
         setStartCoords(origin);
         setUseCurrentLocation(true);
         setStartLocation("Current Location");
         localStorage.setItem("startLocation", "Current Location");
+        var startLocationCoordinatesA = {
+          lat: origin.lat,
+          lng: origin.lng
+        };
+
+        localStorage.setItem("startLocationCoordinatesA", JSON.stringify(startLocationCoordinatesA));
 
         if (currentLocationMarker) {
           currentLocationMarker.setPosition(origin);

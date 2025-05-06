@@ -11,8 +11,10 @@ const PassengerDetails = () => {
   const [name, setName] = useState("");
   const [phone, setPhone] = useState("");
 
-  const startLocation = localStorage.getItem("startLocation");
-  const destination = localStorage.getItem("destination");
+  const startLocation = localStorage.getItem("startLocationCoordinatesA");
+  const destination = localStorage.getItem("destinationCoordinatesB");
+  const startLocationText = localStorage.getItem("startLocation");
+  const destinationText = localStorage.getItem("destination");
   // const userId = localStorage.getItem("userId");
 
   const apiURL = import.meta.env.VITE_API_URL;
@@ -95,11 +97,11 @@ const PassengerDetails = () => {
       {/* Display start and destination from localStorage */}
       <div>
         <label>Start Location:</label>
-        <input type="text" value={startLocation} readOnly />
+        <input type="text" value={startLocationText} disabled />
       </div>
       <div>
         <label>Destination:</label>
-        <input type="text" value={destination} readOnly />
+        <input type="text" value={destinationText} disabled />
       </div>
 
       {/* Seats input */}
