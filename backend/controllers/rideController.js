@@ -4,21 +4,25 @@ import PassengerRide from "../models/ride/passengerRide.js";
 import Passenger from "../models/passenger/passenger.js";
 import User from "../models/user/user.js";
 
+import { Op } from 'sequelize';
+import haversine from "haversine-distance";
+
 export const offerRide = async (req, res) => {
   const {
     userId,
-    name,
-    phone,
     mode,
     startLocation,
     destination,
     seats,
     fare,
     departureTime,
+    routePath,
   } = req.body;
 
   try {
-    // Check if driver exists or create a new one
+    const routePathString =
+      typeof routePath === "string" ? routePath : JSON.stringify(routePath);
+
     let driver = await Driver.findOne({ where: { userId } });
     if (!driver) {
       driver = await Driver.create({ userId });
@@ -32,6 +36,7 @@ export const offerRide = async (req, res) => {
       seats,
       fare,
       departureTime,
+      routePath: routePathString,
     });
 
     res.status(200).json({ message: "Ride offered successfully" });
@@ -71,7 +76,7 @@ export const registerPassenger = async (req, res) => {
 };
 
 export const savePassengerDetails = async (req, res) => {
-  console.log("Request Body:", req.body);
+  // console.log("Request Body:", req.body);
   // Fetch the passengerId related to the user
 // const passenger = await Passenger.findOne({ where: { userId } });
 
@@ -107,19 +112,79 @@ const userId = req.user.userId;
   }
 };
 
-
 export const getMatchingRides = async (req, res) => {
-  const { destination } = req.query;
+  const { passengerStart, passengerEnd, seatsRequired = 1 } = req.body;
+
+  // console.log("Incoming Body:", req.body);
+
+  if (
+    !passengerStart?.lat ||
+    !passengerStart?.lng ||
+    !passengerEnd?.lat ||
+    !passengerEnd?.lng
+  ) {
+    return res.status(400).json({
+      success: false,
+      message: "Missing start or destination coordinates",
+    });
+  }
 
   try {
-    const rides = await Ride.findAll({
-      where: destination ? { destination } : undefined,  // Apply conditionally
-      include: [{ model: Driver, include: [User] }],
+    const allRides = await Ride.findAll({
+      where: {
+        seats: {
+          [Op.gte]: parseInt(seatsRequired),
+        },
+      },
+      include: [
+        {
+          model: Driver,
+          include: [
+            {
+              model: User,
+              attributes: ["fullName", "phoneNo"],
+            },
+          ],
+        },
+      ]
     });
 
-    res.status(200).json({ success: true, rides });
+    const toleranceMeters = 200;
+
+    const matchingRides = allRides.filter((row) => {
+      let route;
+      try {
+        route = JSON.parse(row.routePath);
+        if (!Array.isArray(route)) return false;
+      } catch (e) {
+        console.warn("🚫 Invalid routePath for rideId:", row.rideId);
+        return false;
+      }
+
+      let startIndex = -1;
+      let endIndex = -1;
+
+      route.forEach((point, index) => {
+        const distToStart = haversine(passengerStart, point);
+        const distToEnd = haversine(passengerEnd, point);
+        if (distToStart < toleranceMeters && startIndex === -1) {
+          startIndex = index;
+        }
+        if (distToEnd < toleranceMeters && endIndex === -1) {
+          endIndex = index;
+        }
+      });
+
+      return startIndex !== -1 && endIndex !== -1 && startIndex < endIndex;
+    });
+
+    res.status(200).json({ success: true, rides: matchingRides });
   } catch (err) {
     console.error("❌ Error in getMatchingRides:", err);
-    res.status(500).json({ success: false, message: "Error fetching rides", error: err });
+    res.status(500).json({
+      success: false,
+      message: "Error fetching rides",
+      error: err.message || err,
+    });
   }
 };

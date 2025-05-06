@@ -32,7 +32,7 @@ app.use(authenticate);
 app.use('/api', userRoutes); 
 app.use('/api/rides', rideRoutes);
 
-sequelize.sync({ alter: true })
+sequelize.sync()
   .then(() => {
     console.log("✅ MySQL Database connected successfully!");
 

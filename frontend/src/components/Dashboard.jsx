@@ -1,16 +1,12 @@
 import React from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
-import GoogleMapView from "./GoogleMapView"; // adjust path if needed
+import GoogleMapView from "./GoogleMapView";
 import { useAuth } from "../AuthContext";
 
 const Dashboard = () => {
   const navigate = useNavigate();
-
   const { token, user } = useAuth();
-  // Force user to reselect start and destination
-  // localStorage.removeItem("startLocation");
-  // localStorage.removeItem("destination");
 
   const handleOfferRide = () => {
     const start = localStorage.getItem("startLocation");
@@ -21,7 +17,6 @@ const Dashboard = () => {
       return;
     }
 
-    // Navigate to ride details form if locations are set
     navigate("/ridedetails");
   };
 
@@ -34,18 +29,14 @@ const Dashboard = () => {
       return;
     }
     const userId = user.userId;
-    // Check if userId is available
     if (!userId) {
       alert("User ID is missing. Please log in again.");
       return;
     }
 
     const apiURL = import.meta.env.VITE_API_URL;
-
-    // const userId = localStorage.getItem("userId");
     try {
-      console.log("userId:", userId);
-      console.log("token:", token);
+      // FIX THE LOCATION TO CALL THIS CREATION OF PASSENGER DETAIL.
       await axios.post(
         `${apiURL}/rides/register`,
         { userId },

@@ -36,6 +36,10 @@ const Ride = sequelize.define("ride", {
     type: DataTypes.DATE,
     allowNull: false,
   },
+  routePath: {
+    type: DataTypes.TEXT,
+    allowNull: false
+  },
 }, {
   timestamps: true,
   freezeTableName: true,

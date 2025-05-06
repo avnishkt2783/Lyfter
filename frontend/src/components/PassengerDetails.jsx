@@ -15,7 +15,6 @@ const PassengerDetails = () => {
   const destination = localStorage.getItem("destinationCoordinatesB");
   const startLocationText = localStorage.getItem("startLocation");
   const destinationText = localStorage.getItem("destination");
-  // const userId = localStorage.getItem("userId");
 
   const apiURL = import.meta.env.VITE_API_URL;
   const { token } = useAuth();
@@ -38,15 +37,12 @@ const PassengerDetails = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    if (!name || !phone || !startLocation || !destination) {
+    if (!name || !phone || !startLocation || !destination || !seats) {
       alert("Please fill in all required fields.");
       return;
     }
 
     try {
-      // const passengerRes = await axios.get(`${apiURL}/passenger/getbyuser/${userId}`);
-      // const passengerId = passengerRes.data.passenger.passengerId;
-
       await axios.post(
         `${apiURL}/rides/passengerdetails`,
         {
@@ -64,7 +60,7 @@ const PassengerDetails = () => {
         }
       );
 
-      navigate(`/matchingrides?destination=${destination}`);
+      navigate(`/matchingrides`);
     } catch (error) {
       console.error("Error saving passenger ride request", error);
     }

@@ -13,6 +13,7 @@ import LogoutButton from "./components/LogoutButton";
 import RequireAuth from "./utils/RequireAuth";
 import RideDetails from "./components/RideDetails";
 import PassengerDetails from "./components/PassengerDetails";
+import MatchingRides from "./components/MatchingRides";
 
 import "bootstrap/dist/css/bootstrap.min.css";
 import "bootstrap/dist/js/bootstrap.bundle.min.js";
@@ -42,6 +43,7 @@ function App() {
             <Route path="/profile" element={<Profile />} />
             <Route path="/ridedetails" element={<RideDetails />} />
             <Route path="/passengerdetails" element={<PassengerDetails />} />
+            <Route path="/matchingrides" element={<MatchingRides />} />
           </Route>
         </Routes>
       </main>
