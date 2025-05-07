@@ -9,13 +9,13 @@ A full-stack ride-sharing platform that allows users to request and offer rides,
 ### 🔧 Work in progress...
 
 - [ ] Consistent UI & UX Building.
-- [ ] Matching Logic: map path matching, subset testing, distance comparison.
 - [ ] Driver UI and functionality.
 - [ ] Ride booking system.
+- [ ] Admin panel for driver verification and system management.
 - [ ] Notifications and messaging between driver and passenger.
-- [ ] Live tracking of rides.
 - [ ] Payment integration.
 - [ ] Rating and review system.
+- [ ] Live tracking of rides.
 - [ ] Favicon for LYFTER, remove VITE logo.
 - [ ] LYFTER per alphabet vehicle symbol. (stylised banner for marketing)
 - [ ] Wheels Loading Animation (for better UX) {if possible}
@@ -24,13 +24,13 @@ A full-stack ride-sharing platform that allows users to request and offer rides,
 
 ### ⏳ Work to be done *later*
 
-- [ ] Forgot password functionality and OTP Verification through email.
-- [ ] Admin panel for driver verification and system management.
+- [ ] Forgot password functionality and OTP Verification through email. DRIVER VERIFICATION PENDING, onSuccess -> MAIL REPLY.
 - [ ] Automatically delete old image when a new profile image is uploaded.
 
 ---
 
 ### ☑️ Completed tasks
+- [x] Matching Logic: map path matching, subset testing, distance comparison.
 - [x] Addition of Auto marking of location route in Google Maps.
 - [x] Google Maps Extra buttons removal.
 - [x] Google Maps light and dark theme toggle.
@@ -61,7 +61,8 @@ Lyfter/
 │   │   ├── passenger/
 │   │   │   └── passenger.js
 │   │   ├── ride/
-│   │   │   └── ride.js
+│   │   │   ├── driverRide.js   
+│   │   │   └── passengerRide.js
 │   │   └── user/
 │   │       └── user.js
 │   ├── routes/
@@ -79,18 +80,20 @@ Lyfter/
 │   │   │   ├── GoogleMapView.jsx
 │   │   │   ├── Landing.jsx
 │   │   │   ├── Login.jsx / LogoutButton.jsx / Register.jsx
+│   │   │   ├── MatchingRides.jsx
 │   │   │   ├── Navbar.jsx / Navbar.css
+│   │   │   ├── OfferRideDetails.jsx
 │   │   │   ├── Profile.jsx
-│   │   │   ├── RideDetails.jsx
+│   │   │   ├── RequestRideDetails.jsx
 │   │   │   ├── ThemeToggle.jsx / ThemeToggle.css
-│   │   ├── utils/                  # Contexts and global logic
-│   │   │   ├── App.jsx / App.css
-│   │   │   ├── index.css
-│   │   │   ├── main.jsx
-│   │   │   ├── AuthContext.jsx
-│   │   │   └── ThemeContext.jsx
-│   ├── index.html                  # Root HTML
+│   │   └── utils/                  # Contexts and global logic
+│   │       ├── App.jsx / App.css
+│   │       ├── AuthContext.jsx
+│   │       ├── index.css
+│   │       ├── main.jsx
+│   │       └── ThemeContext.jsx
 │   ├── .env
+│   ├── index.html                  # Root HTML
 │   ├── package.json
 │   ├── README.md
 │   └── vite.config.js              # Vite bundler config
@@ -98,7 +101,7 @@ Lyfter/
 ```
 ---
 
-## ⚙️ Technologies Used
+## ⚙️ Technologies Used { UPDATE REQUIRED }
 
 - **Frontend:** React, Vite, Bootstrap, React Router
 - **Backend:** Node.js, Express, Sequelize, JWT

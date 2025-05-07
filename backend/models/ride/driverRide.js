@@ -2,7 +2,7 @@ import { DataTypes } from "sequelize";
 import sequelize from "../../config/db.js";
 import Driver from "../driver/driver.js";
 
-const Ride = sequelize.define("ride", {
+const DriverRide = sequelize.define("driverRide", {
   rideId: {
     type: DataTypes.INTEGER,
     autoIncrement: true,
@@ -36,18 +36,22 @@ const Ride = sequelize.define("ride", {
     type: DataTypes.DATE,
     allowNull: false,
   },
+  routePath: {
+    type: DataTypes.TEXT,
+    allowNull: false
+  },
 }, {
   timestamps: true,
   freezeTableName: true,
 });
 
-Ride.belongsTo(Driver, {
+DriverRide.belongsTo(Driver, {
   foreignKey: "driverId",
   onDelete: "CASCADE",
 });
 
-Driver.hasMany(Ride, {
+Driver.hasMany(DriverRide, {
   foreignKey: "driverId",
 });
 
-export default Ride;
+export default DriverRide;

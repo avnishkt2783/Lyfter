@@ -9,7 +9,10 @@ const calculateAge = (dob) => {
   const month = today.getMonth();
   const day = today.getDate();
 
-  if (month < birthDate.getMonth() || (month === birthDate.getMonth() && day < birthDate.getDate())) {
+  if (
+    month < birthDate.getMonth() ||
+    (month === birthDate.getMonth() && day < birthDate.getDate())
+  ) {
     age--;
   }
 
@@ -18,8 +21,8 @@ const calculateAge = (dob) => {
 
 const Profile = () => {
   const apiURL = import.meta.env.VITE_API_URL;
-  const { token } = useAuth();
 
+  const { token } = useAuth();
   const [profile, setProfile] = useState(null);
   const [formData, setFormData] = useState({});
   const [profileImg, setProfileImg] = useState(null);
@@ -104,11 +107,13 @@ const Profile = () => {
     }
   };
 
-  if (error) return <p style={{ color: "red", textAlign: "center" }}>{error}</p>;
-  if (!profile) return <p style={{ textAlign: "center" }}>Loading profile...</p>;
+  if (error)
+    return <p style={{ color: "red", textAlign: "center" }}>{error}</p>;
+  if (!profile)
+    return <p style={{ textAlign: "center" }}>Loading profile...</p>;
 
   const age = formData.dob ? calculateAge(formData.dob) : null;
-  const backendProfileURL="http://localhost:3000";
+  const backendProfileURL = "http://localhost:3000";
 
   return (
     <div style={{ maxWidth: "600px", margin: "0 auto", padding: "20px" }}>
@@ -121,7 +126,11 @@ const Profile = () => {
       <form onSubmit={handleSubmit} encType="multipart/form-data">
         <div style={{ marginBottom: "15px" }}>
           <img
-            src={previewImg || `${backendProfileURL}${profile.profileImg}`|| "/default.jpg"}
+            src={
+              previewImg ||
+              `${backendProfileURL}${profile.profileImg}` ||
+              "/default.jpg"
+            }
             alt="Profile"
             style={{ width: 120, height: 120, borderRadius: "50%" }}
           />
@@ -174,18 +183,14 @@ const Profile = () => {
             name="dob"
             value={formData.dob || ""}
             onChange={handleChange}
-            disabled={!!profile.dob} 
-            required={!profile.dob} 
+            disabled={!!profile.dob}
+            required={!profile.dob}
           />
         </label>
 
         <label>
-          Age: 
-          <input
-            name="age"
-            value={age || ""}
-            disabled
-          />
+          Age:
+          <input name="age" value={age || ""} disabled />
         </label>
 
         <h4>Address</h4>
