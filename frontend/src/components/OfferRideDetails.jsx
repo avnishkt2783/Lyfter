@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import axios from "axios";
 import { useAuth } from "../AuthContext";
 
-const RideDetails = () => {
+const OfferRideDetails = () => {
   const [user, setUser] = useState({});
   const [mode, setMode] = useState("Car");
   const [seats, setSeats] = useState(1);
@@ -75,12 +75,17 @@ const RideDetails = () => {
         routePath,
       };
 
-      const res = await axios.post(`${apiURL}/rides/offerride`, rideData, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
+      const res = await axios.post(
+        `${apiURL}/rides/offerRideDetails`,
+        rideData,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
 
+      // Show the Offered Rides page. NOW. and show some buttons to manage the rides.
       alert("Ride offered successfully!");
       console.log(res.data);
     } catch (error) {
@@ -175,4 +180,4 @@ const RideDetails = () => {
   );
 };
 
-export default RideDetails;
+export default OfferRideDetails;

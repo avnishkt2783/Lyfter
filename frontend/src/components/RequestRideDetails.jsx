@@ -3,11 +3,10 @@ import axios from "axios";
 import { useAuth } from "../AuthContext";
 import { useNavigate } from "react-router-dom";
 
-const PassengerDetails = () => {
+const RequestRideDetails = () => {
   const navigate = useNavigate();
   const [userData, setUserData] = useState({});
   const [seats, setSeats] = useState(1);
-  // Editable fields
   const [name, setName] = useState("");
   const [phone, setPhone] = useState("");
 
@@ -26,8 +25,6 @@ const PassengerDetails = () => {
       })
       .then((res) => {
         setUserData(res.data);
-
-        // If fullName or phoneNo exists, set them in editable state
         if (res.data.fullName) setName(res.data.fullName);
         if (res.data.phoneNo) setPhone(res.data.phoneNo);
       })
@@ -44,9 +41,9 @@ const PassengerDetails = () => {
 
     try {
       await axios.post(
-        `${apiURL}/rides/passengerdetails`,
+        `${apiURL}/rides/requestRideDetails`,
         {
-          // passengerId,
+          userId: userData.userId,
           name,
           phone,
           startLocation,
@@ -60,7 +57,7 @@ const PassengerDetails = () => {
         }
       );
 
-      navigate(`/matchingrides`);
+      navigate(`/matchingRides`);
     } catch (error) {
       console.error("Error saving passenger ride request", error);
     }
@@ -89,8 +86,7 @@ const PassengerDetails = () => {
           required
         />
       </div>
-
-      {/* Display start and destination from localStorage */}
+      {/* Display start and destination from localStorage */} {/*DONE*/}
       <div>
         <label>Start Location:</label>
         <input type="text" value={startLocationText} disabled />
@@ -99,8 +95,6 @@ const PassengerDetails = () => {
         <label>Destination:</label>
         <input type="text" value={destinationText} disabled />
       </div>
-
-      {/* Seats input */}
       <div>
         <label>Seats Required:</label>
         <input
@@ -112,10 +106,9 @@ const PassengerDetails = () => {
           placeholder="Seats Required"
         />
       </div>
-
       <button type="submit">Show Rides</button>
     </form>
   );
 };
 
-export default PassengerDetails;
+export default RequestRideDetails;

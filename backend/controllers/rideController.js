@@ -1,13 +1,13 @@
-import Driver from "../models/driver/driver.js";
-import Ride from "../models/ride/ride.js";
-import PassengerRide from "../models/ride/passengerRide.js";
-import Passenger from "../models/passenger/passenger.js";
 import User from "../models/user/user.js";
+import Driver from "../models/driver/driver.js";
+import DriverRide from "../models/ride/driverRide.js";
+import Passenger from "../models/passenger/passenger.js";
+import PassengerRide from "../models/ride/passengerRide.js";
 
 import { Op } from 'sequelize';
 import haversine from "haversine-distance";
 
-export const offerRide = async (req, res) => {
+export const offerRideDetails = async (req, res) => {
   const {
     userId,
     mode,
@@ -28,7 +28,7 @@ export const offerRide = async (req, res) => {
       driver = await Driver.create({ userId });
     }
 
-    await Ride.create({
+    await DriverRide.create({
       driverId: driver.driverId,
       mode,
       startLocation,
@@ -46,41 +46,8 @@ export const offerRide = async (req, res) => {
   }
 };
 
-export const registerPassenger = async (req, res) => {
-  const { userId } = req.body;
-
-  if (!userId) {
-    return res.status(400).json({ success: false, message: "User ID is required." });
-  }
-
-  try {
-    // Check if user exists
-    const user = await User.findByPk(userId);
-    if (!user) {
-      return res.status(404).json({ success: false, message: "User not found." });
-    }
-
-    // Check if already registered as passenger
-    const existingPassenger = await Passenger.findOne({ where: { userId } });
-    if (existingPassenger) {
-      return res.status(200).json({ success: true, message: "User already registered as passenger." });
-    }
-
-    // Create passenger entry
-    const newPassenger = await Passenger.create({ userId });
-
-    res.status(201).json({ success: true, passenger: newPassenger });
-  } catch (error) {
-    res.status(500).json({ success: false, message: "Failed to register passenger", error });
-  }
-};
-
-export const savePassengerDetails = async (req, res) => {
-  // console.log("Request Body:", req.body);
-  // Fetch the passengerId related to the user
-// const passenger = await Passenger.findOne({ where: { userId } });
-
-const userId = req.user.userId;
+export const requestRideDetails = async (req, res) => {
+  const userId = req.user.userId;
   const {
     name,
     phone,
@@ -90,14 +57,13 @@ const userId = req.user.userId;
   } = req.body;
   try {
 
-    const passenger = await Passenger.findOne({ where: { userId } });
-
+    let passenger = await Passenger.findOne({ where: { userId } });
     if (!passenger) {
-      return res.status(404).json({ success: false, message: "Passenger not found" });
+      passenger = await Passenger.create({ userId });
     }
 
     const saved = await PassengerRide.create({
-      passengerId:passenger.passengerId,
+      passengerId: passenger.passengerId,
       name,
       phone,
       startLocation,
@@ -112,10 +78,8 @@ const userId = req.user.userId;
   }
 };
 
-export const getMatchingRides = async (req, res) => {
+export const matchingRides = async (req, res) => {
   const { passengerStart, passengerEnd, seatsRequired = 1 } = req.body;
-
-  // console.log("Incoming Body:", req.body);
 
   if (
     !passengerStart?.lat ||
@@ -130,12 +94,13 @@ export const getMatchingRides = async (req, res) => {
   }
 
   try {
-    const allRides = await Ride.findAll({
+    const allRides = await DriverRide.findAll({
       where: {
         seats: {
           [Op.gte]: parseInt(seatsRequired),
         },
       },
+      // FIX THIS CODE. TO AVOID THE TABLE JOINING FOR INFO SHARING.
       include: [
         {
           model: Driver,

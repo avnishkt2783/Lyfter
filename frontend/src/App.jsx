@@ -11,8 +11,8 @@ import Footer from "./components/Footer";
 import Profile from "./components/Profile";
 import LogoutButton from "./components/LogoutButton";
 import RequireAuth from "./utils/RequireAuth";
-import RideDetails from "./components/RideDetails";
-import PassengerDetails from "./components/PassengerDetails";
+import OfferRideDetails from "./components/OfferRideDetails";
+import RequestRideDetails from "./components/RequestRideDetails";
 import MatchingRides from "./components/MatchingRides";
 
 import "bootstrap/dist/css/bootstrap.min.css";
@@ -41,9 +41,12 @@ function App() {
           <Route element={<RequireAuth />}>
             <Route path="/dashboard" element={<Dashboard />} />
             <Route path="/profile" element={<Profile />} />
-            <Route path="/ridedetails" element={<RideDetails />} />
-            <Route path="/passengerdetails" element={<PassengerDetails />} />
-            <Route path="/matchingrides" element={<MatchingRides />} />
+            <Route path="/offerRideDetails" element={<OfferRideDetails />} />
+            <Route
+              path="/requestRideDetails"
+              element={<RequestRideDetails />}
+            />
+            <Route path="/matchingRides" element={<MatchingRides />} />
           </Route>
         </Routes>
       </main>

@@ -51,14 +51,6 @@ const GoogleMapView = () => {
     loadGoogleMapsScript()
       .then(() => {
         const initializeMap = (origin) => {
-          // navigator.geolocation.getCurrentPosition(
-          //   (position) => {
-          // const origin = {
-          //   lat: position.coords.latitude,
-          //   lng: position.coords.longitude,
-          // };
-          // setStartCoords(origin);
-
           const mapInstance = new window.google.maps.Map(mapRef.current, {
             zoom: 14,
             center: origin,
@@ -111,9 +103,6 @@ const GoogleMapView = () => {
                     "startLocationCoordinatesA",
                     JSON.stringify(startLocationCoordinatesA)
                   );
-                  // const storedCoords = JSON.parse(localStorage.getItem("startLocationCoordinatesA"));
-                  // console.log(storedCoords.lng + " OBJECKTTTTT startLocationCoordinatesA");
-
                   setUseCurrentLocation(false);
                   setStartCoords(e.latLng);
 
@@ -325,11 +314,6 @@ const GoogleMapView = () => {
       endMarker.setMap(null);
       setEndMarker(null);
     }
-
-    // if (!useCurrentLocation && currentLocationMarker) {
-    //   currentLocationMarker.setMap(null);
-    // }
-
     localStorage.removeItem("startLocation");
     localStorage.removeItem("destination");
     localStorage.removeItem("startLocationCoordinatesA");

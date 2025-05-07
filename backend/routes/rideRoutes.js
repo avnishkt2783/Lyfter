@@ -1,12 +1,11 @@
 import express from "express";
-import { offerRide, registerPassenger, savePassengerDetails, getMatchingRides } from "../controllers/rideController.js";
+import { offerRideDetails, requestRideDetails, matchingRides } from "../controllers/rideController.js";
 
 const router = express.Router();
 
 // POST /api/rides
-router.post("/offerride", offerRide);
-router.post("/register", registerPassenger);
-router.post("/passengerdetails",savePassengerDetails);
-router.post("/matchingrides", getMatchingRides)
+router.post("/offerRideDetails", offerRideDetails);
+router.post("/requestRideDetails",requestRideDetails);
+router.post("/matchingRides", matchingRides)
 
 export default router;
