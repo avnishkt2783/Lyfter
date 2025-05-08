@@ -14,6 +14,8 @@ import RequireAuth from "./utils/RequireAuth";
 import OfferRideDetails from "./components/OfferRideDetails";
 import RequestRideDetails from "./components/RequestRideDetails";
 import MatchingRides from "./components/MatchingRides";
+import YourOfferedRides from "./components/YourOfferedRides";
+import YourRequestedRides from "./components/YourRequestedRides";
 
 import "bootstrap/dist/css/bootstrap.min.css";
 import "bootstrap/dist/js/bootstrap.bundle.min.js";
@@ -47,6 +49,11 @@ function App() {
               element={<RequestRideDetails />}
             />
             <Route path="/matchingRides" element={<MatchingRides />} />
+            <Route path="/yourOfferedRides" element={<YourOfferedRides />} />
+            <Route
+              path="/yourRequestedRides"
+              element={<YourRequestedRides />}
+            />
           </Route>
         </Routes>
       </main>

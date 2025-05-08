@@ -4,7 +4,7 @@ import sequelize from "../../config/db.js";
 import passenger from "../passenger/passenger.js";
 
 const PassengerRide = sequelize.define("passengerRide", {
-  id: {
+  passengerRideId: {
     type: DataTypes.INTEGER,
     autoIncrement: true,
     primaryKey: true,
@@ -13,11 +13,11 @@ const PassengerRide = sequelize.define("passengerRide", {
     type: DataTypes.INTEGER,
     allowNull: false,
   },
-  name: {
+  passengerName: {
     type: DataTypes.STRING,
     allowNull: false,
   },
-  phone: {
+  passengerPhoneNo: {
     type: DataTypes.STRING,
     allowNull: false,
   },
@@ -33,15 +33,22 @@ const PassengerRide = sequelize.define("passengerRide", {
     type: DataTypes.INTEGER,
     allowNull: false,
   },
-  rideId: {
+  driverRideId: {
     type: DataTypes.INTEGER,
-    allowNull: true, // filled on confirm
+    allowNull: true, 
   },
 }, {
   timestamps: true,
   freezeTableName: true,
 });
 
-PassengerRide.belongsTo(passenger, { foreignKey: "passengerId" });
+PassengerRide.belongsTo(passenger, { 
+  foreignKey: "passengerId",
+  onDelete: 'CASCADE' 
+});
+
+passenger.hasMany(PassengerRide, {
+  foreignKey: "passengerId",
+})
 
 export default PassengerRide;

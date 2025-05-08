@@ -3,7 +3,7 @@ import sequelize from "../../config/db.js";
 import Driver from "../driver/driver.js";
 
 const DriverRide = sequelize.define("driverRide", {
-  rideId: {
+  driverRideId: {
     type: DataTypes.INTEGER,
     autoIncrement: true,
     primaryKey: true,

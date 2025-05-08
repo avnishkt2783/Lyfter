@@ -43,6 +43,8 @@ export const AuthProvider = ({ children }) => {
     localStorage.removeItem("startLocationCoordinatesA");
     localStorage.removeItem("destinationCoordinatesB");
     localStorage.removeItem("routePath");
+    localStorage.removeItem("seatsRequired");
+    localStorage.removeItem("passengerNamePhoneNo");
   };
 
   const updateTheme = (newTheme) => {
