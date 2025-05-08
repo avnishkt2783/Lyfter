@@ -1,26 +1,22 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
 import { useAuth } from "../AuthContext";
+import { useNavigate } from "react-router-dom";
 
 const MatchingRides = () => {
+  const navigate = useNavigate();
   const apiURL = import.meta.env.VITE_API_URL;
-  const { token } = useAuth();
-
+  const { token, user } = useAuth();
+  const userId = user.userId;
   const [loading, setLoading] = useState(true);
   const [rides, setRides] = useState([]);
-
+  const startLocation = localStorage.getItem("startLocationCoordinatesA");
+  const destination = localStorage.getItem("destinationCoordinatesB");
   const destinationText = localStorage.getItem("destination");
-
-  // Dummy placeholder confirmRide until you pass the real one
-  const confirmRide = async (rideId) => {
-    try {
-      // Send confirmation request here
-      console.log("Confirming ride ID:", rideId);
-      // TODO: Add confirmation logic or modal
-    } catch (error) {
-      console.error("Error confirming ride:", error);
-    }
-  };
+  const seatsRequired = localStorage.getItem("seatsRequired");
+  const passengerNamePhoneNo = JSON.parse(
+    localStorage.getItem("passengerNamePhoneNo")
+  );
 
   useEffect(() => {
     const fetchMatchingRides = async () => {
@@ -38,8 +34,7 @@ const MatchingRides = () => {
       try {
         const response = await axios.post(
           `${apiURL}/rides/matchingRides`,
-          { passengerStart: start, passengerEnd: dest },
-          // Send SeatsRequired Value for backend...
+          { passengerStart: start, passengerEnd: dest, seatsRequired },
           {
             headers: {
               Authorization: `Bearer ${token}`,
@@ -64,8 +59,41 @@ const MatchingRides = () => {
     }
   }, [token]);
 
+  const handleNavigate = () => {
+    navigate("/yourRequestedRides");
+  };
+
+  // Dummy placeholder confirmRide until you pass the real one
+  const confirmRide = async (ride) => {
+    console.log("buttonclick", ride);
+
+    try {
+      await axios.post(
+        `${apiURL}/rides/requestRideDetails`,
+        {
+          userId,
+          passengerName: passengerNamePhoneNo.passengerName,
+          passengerPhoneNo: passengerNamePhoneNo.passengerPhoneNo,
+          startLocation,
+          destination,
+          seatsRequired,
+          driverRideId: ride?.driverRideId,
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+    } catch (error) {
+      console.error("Error confirming ride:", error);
+    }
+  };
+
   return (
     <div>
+      <p>View and Manage all Requested rides. </p>
+      <button onClick={handleNavigate}>Your Requested Rides</button>
       <h2>Available Rides to {destinationText || "destination"}</h2>
 
       {loading ? (
@@ -103,9 +131,7 @@ const MatchingRides = () => {
                 <strong>Departure:</strong>{" "}
                 {new Date(ride.departureTime).toLocaleString()}
               </p>
-              <button onClick={() => confirmRide(ride.rideId)}>
-                Confirm Ride
-              </button>
+              <button onClick={() => confirmRide(ride)}>Confirm Ride</button>
               <button style={{ marginLeft: "10px" }}>Reject</button>
             </div>
           );

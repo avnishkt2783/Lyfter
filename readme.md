@@ -97,7 +97,7 @@ Lyfter/
 │   ├── package.json
 │   ├── README.md
 │   └── vite.config.js              # Vite bundler config
-└── README.md                       # This file`
+└── README.md                       # This file
 ```
 ---
 

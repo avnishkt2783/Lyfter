@@ -7,8 +7,8 @@ const RequestRideDetails = () => {
   const navigate = useNavigate();
   const [userData, setUserData] = useState({});
   const [seats, setSeats] = useState(1);
-  const [name, setName] = useState("");
-  const [phone, setPhone] = useState("");
+  const [passengerName, setPassengerName] = useState("");
+  const [passengerPhoneNo, setPassengerPhoneNo] = useState("");
 
   const startLocation = localStorage.getItem("startLocationCoordinatesA");
   const destination = localStorage.getItem("destinationCoordinatesB");
@@ -25,8 +25,8 @@ const RequestRideDetails = () => {
       })
       .then((res) => {
         setUserData(res.data);
-        if (res.data.fullName) setName(res.data.fullName);
-        if (res.data.phoneNo) setPhone(res.data.phoneNo);
+        if (res.data.fullName) setPassengerName(res.data.fullName);
+        if (res.data.phoneNo) setPassengerPhoneNo(res.data.phoneNo);
       })
       .catch((err) => console.error("Error fetching user:", err));
   }, []);
@@ -34,29 +34,24 @@ const RequestRideDetails = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    if (!name || !phone || !startLocation || !destination || !seats) {
+    if (
+      !passengerName ||
+      !passengerPhoneNo ||
+      !startLocation ||
+      !destination ||
+      !seats
+    ) {
       alert("Please fill in all required fields.");
       return;
     }
 
     try {
-      await axios.post(
-        `${apiURL}/rides/requestRideDetails`,
-        {
-          userId: userData.userId,
-          name,
-          phone,
-          startLocation,
-          destination,
-          seatsRequired: seats,
-        },
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
-
+      localStorage.setItem("seatsRequired", seats);
+      const passengerNamePhoneNo = JSON.stringify({
+        passengerName,
+        passengerPhoneNo,
+      });
+      localStorage.setItem("passengerNamePhoneNo", passengerNamePhoneNo);
       navigate(`/matchingRides`);
     } catch (error) {
       console.error("Error saving passenger ride request", error);
@@ -70,8 +65,8 @@ const RequestRideDetails = () => {
         <label>Name:</label>
         <input
           type="text"
-          value={name}
-          onChange={(e) => setName(e.target.value)}
+          value={passengerName}
+          onChange={(e) => setPassengerName(e.target.value)}
           placeholder="Enter your full name"
           required
         />
@@ -80,8 +75,8 @@ const RequestRideDetails = () => {
         <label>Phone Number:</label>
         <input
           type="tel"
-          value={phone}
-          onChange={(e) => setPhone(e.target.value)}
+          value={passengerPhoneNo}
+          onChange={(e) => setPassengerPhoneNo(e.target.value)}
           placeholder="Enter your phone number"
           required
         />

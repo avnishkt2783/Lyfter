@@ -3,6 +3,7 @@ import Driver from "../models/driver/driver.js";
 import DriverRide from "../models/ride/driverRide.js";
 import Passenger from "../models/passenger/passenger.js";
 import PassengerRide from "../models/ride/passengerRide.js";
+import PassengerRideDriverRide from "../models/ride/passengerRideDriverRide.js";
 
 import { Op } from 'sequelize';
 import haversine from "haversine-distance";
@@ -47,39 +48,66 @@ export const offerRideDetails = async (req, res) => {
 };
 
 export const requestRideDetails = async (req, res) => {
-  const userId = req.user.userId;
   const {
-    name,
-    phone,
+    userId,
+    passengerName,
+    passengerPhoneNo,
     startLocation,
     destination,
     seatsRequired,
+    driverRideId,
   } = req.body;
   try {
-
     let passenger = await Passenger.findOne({ where: { userId } });
     if (!passenger) {
       passenger = await Passenger.create({ userId });
     }
+    const passengerId = passenger.passengerId;
 
-    const saved = await PassengerRide.create({
-      passengerId: passenger.passengerId,
-      name,
-      phone,
+    // Check for an existing request with the same route
+    const passengerRide = await PassengerRide.findOne({
+      where: {
+        passengerId,
+        startLocation,
+        destination,
+      },
+    });
+
+    if (passengerRide) {
+      return res.status(409).json({
+        success: false,
+        message: `You have already requested a ride for this route. passengerRideId: ${passengerRide.passengerRideId}`,
+      });
+    }
+
+    const savedPassengerRide = await PassengerRide.create({
+      passengerId,
+      passengerName,
+      passengerPhoneNo,
       startLocation,
       destination,
       seatsRequired,
     });
 
-    res.status(200).json({ success: true, rideRequest: saved });
+    const savedPRDR = await PassengerRideDriverRide.create({
+      passengerRideId: savedPassengerRide.passengerRideId,
+      driverRideId,
+      status: "Requested", //Requested, Accepted, Confirmed
+    }) 
+
+    res.status(200).json({ success: true, rideRequest: savedPassengerRide, prdr: savedPRDR });
   } catch (err) {
     console.error("❌ Error in savePassengerDetails:", err);
     res.status(500).json({ success: false, message: "Failed to save details", error: err });
   }
 };
 
+// export const createPassengerRideDriverRide = async (req, res) => {
+//   // CODE FOR CREATION OF PASSENGER RIDE AND DRIVER RIDE.
+// };
+
 export const matchingRides = async (req, res) => {
-  const { passengerStart, passengerEnd, seatsRequired = 1 } = req.body;
+  const { passengerStart, passengerEnd, seatsRequired } = req.body;
 
   if (
     !passengerStart?.lat ||
