@@ -73,14 +73,16 @@ export const requestRideDetails = async (req, res) => {
       },
     });
 
+    var savedPassengerRide;
     if (passengerRide) {
-      return res.status(409).json({
-        success: false,
-        message: `You have already requested a ride for this route. passengerRideId: ${passengerRide.passengerRideId}`,
-      });
+      // return res.status(409).json({
+        // success: false,
+        console.log(`You have already requested a ride for this route. passengerRideId: ${passengerRide.passengerRideId}`);
+         savedPassengerRide = passengerRide; // <-- Add this line
+      // });
     }
-
-    const savedPassengerRide = await PassengerRide.create({
+else{
+    savedPassengerRide = await PassengerRide.create({
       passengerId,
       passengerName,
       passengerPhoneNo,
@@ -88,7 +90,8 @@ export const requestRideDetails = async (req, res) => {
       destination,
       seatsRequired,
     });
-
+  }
+console.log(savedPassengerRide.passengerRideId);
     const savedPRDR = await PassengerRideDriverRide.create({
       passengerRideId: savedPassengerRide.passengerRideId,
       driverRideId,
