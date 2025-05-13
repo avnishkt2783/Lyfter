@@ -29,6 +29,16 @@ const Dashboard = () => {
     navigate("/requestRideDetails");
   };
 
+  
+  const handleNavigateRequestedRides = () => {
+    navigate("/yourRequestedRides");
+  };
+
+  const handleNavigateOfferedRides = () =>{
+    navigate("/yourOfferedRides");
+  }
+
+
   return (
     <div>
       <h2>Welcome to the Lyfter</h2>
@@ -38,6 +48,11 @@ const Dashboard = () => {
         <button onClick={handleRequestRide} style={{ marginLeft: "10px" }}>
           Request Ride
         </button>
+      </div>
+      <div style={{ marginTop: "20px" }}>
+         <p>View and Manage all Requested rides. </p>
+      <button onClick={handleNavigateRequestedRides}>Your Requested Rides</button>
+      <button onClick={handleNavigateOfferedRides}>Your offered Rides</button>
       </div>
     </div>
   );
