@@ -171,12 +171,12 @@ const OfferRideDetails = () => {
         <button type="submit">Offer Ride</button>
       </form>
 
-      <p>
+      {/* <p>
         Create a redirect to a page of "Your Rides**" where the user sees what
         rides the have created. show the start and destination location using
         google maps API on frontend. addition of Three/Four buttons to manage
         the rides. Delete Ride, Start Ride, etc.
-      </p>
+      </p> */}
     </div>
   );
 };

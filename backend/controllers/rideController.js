@@ -184,3 +184,164 @@ export const matchingRides = async (req, res) => {
     });
   }
 };
+
+
+// Controller to get all offered rides for the driver
+export const getOfferedRides = async (req, res) => {
+
+  try {
+     const userId = req.user?.userId;
+
+        if (!userId) {
+            return res.status(401).json({ error: "Unauthorized: User not found" });
+        }
+
+        // Find driverId from userId
+        const driver = await Driver.findOne({ where: { userId } });
+
+        if (!driver) {
+            return res.status(401).json({ error: "Unauthorized: Driver not found" });
+        }
+
+        const driverId = driver.driverId;
+    const rides = await DriverRide.findAll({
+      where: { driverId },
+      order: [['createdAt', 'DESC']], // Order by creation date (newest first)
+        include: [
+                {
+                    model: PassengerRideDriverRide,
+                    attributes: ['status'],
+                    where: { status: 'Requested' },
+                    required: false,
+                    include: [
+                        {
+                            model: PassengerRide,
+                            attributes: ['passengerRideId'],
+                        },
+                    ],
+                },
+            ],
+    });
+
+    // For each ride, count the pending requests
+      const rideData = rides.map(ride => {
+            const pendingRequests = Array.isArray(ride.passengerRideDriverRides) ? ride.passengerRideDriverRides.length : 0;
+             console.log(`Ride ID: ${ride.driverRideId}, Pending Requests: ${pendingRequests}`);
+            return { ...ride.dataValues, pendingRequests };
+        });
+
+        res.status(200).json({ rides: rideData });
+  } catch (err) {
+    console.error("Error fetching offered rides:", err);
+    res.status(500).json({ error: "Failed to fetch offered rides" });
+  }
+};
+
+// Get pending requests for a specific ride
+export const getPendingRequests = async (req, res) => {
+  
+  try {
+    const userId = req.user?.userId;
+     const driverRideId = req.params.driverRideId;
+
+        if (!userId) {
+           console.error("❌ Unauthorized: User not found");
+            return res.status(401).json({ error: "Unauthorized: User not found" });
+        }
+
+        // Find driverId from userId
+        const driver = await Driver.findOne({ where: { userId } });
+
+        if (!driver) {
+           console.error("❌ Unauthorized: Driver not found");
+            return res.status(401).json({ error: "Unauthorized: Driver not found" });
+        }
+
+          // Validate the driverRideId
+    if (!driverRideId) {
+      console.error("❌ Missing driverRideId");
+      return res.status(400).json({ error: "Invalid request: Missing driverRideId" });
+    }
+
+    console.log(`✅ Fetching pending requests for driverRideId: ${driverRideId}`);
+
+        // const driverId = driver.driverId;
+        // const driverRideId = await DriverRide.findOne({ where: { driverId }})
+    const requests = await PassengerRideDriverRide.findAll({
+      where: { driverRideId, status: 'Requested' },
+      include: [
+    {
+      model: PassengerRide,
+       attributes: ['passengerRideId', 'passengerName', 'passengerPhoneNo', 'startLocation', 'destination', 'seatsRequired'], // Directly from passengerRide table
+    }
+  ]
+    });
+
+    console.log("✅ Raw Pending Requests: ", JSON.stringify(requests, null, 2));
+
+     // Check if the requests array is empty or contains null entries
+    if (!requests || requests.length === 0) {
+      console.warn(`🚫 No pending requests found for driverRideId: ${driverRideId}`);
+      return res.status(404).json({ error: "No pending requests found" });
+    }
+
+     // Map the results properly
+    const pendingRequests = requests.map((request) => {
+      return {
+        passengerRideId: request.passengerRide?.passengerRideId || "N/A",
+        passengerName: request.passengerRide?.passengerName || "Unknown",
+        passengerPhoneNo: request.passengerRide?.passengerPhoneNo || "N/A",
+        startLocation: request.passengerRide?.startLocation || "N/A",
+        destination: request.passengerRide?.destination || "N/A",
+        seatsRequired: request.passengerRide?.seatsRequired || 0,
+      };
+    });
+
+    console.log("✅ Fetched Pending Requests: ", pendingRequests);
+    if (!pendingRequests || pendingRequests.length === 0) {
+      return res.status(404).json({ message: "No pending requests found" });
+    }
+
+    res.status(200).json({ requests: pendingRequests });
+  } catch (err) {
+    console.error("Error fetching pending requests:", err.message);
+    res.status(500).json({ error: "Failed to fetch pending requests" });
+  }
+};
+
+// Update request status (Accept/Reject)
+export const updateRequestStatus = async (req, res) => {
+  const { passengerRideId, status } = req.body;
+  
+  try {
+    await PassengerRideDriverRide.update({ status }, {
+      where: { passengerRideId }
+    });
+    
+    res.status(200).json({ success: true });
+  } catch (err) {
+    console.error("Error updating request status:", err);
+    res.status(500).json({ error: "Failed to update request status" });
+  }
+};
+
+// Handle ride actions (Start, Cancel, Finish)
+export const rideAction = async (req, res) => {
+  const { driverRideId, action } = req.body;
+
+  try {
+    // Implement logic based on action
+    if (action === "Start Ride") {
+      // Update ride status to started or other logic
+    } else if (action === "Cancel Ride") {
+      // Cancel the ride
+    } else if (action === "Finish Ride") {
+      // Mark the ride as finished
+    }
+    
+    res.status(200).json({ success: true });
+  } catch (err) {
+    console.error("Error performing ride action:", err);
+    res.status(500).json({ error: "Failed to perform ride action" });
+  }
+};
