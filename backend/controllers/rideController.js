@@ -237,7 +237,166 @@ export const getOfferedRides = async (req, res) => {
   }
 };
 
+// export const getRequestedRides = async (req, res) => {
+//   const { userId } = req.params;
+
+//   console.log("---------------------------------------------------");
+//   console.log("userId: " + userId);
+//   console.log("---------------------------------------------------");
+
+//   try {
+//     // Find passenger by userId
+//     const passenger = await Passenger.findOne({ where: { userId } });
+
+//     console.log("---------------------------------------------------");
+//     console.log(passenger);
+//     console.log("---------------------------------------------------");
+
+//     if (!passenger) {
+//       return res.status(404).json({ error: "Passenger not found" });
+//     }
+
+//     const passengerId = passenger.passengerId;
+
+//     console.log("---------------------------------------------------");
+//     console.log("passengerId: " + passengerId);
+//     console.log("---------------------------------------------------");
+
+//     // Find all requested rides for the passenger
+//     // const requestedRides = await PassengerRideDriverRide.findAll({
+//     //   where: { passengerId },
+//     //   attributes: ['status'], // Include the status from PassengerRideDriverRide
+//     //   include: [
+//     //     {
+//     //       model: PassengerRide,
+//     //       attributes: ['passengerRideId', 'startLocation', 'destination', 'seatsRequired'],
+//     //     },
+//     //     {
+//     //       model: DriverRide,
+//     //       attributes: ['startLocation', 'destination', 'fare', 'seats', 'driverId'],
+//     //       include: [
+//     //         {
+//     //           model: Driver,
+//     //           include: [
+//     //             {
+//     //               model: User,
+//     //               attributes: ['fullName', 'phoneNo'],
+//     //             },
+//     //           ],
+//     //         },
+//     //       ],
+//     //     },
+//     //   ],
+//     // });
+
+//     const requestedRides = await PassengerRideDriverRide.findAll({
+//   where: { passengerId },
+//   attributes: ['status'],
+//   include: [
+//     {
+//       model: PassengerRide,
+//       attributes: ['passengerRideId', 'startLocation', 'destination', 'seatsRequired'],
+//     },
+//     {
+//       model: DriverRide,
+//       attributes: ['startLocation', 'destination', 'fare', 'seats', 'driverId'],
+//       include: [
+//         {
+//           model: Driver,
+//           include: [
+//             {
+//               model: User,
+//               attributes: ['fullName', 'phoneNo'],
+//             },
+//           ],
+//         },
+//       ],
+//     },
+//   ],
+// });
+
+
+//     if (!requestedRides || requestedRides.length === 0) {
+//       return res.status(404).json({ message: "No requested rides found" });
+//     }
+
+//     res.status(200).json({ rides: requestedRides });
+//   } catch (err) {
+//     console.error("Error fetching requested rides:", err);
+//     res.status(500).json({ error: "Failed to fetch requested rides" });
+//   }
+// };
+
 // Get pending requests for a specific ride
+
+  export const getRequestedRides = async (req, res) => {
+    const userId = req.user?.userId;
+
+    console.log("---------------------------------------------------");
+    console.log("userId: " + userId);
+    console.log("---------------------------------------------------");
+
+    try {
+      // Find the passenger by userId
+      const passenger = await Passenger.findOne({ where: { userId } });
+
+      console.log("---------------------------------------------------");
+      console.log("Passenger object: ", passenger);
+      console.log("---------------------------------------------------");
+
+      if (!passenger) {
+        return res.status(404).json({ error: "Passenger not found" });
+      }
+
+      const passengerId = passenger.passengerId;
+
+      console.log("---------------------------------------------------");
+      console.log("Passenger ID: " + passengerId);
+      console.log("---------------------------------------------------");
+
+      // Find all requested rides for the passenger
+      const requestedRides = await PassengerRideDriverRide.findAll({
+        attributes: ['status'], // Include the status from PassengerRideDriverRide
+        include: [
+          {
+            model: PassengerRide,
+            where: { passengerId }, // Filter by passengerId within the associated PassengerRide
+            attributes: ['passengerRideId', 'startLocation', 'destination', 'seatsRequired'],
+          },
+          {
+            model: DriverRide,
+            attributes: ['startLocation', 'destination', 'fare', 'seats', 'driverId'],
+            include: [
+              {
+                model: Driver,
+                include: [
+                  {
+                    model: User,
+                    attributes: ['fullName', 'phoneNo'],
+                  },
+                ],
+              },
+            ],
+          },
+        ],
+      });
+
+      console.log("---------------------------------------------------");
+      console.log("Requested Rides: ", requestedRides);
+      console.log("---------------------------------------------------");
+
+      if (!requestedRides || requestedRides.length === 0) {
+        return res.status(404).json({ message: "No requested rides found" });
+      }
+
+      res.status(200).json({ rides: requestedRides });
+    } catch (err) {
+      console.error("Error fetching requested rides:", err);
+      res.status(500).json({ error: "Failed to fetch requested rides" });
+    }
+  };
+
+
 export const getPendingRequests = async (req, res) => {
   
   try {

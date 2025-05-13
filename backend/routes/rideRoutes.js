@@ -1,5 +1,14 @@
 import express from "express";
-import { offerRideDetails, requestRideDetails, matchingRides, getOfferedRides, getPendingRequests, updateRequestStatus, rideAction } from "../controllers/rideController.js";
+import { 
+    offerRideDetails,
+    requestRideDetails, 
+    matchingRides, 
+    getOfferedRides, 
+    getRequestedRides, 
+    getPendingRequests, 
+    updateRequestStatus, 
+    rideAction 
+} from "../controllers/rideController.js";
 
 const router = express.Router();
 
@@ -9,6 +18,9 @@ router.post("/requestRideDetails",requestRideDetails);
 router.post("/matchingRides", matchingRides);
 
 router.get("/yourofferedrides", getOfferedRides);  // Fetch all rides offered by a driver
+
+// GET /api/rides/requestedRides/:userId
+router.get("/requestedRides/:userId", getRequestedRides);  // <-- Add this line
 
 // GET /api/rides/pending-requests/:driverRideId
 router.get("/pendingrequests/:driverRideId", getPendingRequests);  // Get pending requests for a ride
