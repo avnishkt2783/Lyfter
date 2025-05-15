@@ -3,9 +3,13 @@ import dotenv from 'dotenv';
 dotenv.config();
 
 const whitelist = [
-    '/api/register',
     '/api/login',
-    '/api/logout'
+    '/api/logout',
+    '/api/forgot-password',
+    '/api/reset-password',
+    '/api/register/request',
+    '/api/register/verify',
+    '/api/register/resend',
 ];
 
 const authenticate = (req, res, next) => {

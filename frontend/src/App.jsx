@@ -17,6 +17,7 @@ import RequestRideDetails from "./components/RequestRideDetails";
 import MatchingRides from "./components/MatchingRides";
 import YourOfferedRides from "./components/YourOfferedRides";
 import YourRequestedRides from "./components/YourRequestedRides";
+import ForgotPassword from "./components/ForgotPassword";
 
 import "bootstrap/dist/css/bootstrap.min.css";
 import "bootstrap/dist/js/bootstrap.bundle.min.js";
@@ -41,6 +42,7 @@ function App() {
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<Register />} />
           <Route path="/logout" element={<LogoutButton />} />
+          <Route path="/forgot-password" element={<ForgotPassword />} />
 
           <Route element={<RequireAuth />}>
             <Route path="/dashboard" element={<Dashboard />} />

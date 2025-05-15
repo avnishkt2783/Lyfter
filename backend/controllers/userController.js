@@ -5,60 +5,8 @@ dotenv.config();
 
 import User from "../models/user/user.js";
 import Auth from "../models/auth/auth.js";
-
-export const registerUser = async (req, res) => {
-
-  const { fullName, gender, email, phoneNo, password } = req.body;
-
-  try {
-    const existingUser = await User.findOne({ where: { email } });
-    if (existingUser) {
-      return res.status(409).json({ message: "Email already registered!" });
-    }
-
-    const existingUserPhone = await User.findOne({ where: { phoneNo } });
-    if (existingUserPhone) {
-      return res.status(409).json({ message: "Phone Number already registered!" });
-    }
-
-    const hashedPassword = await bcrypt.hash(password, 10);
-
-    const user = await User.create({
-      fullName,
-      gender,
-      email,
-      phoneNo,
-      password : hashedPassword,
-    });
-
-    const token = jwt.sign(
-      {userId: user.userId, fullName: user.fullName, email: user.email, phoneNo: user.phoneNo},
-      process.env.JWT_SECRET_KEY,
-      { expiresIn: process.env.TOKEN_EXPIRY || "1h"}
-    );
-
-    await Auth.create({
-      userId: user.userId,
-      token: token,
-    });
-
-    user.isLoggedIn = true;
-    await user.save();
-
-    res.status(201).json({ 
-      message: "User registered successfully!", 
-      userId: user.userId,
-      fullName: user.fullName ,
-      email: user.email,
-      phoneNo: user.phoneNo,
-      token
-    });
-  } 
-  catch (error) {
-    console.error('Error while registering user:', error);  
-    res.status(500).json({ message: "Registration failed. Try again." });
-  }
-};
+import OTPVerification from "../models/OTPVerification/OTPVerification.js";
+import sendMail from "../utils/sendMail.js";
 
 export const loginUser = async (req, res) => {
   const { email, password } = req.body;
@@ -76,9 +24,15 @@ export const loginUser = async (req, res) => {
     }
 
     const token = jwt.sign(
-      {userId: user.userId, fullName: user.fullName, email: user.email, phoneNo: user.phoneNo, theme: user.theme},
+      {
+        userId: user.userId,
+        fullName: user.fullName,
+        email: user.email,
+        phoneNo: user.phoneNo,
+        theme: user.theme,
+      },
       process.env.JWT_SECRET_KEY,
-      { expiresIn: process.env.TOKEN_EXPIRY || "1h"}
+      { expiresIn: process.env.TOKEN_EXPIRY || "1h" }
     );
 
     await Auth.create({
@@ -241,5 +195,206 @@ export const updateTheme = async (req, res) => {
   } catch (error) {
     console.error("Error updating theme:", error);
     res.status(500).json({ message: "Failed to update theme" });
+  }
+};
+
+export const sendOTP = async (req, res) => {
+  const { email } = req.body;
+
+  try {
+    // Check if user exists
+    const user = await User.findOne({ where: { email } });
+    if (!user) return res.status(404).json({ message: "User not found" });
+
+    // Clear any previous OTPs for this user
+    await OTPVerification.destroy({
+      where: { userId: user.userId },
+    });
+
+    // Generate OTP and set expiration time
+    const otp = Math.floor(100000 + Math.random() * 900000).toString(); // 6-digit OTP
+    const expiresAt = new Date(Date.now() + 10 * 60 * 1000); // 10 min expiry
+
+    // Save OTP in the OTPVerification table
+    await OTPVerification.create({
+      userId: user.userId,
+      email, // ✅ FIXED: include email
+      otp,
+      expiresAt,
+    });
+
+    // Send OTP email
+    await sendMail(email, "Your Lyfter OTP", `Your OTP is: ${otp}`);
+
+    res.status(200).json({ message: "OTP generated successfully", otp }); // Don't send OTP in prod
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: "Server error" });
+  }
+};
+
+// Function to verify OTP and reset password
+export const verifyOTP = async (req, res) => {
+  const { email, otp, newPassword } = req.body;
+
+  try {
+    // Find user by email
+    const user = await User.findOne({ where: { email } });
+    if (!user) return res.status(404).json({ message: "User not found" });
+
+    // Find the most recent OTP record
+    const record = await OTPVerification.findOne({
+      where: {
+        userId: user.userId,
+        otp,
+      },
+      order: [["createdAt", "DESC"]], // in case of multiple records
+    });
+
+    if (!record) return res.status(400).json({ message: "Invalid OTP" });
+
+    // Check if OTP is expired
+    if (new Date() > record.expiresAt) {
+      return res.status(400).json({ message: "OTP expired" });
+    }
+
+    // Hash new password and update user's password
+    const hashedPassword = await bcrypt.hash(newPassword, 10);
+    user.password = hashedPassword;
+    await user.save();
+
+    // Clean up OTP records
+    await OTPVerification.destroy({ where: { userId: user.userId } });
+
+    res.status(200).json({ message: "Password reset successful" });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: "Server error" });
+  }
+};
+
+export const sendRegisterOTP = async (req, res) => {
+  const { fullName, gender, email, phoneNo, password } = req.body;
+
+  try {
+    // Check if user already exists
+    const existingEmail = await User.findOne({ where: { email } });
+    if (existingEmail) return res.status(409).json({ message: "Email already registered!" });
+
+    const existingPhone = await User.findOne({ where: { phoneNo } });
+    if (existingPhone) return res.status(409).json({ message: "Phone number already registered!" });
+
+    // Generate OTP
+    const otp = Math.floor(100000 + Math.random() * 900000).toString();
+    const expiresAt = new Date(Date.now() + 10 * 60 * 1000); // 10 minutes expiry
+
+    // Save OTP with payload
+    await OTPVerification.create({
+      email,
+      otp,
+      expiresAt,
+      payload: JSON.stringify({ fullName, gender, email, phoneNo, password }),
+    });
+
+    // Send OTP via email
+    await sendMail(email, "Lyfter Registration OTP", `Your OTP is: ${otp}`);
+
+    res.status(200).json({ message: "OTP sent to email. Please verify to complete registration." });
+  } catch (error) {
+    console.error("Error in sendRegisterOTP:", error);
+    res.status(500).json({ message: "Failed to send OTP." });
+  }
+};
+
+export const verifyRegisterOTP = async (req, res) => {
+  const { email, otp } = req.body;
+
+  try {
+    const otpRecord = await OTPVerification.findOne({ where: { email, otp } });
+
+    if (!otpRecord) {
+      return res.status(400).json({ message: "Invalid OTP" });
+    }
+
+    if (new Date() > otpRecord.expiresAt) {
+      return res.status(400).json({ message: "OTP expired" });
+    }
+
+    const userData = JSON.parse(otpRecord.payload);
+
+    // Hash the password
+    const hashedPassword = await bcrypt.hash(userData.password, 10);
+
+    // Create user
+    const user = await User.create({
+      fullName: userData.fullName,
+      gender: userData.gender,
+      email: userData.email,
+      phoneNo: userData.phoneNo,
+      password: hashedPassword,
+    });
+
+    // Generate JWT
+    const token = jwt.sign(
+      {
+        userId: user.userId,
+        fullName: user.fullName,
+        email: user.email,
+      },
+      process.env.JWT_SECRET_KEY,
+      { expiresIn: "1h" }
+    );
+
+    // Store token in Auth table
+    await Auth.create({ userId: user.userId, token });
+
+    // Clean up OTP record
+    await OTPVerification.destroy({ where: { email } });
+
+    res.status(201).json({
+      message: "User registered and logged in successfully!",
+      userId: user.userId,
+      fullName: user.fullName,
+      email: user.email,
+      token,
+    });
+  } catch (error) {
+    console.error("Error in verifyRegisterOTP:", error);
+    res.status(500).json({ message: "OTP verification failed." });
+  }
+};
+
+export const resendRegisterOTP = async (req, res) => {
+  const { email } = req.body;
+
+  try {
+    // Find latest OTP record for this email
+    const otpRecord = await OTPVerification.findOne({ where: { email }, order: [['createdAt', 'DESC']] });
+
+    if (!otpRecord) {
+      return res.status(404).json({ message: "No pending OTP request found." });
+    }
+
+    const userData = JSON.parse(otpRecord.payload);
+
+    // Generate new OTP
+    const newOtp = Math.floor(100000 + Math.random() * 900000).toString();
+    const expiresAt = new Date(Date.now() + 10 * 60 * 1000);
+
+    // Create new OTP record
+    await OTPVerification.create({
+      email,
+      otp: newOtp,
+      expiresAt,
+      payload: JSON.stringify(userData),
+    });
+
+    // Send new OTP
+    await sendMail(email, "Lyfter OTP Resend", `Your new OTP is: ${newOtp}`);
+
+    res.status(200).json({ message: "OTP resent successfully." });
+  } catch (error) {
+    console.error("Error in resendRegisterOTP:", error);
+    res.status(500).json({ message: "Failed to resend OTP." });
   }
 };

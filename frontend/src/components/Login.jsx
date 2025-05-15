@@ -121,6 +121,17 @@ const Login = () => {
                     Register here
                   </Link>
                 </p>
+                <p>
+                  Forgot your Password?{" "}
+                  <Link
+                    to="/forgot-password"
+                    className={`text-decoration-none ${
+                      isDark ? "text-info" : "text-primary"
+                    }`}
+                  >
+                    Reset here
+                  </Link>
+                </p>
                 <button
                   onClick={() => navigate("/")}
                   className={`btn mt-2 ${

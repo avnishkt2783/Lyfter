@@ -51,6 +51,10 @@ const User = sequelize.define("user", {
     allowNull: true,  
     defaultValue: "dark",
   },
+  isVerified: {
+    type: DataTypes.BOOLEAN,
+    defaultValue: false,  // This is important for OTP verification
+  }
 }, {
   freezeTableName: true,
 });
