@@ -18,6 +18,7 @@ export const offerRideDetails = async (req, res) => {
     fare,
     departureTime,
     routePath,
+    status,
   } = req.body;
 
   try {
@@ -38,6 +39,7 @@ export const offerRideDetails = async (req, res) => {
       fare,
       departureTime,
       routePath: routePathString,
+      status, // Waiting, Started, Finished, Cancelled
     });
 
     res.status(200).json({ message: "Ride offered successfully" });
@@ -57,6 +59,7 @@ export const requestRideDetails = async (req, res) => {
     seatsRequired,
     driverRideId,
   } = req.body;
+
   try {
     let passenger = await Passenger.findOne({ where: { userId } });
     if (!passenger) {
@@ -68,35 +71,50 @@ export const requestRideDetails = async (req, res) => {
     const passengerRide = await PassengerRide.findOne({
       where: {
         passengerId,
+        passengerName,
+        passengerPhoneNo,
         startLocation,
         destination,
+        seatsRequired,
       },
     });
 
     var savedPassengerRide;
     if (passengerRide) {
-      // return res.status(409).json({
-        // success: false,
-        console.log(`You have already requested a ride for this route. passengerRideId: ${passengerRide.passengerRideId}`);
-         savedPassengerRide = passengerRide; // <-- Add this line
-      // });
+      console.log(`You have already requested a ride for this route. passengerRideId: ${passengerRide.passengerRideId}`);
+      savedPassengerRide = passengerRide; 
     }
-else{
-    savedPassengerRide = await PassengerRide.create({
-      passengerId,
-      passengerName,
-      passengerPhoneNo,
-      startLocation,
-      destination,
-      seatsRequired,
+    else{
+      savedPassengerRide = await PassengerRide.create({
+        passengerId,
+        passengerName,
+        passengerPhoneNo,
+        startLocation,
+        destination,
+        seatsRequired,
+      });
+    } 
+    console.log(savedPassengerRide.passengerRideId);
+
+    const existingPRDR = await PassengerRideDriverRide.findOne({
+      where: {
+        passengerRideId: savedPassengerRide.passengerRideId,
+        driverRideId,
+      },
     });
-  }
-console.log(savedPassengerRide.passengerRideId);
-    const savedPRDR = await PassengerRideDriverRide.create({
-      passengerRideId: savedPassengerRide.passengerRideId,
-      driverRideId,
-      status: "Requested", //Requested, Accepted, Confirmed
-    }) 
+
+    var savedPRDR;
+    if(existingPRDR){
+      console.log(`Ride already created, Go to Your Requested Rides.`);
+      savedPRDR = existingPRDR; 
+    }
+    else{
+      savedPRDR = await PassengerRideDriverRide.create({
+        passengerRideId: savedPassengerRide.passengerRideId,
+        driverRideId,
+        status: "Requested", //Requested, Accepted, Rejected, Confirmed
+      }) 
+    }
 
     res.status(200).json({ success: true, rideRequest: savedPassengerRide, prdr: savedPRDR });
   } catch (err) {
@@ -104,10 +122,6 @@ console.log(savedPassengerRide.passengerRideId);
     res.status(500).json({ success: false, message: "Failed to save details", error: err });
   }
 };
-
-// export const createPassengerRideDriverRide = async (req, res) => {
-//   // CODE FOR CREATION OF PASSENGER RIDE AND DRIVER RIDE.
-// };
 
 export const matchingRides = async (req, res) => {
   const { passengerStart, passengerEnd, seatsRequired } = req.body;
@@ -130,8 +144,8 @@ export const matchingRides = async (req, res) => {
         seats: {
           [Op.gte]: parseInt(seatsRequired),
         },
+        status: "Waiting",
       },
-      // FIX THIS CODE. TO AVOID THE TABLE JOINING FOR INFO SHARING.
       include: [
         {
           model: Driver,
@@ -502,5 +516,22 @@ export const rideAction = async (req, res) => {
   } catch (err) {
     console.error("Error performing ride action:", err);
     res.status(500).json({ error: "Failed to perform ride action" });
+  }
+};
+
+export const revokeRide = async (req, res) => {
+  const { passengerRideId } = req.params;
+
+  try {
+    const ride = await PassengerRide.findByPk(passengerRideId);
+    if (!ride) {
+      return res.status(404).json({ message: 'Ride not found' });
+    }
+
+    await ride.destroy();
+    res.status(200).json({ message: 'Ride revoked successfully' });
+  } catch (error) {
+    console.error('Error revoking ride:', error);
+    res.status(500).json({ message: 'Internal server error' });
   }
 };

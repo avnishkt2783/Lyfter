@@ -7,7 +7,8 @@ import {
     getRequestedRides, 
     getPendingRequests, 
     updateRequestStatus, 
-    rideAction 
+    rideAction,
+    revokeRide,
 } from "../controllers/rideController.js";
 
 const router = express.Router();
@@ -30,5 +31,8 @@ router.post("/updaterequeststatus", updateRequestStatus);  // Update request sta
 
 // POST /api/rides/ride-action
 router.post("/rideaction", rideAction);  // Action (Start, Cancel, Finish Ride)
+
+// routes/rides.js
+router.delete('/revoke/:passengerRideId', revokeRide);
 
 export default router;

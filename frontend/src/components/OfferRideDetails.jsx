@@ -75,6 +75,7 @@ const OfferRideDetails = () => {
         fare,
         departureTime,
         routePath,
+        status: "Waiting",
       };
 
       const res = await axios.post(

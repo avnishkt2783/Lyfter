@@ -33,10 +33,6 @@ const PassengerRide = sequelize.define("passengerRide", {
     type: DataTypes.INTEGER,
     allowNull: false,
   },
-  driverRideId: {
-    type: DataTypes.INTEGER,
-    allowNull: true, 
-  },
 }, {
   timestamps: true,
   freezeTableName: true,
