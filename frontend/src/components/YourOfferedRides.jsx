@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
-import { Modal, Button, Badge, Card } from 'react-bootstrap';
+import { Modal, Button, Badge, Card, Accordion } from 'react-bootstrap';
 import { useAuth } from "../AuthContext";
 
 // Function to convert coordinates to address
@@ -92,14 +92,23 @@ const YourOfferedRides = () => {
               console.log(startAddress);
               console.log(endAddress);
 
+               // Fetch accepted or confirmed rides
+          const acceptedRidesResponse = await axios.get(
+            `${apiURL}/rides/acceptedorconfirmed/${ride.driverRideId}`, {
+              headers: { Authorization: `Bearer ${token}` },
+            }
+          );
+          console.log(acceptedRidesResponse);
+
               return {
                 ...ride,
                 startLocation: startAddress,
                 destination: endAddress,
+                 acceptedRides: acceptedRidesResponse.data.rides || [],
               };
             } catch (err) {
               console.error("Error in geocoding:", err);
-              return ride; // Return ride without changes if geocoding fails
+               return { ...ride, acceptedRides: [] };
             }
           })
         );
@@ -161,15 +170,31 @@ const YourOfferedRides = () => {
   // Accept or reject a passenger request
   const handleRequestStatusChange = async (passengerRideId, status) => {
     try {
-      const response = await axios.post(`${apiURL}/rides/updaterequeststatus`, { passengerRideId, status });
+      const response = await axios.post(`${apiURL}/rides/updaterequeststatus`, { passengerRideId, status },{ headers: { Authorization: `Bearer ${token}` } } );
       if (response.data.success) {
+          if (status === "Accepted") {
+        setSelectedRequest((prevRequests) =>
+          prevRequests.map((request) =>
+            request.passengerRideId === passengerRideId
+              ? { ...request, status: "Accepted" }
+              : request
+          )
+        );
+        alert("Ride accepted successfully!");
+      }
+         if (status === 'Rejected') {
+        setSelectedRequest((prevRequests) =>
+          prevRequests.filter((request) => request.passengerRideId !== passengerRideId)
+        );
+      }
         setShowModal(false);
         setRides(prevRides => prevRides.map(ride => {
-          if (ride.driverRideId === passengerRideId) {
+          if (ride.driverRideId === passengerRideId && status === 'Rejected') {
             return { ...ride, pendingRequests: ride.pendingRequests - 1 };
           }
           return ride;
         }));
+         console.log(`Request ${status} successfully.`);
       }
     } catch (error) {
       console.error("Error updating request status:", error);
@@ -222,12 +247,39 @@ const YourOfferedRides = () => {
                   </Badge>
                 )}
 
-                {/* Buttons: Start Ride, Cancel Ride, Finish Ride */}
+                 {/* Buttons: Start Ride, Cancel Ride, Finish Ride */}
                 <div className="ride-buttons">
                   <Button variant="primary" onClick={() => handleRideAction(ride.driverRideId, 'Start Ride')}>Start Ride</Button>
                   <Button variant="danger" onClick={() => handleRideAction(ride.driverRideId, 'Cancel Ride')}>Cancel Ride</Button>
                   <Button variant="success" onClick={() => handleRideAction(ride.driverRideId, 'Finish Ride')}>Finish Ride</Button>
                 </div>
+
+                {/* Accordion for Accepted/Confirmed Rides */}
+     {ride.acceptedRides && ride.acceptedRides.length > 0 && (
+  <Accordion defaultActiveKey={null} className="mt-3">
+    <Accordion.Item eventKey="0">
+      <Accordion.Header>Accepted/Confirmed Passengers</Accordion.Header>
+      <Accordion.Body>
+        {ride.acceptedRides.map((acceptedRide) => (
+          <div key={acceptedRide.passengerRideDriverRideId} className="accepted-ride">
+            <p><strong>Passenger Name:</strong> {acceptedRide.passengerRide?.passengerName || "Unknown"}</p>
+            <p><strong>Phone No:</strong> {acceptedRide.passengerRide?.passengerPhoneNo || "N/A"}</p>
+            <p><strong>Start Location:</strong> {acceptedRide.passengerRide?.startLocation || "N/A"}</p>
+            <p><strong>Destination:</strong> {acceptedRide.passengerRide?.destination || "N/A"}</p>
+            <p><strong>Seats Required:</strong> {acceptedRide.passengerRide?.seatsRequired || 0}</p>
+            <p><strong>Status:</strong> {acceptedRide.status}</p>
+            <p><strong>Created At:</strong> {new Date(acceptedRide.createdAt).toLocaleString()}</p>
+            <p><strong>Updated At:</strong> {new Date(acceptedRide.updatedAt).toLocaleString()}</p>
+            <hr />
+          </div>
+        ))}
+      </Accordion.Body>
+    </Accordion.Item>
+  </Accordion>
+)}
+
+
+               
               </Card.Body>
             </Card>
           ))}

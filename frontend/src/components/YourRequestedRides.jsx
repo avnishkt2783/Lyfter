@@ -161,8 +161,10 @@ const YourRequestedRides = () => {
             : ride
         )
       );
+      alert("Ride confirmed successfully!");
     } catch (error) {
       console.error("Error confirming ride:", error);
+      alert("Failed to confirm the ride.");
     }
   };
 
@@ -191,6 +193,8 @@ const YourRequestedRides = () => {
           } else if (ride.status === "Confirmed") {
             message = "Ride has been successfully confirmed";
             showRevoke = false;
+          } else if (ride.status === "Rejected") {
+            message = "Your Ride has been rejected";
           }
 
           return (

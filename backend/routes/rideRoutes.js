@@ -6,7 +6,9 @@ import {
     getOfferedRides, 
     getRequestedRides, 
     getPendingRequests, 
-    updateRequestStatus, 
+    updateRequestStatus,
+    confirmRide, 
+    acceptedOrConfirmed,
     rideAction,
     revokeRide,
 } from "../controllers/rideController.js";
@@ -28,6 +30,10 @@ router.get("/pendingrequests/:driverRideId", getPendingRequests);  // Get pendin
 
 // POST /api/rides/update-request-status
 router.post("/updaterequeststatus", updateRequestStatus);  // Update request status (Accepted or Rejected)
+// In your routes file
+router.post("/confirm/:passengerRideId", confirmRide);
+
+router.get("/acceptedorconfirmed/:driverRideId", acceptedOrConfirmed);
 
 // POST /api/rides/ride-action
 router.post("/rideaction", rideAction);  // Action (Start, Cancel, Finish Ride)
