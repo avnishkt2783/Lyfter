@@ -131,8 +131,7 @@ const MatchingRides = () => {
                 <strong>Departure:</strong>{" "}
                 {new Date(ride.departureTime).toLocaleString()}
               </p>
-              <button onClick={() => confirmRide(ride)}>Confirm Ride</button>
-              <button style={{ marginLeft: "10px" }}>Reject</button>
+              <button onClick={() => confirmRide(ride)}>Request Ride</button>
             </div>
           );
         })
