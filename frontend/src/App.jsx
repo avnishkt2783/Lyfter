@@ -5,6 +5,7 @@ import { useTheme } from "./ThemeContext";
 import Navbar from "./components/Navbar";
 import Landing from "./components/Landing";
 import Login from "./components/Login";
+import About from "./components/About";
 import Register from "./components/Register";
 import Dashboard from "./components/Dashboard";
 import Footer from "./components/Footer";
@@ -36,6 +37,7 @@ function App() {
       <main className="flex-grow-1">
         <Routes>
           <Route path="/" element={<Landing />} />
+          <Route path="/about" element={<About />} />
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<Register />} />
           <Route path="/logout" element={<LogoutButton />} />

@@ -40,6 +40,10 @@ const DriverRide = sequelize.define("driverRide", {
     type: DataTypes.TEXT,
     allowNull: false
   },
+  status: {
+      type: DataTypes.STRING,
+      allowNull: false,
+  }
 }, {
   timestamps: true,
   freezeTableName: true,

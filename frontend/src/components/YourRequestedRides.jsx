@@ -28,23 +28,27 @@ const loadGoogleMapsScript = () => {
   return new Promise((resolve, reject) => {
     if (window.google && window.google.maps) return resolve();
 
-      // Check if a script with the same source already exists in the document
-    const existingScript = document.querySelector(`script[src*="maps.googleapis.com/maps/api/js"]`);
+    // Check if a script with the same source already exists in the document
+    const existingScript = document.querySelector(
+      `script[src*="maps.googleapis.com/maps/api/js"]`
+    );
     if (existingScript) {
       existingScript.onload = resolve;
       existingScript.onerror = reject;
       return;
     }
 
-     // Create a new script element to load the Google Maps API
+    // Create a new script element to load the Google Maps API
     const script = document.createElement("script");
-    script.src = `https://maps.googleapis.com/maps/api/js?key=${import.meta.env.VITE_GOOGLE_MAPS_API_KEY}&libraries=places`;
+    script.src = `https://maps.googleapis.com/maps/api/js?key=${
+      import.meta.env.VITE_GOOGLE_MAPS_API_KEY
+    }&libraries=places`;
     script.async = true;
     script.defer = true;
     // script.onload = resolve;
     // script.onerror = reject;
 
-     // Resolve or reject based on script load
+    // Resolve or reject based on script load
     script.onload = () => {
       console.log("Google Maps script loaded successfully.");
       resolve();
@@ -67,16 +71,22 @@ const YourRequestedRides = () => {
   useEffect(() => {
     const fetchRequestedRides = async () => {
       try {
-         await loadGoogleMapsScript();
+        await loadGoogleMapsScript();
 
-        const response = await axios.get(`${apiURL}/rides/requestedRides/${userId}`, {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        });
+        const response = await axios.get(
+          `${apiURL}/rides/requestedRides/${userId}`,
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          }
+        );
+
+        console.log("LAUDE KA RESPONSE-----------------------------");
+
         console.log(response);
 
-         // Convert coordinates to text addresses
+        // Convert coordinates to text addresses
         const ridesData = await Promise.all(
           response.data.rides.map(async (ride) => {
             try {
@@ -84,9 +94,15 @@ const YourRequestedRides = () => {
               const endCoords = JSON.parse(ride.driverRide?.destination);
               console.log(startCoords);
               console.log(endCoords);
-              
-              const startAddress = await geocodeLatLng(startCoords.lat, startCoords.lng);
-              const endAddress = await geocodeLatLng(endCoords.lat, endCoords.lng);
+
+              const startAddress = await geocodeLatLng(
+                startCoords.lat,
+                startCoords.lng
+              );
+              const endAddress = await geocodeLatLng(
+                endCoords.lat,
+                endCoords.lng
+              );
               console.log(startAddress);
               console.log(endAddress);
 
@@ -117,7 +133,11 @@ const YourRequestedRides = () => {
           Authorization: `Bearer ${token}`,
         },
       });
-       setRequestedRides((prevRides) => prevRides.filter((ride) => ride.passengerRide.passengerRideId !== rideId));
+      setRequestedRides((prevRides) =>
+        prevRides.filter(
+          (ride) => ride.passengerRide.passengerRideId !== rideId
+        )
+      );
     } catch (error) {
       console.error("Error revoking ride:", error);
     }
@@ -134,9 +154,11 @@ const YourRequestedRides = () => {
           },
         }
       );
-        setRequestedRides((prevRides) =>
+      setRequestedRides((prevRides) =>
         prevRides.map((ride) =>
-          ride.passengerRide.passengerRideId === rideId ? { ...ride, status: "Confirmed" } : ride
+          ride.passengerRide.passengerRideId === rideId
+            ? { ...ride, status: "Confirmed" }
+            : ride
         )
       );
     } catch (error) {
@@ -151,7 +173,8 @@ const YourRequestedRides = () => {
         <p>No requested rides found.</p>
       ) : (
         requestedRides.map((ride) => {
-          const driverName = ride.driverRide?.driver?.user?.fullName || "Unknown";
+          const driverName =
+            ride.driverRide?.driver?.user?.fullName || "Unknown";
           const driverPhone = ride.driverRide?.driver?.user?.phoneNo || "N/A";
           // const startLocation = JSON.parse(ride.driverRide?.startLocation || "{}");
           // const destination = JSON.parse(ride.driverRide?.destination || "{}");
@@ -180,20 +203,46 @@ const YourRequestedRides = () => {
                 borderRadius: "8px",
               }}
             >
-              <p><strong>Driver:</strong> {driverName}</p>
-              <p><strong>Phone:</strong> {driverPhone}</p>
-              <p><strong>Start Location:</strong> {ride.startLocation}</p>
-              <p><strong>Destination:</strong> {ride.destination}</p>
-              <p><strong>Fare:</strong> ₹{ride.driverRide?.fare || "N/A"}</p>
-              <p><strong>Seats Requested:</strong> {ride.passengerRide?.seatsRequired || "N/A"}</p>
-              <p><strong>Seats Available:</strong> {ride.driverRide?.seats || "N/A"}</p>
-              <p><strong>Status:</strong> {message}</p>
+              <p>
+                <strong>Driver:</strong> {driverName}
+              </p>
+              <p>
+                <strong>Phone:</strong> {driverPhone}
+              </p>
+              <p>
+                <strong>Start Location:</strong> {ride.startLocation}
+              </p>
+              <p>
+                <strong>Destination:</strong> {ride.destination}
+              </p>
+              <p>
+                <strong>Fare:</strong> ₹{ride.driverRide?.fare || "N/A"}
+              </p>
+              <p>
+                <strong>Seats Requested:</strong>{" "}
+                {ride.passengerRide?.seatsRequired || "N/A"}
+              </p>
+              <p>
+                <strong>Seats Available:</strong>{" "}
+                {ride.driverRide?.seats || "N/A"}
+              </p>
+              <p>
+                <strong>Status:</strong> {message}
+              </p>
               {showConfirm && (
-                <button onClick={() => handleConfirm(ride.passengerRide.passengerRideId)}>Confirm</button>
+                <button
+                  onClick={() =>
+                    handleConfirm(ride.passengerRide.passengerRideId)
+                  }
+                >
+                  Confirm
+                </button>
               )}
               {showRevoke && (
                 <button
-                  onClick={() => handleRevoke(ride.passengerRide.passengerRideId)}
+                  onClick={() =>
+                    handleRevoke(ride.passengerRide.passengerRideId)
+                  }
                   style={{ marginLeft: "10px" }}
                 >
                   Revoke
