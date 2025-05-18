@@ -1,6 +1,19 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
 import { useAuth } from "../AuthContext";
+import {
+  FaUser,
+  FaPhone,
+  FaMapMarkerAlt,
+  FaRoute,
+  FaMoneyBillWave,
+  FaChair,
+  FaInfoCircle,
+  FaCheckCircle,
+  FaTimesCircle,
+} from "react-icons/fa";
+import { useTheme } from "../ThemeContext";
+import "./YourRequestedRides.css";
 
 // Function to convert coordinates to address
 const geocodeLatLng = async (lat, lng) => {
@@ -68,6 +81,9 @@ const YourRequestedRides = () => {
   const apiURL = import.meta.env.VITE_API_URL;
   const [requestedRides, setRequestedRides] = useState([]);
   const [loading, setLoading] = useState(false);
+
+  const { theme } = useTheme();
+  const isDark = theme === "dark";
 
   useEffect(() => {
     if (authLoading) return; // wait for auth to finish
@@ -226,104 +242,352 @@ const YourRequestedRides = () => {
     }
   };
 
+  // return (
+  //   <div>
+  //     <h2>Your Requested Rides</h2>
+  //     {requestedRides.length === 0 ? (
+  //       <p>No requested rides found.</p>
+  //     ) : (
+  //       requestedRides.map((ride) => {
+  //         const driverName =
+  //           ride.driverRide?.driver?.user?.fullName || "Unknown";
+  //         const driverPhone = ride.driverRide?.driver?.user?.phoneNo || "N/A";
+
+  //         let message = "";
+  //         let showConfirm = false;
+  //         let showRevoke = true;
+
+  //         if (ride.status === "Requested") {
+  //           message = "Waiting for driver to accept your request.";
+  //         } else if (ride.status === "Accepted") {
+  //           message =
+  //             "Your request was accepted by the Driver. Confirm ASAP before seats get occupied.";
+  //           showConfirm = true;
+  //         } else if (ride.status === "Confirmed") {
+  //           message = "You booked your seats. Driver can Start or Cancel Ride.";
+  //           showRevoke = false;
+  //         } else if (ride.status === "Rejected") {
+  //           message =
+  //             "The Ride was Cancelled or the request was Rejected by the Driver.";
+  //         } else if (ride.status === "Finished") {
+  //           message = "Your Ride has Finished.";
+  //           showRevoke = false;
+  //         }
+
+  //         return (
+  //           <div
+  //             key={ride.passengerRide.passengerRideId}
+  //             style={{
+  //               border: "1px solid #ccc",
+  //               padding: "15px",
+  //               margin: "15px 0",
+  //               borderRadius: "8px",
+  //             }}
+  //           >
+  //             <p>
+  //               <strong>Driver:</strong> {driverName}
+  //             </p>
+  //             <p>
+  //               <strong>Phone:</strong> {driverPhone}
+  //             </p>
+  //             <p>
+  //               <strong>Start Location:</strong> {ride.startLocation}
+  //             </p>
+  //             <p>
+  //               <strong>Destination:</strong> {ride.destination}
+  //             </p>
+  //             <p>
+  //               <strong>Fare:</strong> ₹{ride.driverRide?.fare || "N/A"}
+  //             </p>
+  //             <p>
+  //               <strong>Seats Requested:</strong>{" "}
+  //               {ride.passengerRide?.seatsRequired || "N/A"}
+  //             </p>
+  //             <p>
+  //               <strong>Seats Available:</strong>{" "}
+  //               {ride.driverRide?.seats || "N/A"}
+  //             </p>
+  //             <p>
+  //               <strong>Status:</strong> {message}
+  //             </p>
+  //             {showConfirm && (
+  //               <button
+  //                 onClick={() =>
+  //                   handleConfirm(
+  //                     ride.passengerRide.passengerRideId,
+  //                     ride.driverRide.driverRideId
+  //                   )
+  //                 }
+  //               >
+  //                 Confirm
+  //               </button>
+  //             )}
+  //             {showRevoke && (
+  //               <button
+  //                 onClick={() =>
+  //                   handleRevoke(
+  //                     ride.passengerRide.passengerRideId,
+  //                     ride.driverRide.driverRideId
+  //                   )
+  //                 }
+  //                 style={{ marginLeft: "10px" }}
+  //               >
+  //                 Revoke / Delete
+  //               </button>
+  //             )}
+  //           </div>
+  //         );
+  //       })
+  //     )}
+  //   </div>
+  // );
+
   return (
-    <div>
-      <h2>Your Requested Rides</h2>
-      {requestedRides.length === 0 ? (
-        <p>No requested rides found.</p>
-      ) : (
-        requestedRides.map((ride) => {
-          const driverName =
-            ride.driverRide?.driver?.user?.fullName || "Unknown";
-          const driverPhone = ride.driverRide?.driver?.user?.phoneNo || "N/A";
+    // <div className="rides-container">
+    //   <h2 className="rides-heading">Your Requested Rides</h2>
+    //   {requestedRides.length === 0 ? (
+    //     <p className="no-rides">No requested rides found.</p>
+    //   ) : (
+    //     requestedRides.map((ride) => {
+    //       const driverName =
+    //         ride.driverRide?.driver?.user?.fullName || "Unknown";
+    //       const driverPhone = ride.driverRide?.driver?.user?.phoneNo || "N/A";
 
-          let message = "";
-          let showConfirm = false;
-          let showRevoke = true;
+    //       let message = "";
+    //       let showConfirm = false;
+    //       let showRevoke = true;
+    //       let statusClass = "";
 
-          if (ride.status === "Requested") {
-            message = "Waiting for driver to accept your request.";
-          } else if (ride.status === "Accepted") {
-            message =
-              "Your request was accepted by the Driver. Confirm ASAP before seats get occupied.";
-            showConfirm = true;
-          } else if (ride.status === "Confirmed") {
-            message = "You booked your seats. Driver can Start or Cancel Ride.";
-            showRevoke = false;
-          } else if (ride.status === "Rejected") {
-            message =
-              "The Ride was Cancelled or the request was Rejected by the Driver.";
-          } else if (ride.status === "Finished") {
-            message = "Your Ride has Finished.";
-            showRevoke = false;
-          }
+    //       switch (ride.status) {
+    //         case "Requested":
+    //           message = "Waiting for driver to accept your request.";
+    //           statusClass = "status-requested";
+    //           break;
+    //         case "Accepted":
+    //           message = "Request accepted. Confirm ASAP!";
+    //           showConfirm = true;
+    //           statusClass = "status-accepted";
+    //           break;
+    //         case "Confirmed":
+    //           message =
+    //             "You booked your seats. Driver can Start or Cancel Ride.";
+    //           showRevoke = false;
+    //           statusClass = "status-confirmed";
+    //           break;
+    //         case "Rejected":
+    //           message = "Ride was cancelled or request rejected.";
+    //           statusClass = "status-rejected";
+    //           break;
+    //         case "Finished":
+    //           message = "Ride completed.";
+    //           showRevoke = false;
+    //           statusClass = "status-finished";
+    //           break;
+    //         default:
+    //           message = "Unknown status.";
+    //           statusClass = "status-unknown";
+    //       }
 
-          return (
-            <div
-              key={ride.passengerRide.passengerRideId}
-              style={{
-                border: "1px solid #ccc",
-                padding: "15px",
-                margin: "15px 0",
-                borderRadius: "8px",
-              }}
-            >
-              <p>
-                <strong>Driver:</strong> {driverName}
-              </p>
-              <p>
-                <strong>Phone:</strong> {driverPhone}
-              </p>
-              <p>
-                <strong>Start Location:</strong> {ride.startLocation}
-              </p>
-              <p>
-                <strong>Destination:</strong> {ride.destination}
-              </p>
-              <p>
-                <strong>Fare:</strong> ₹{ride.driverRide?.fare || "N/A"}
-              </p>
-              <p>
-                <strong>Seats Requested:</strong>{" "}
-                {ride.passengerRide?.seatsRequired || "N/A"}
-              </p>
-              <p>
-                <strong>Seats Available:</strong>{" "}
-                {ride.driverRide?.seats || "N/A"}
-              </p>
-              <p>
-                <strong>Status:</strong> {message}
-              </p>
-              {showConfirm && (
-                <button
-                  onClick={() =>
-                    handleConfirm(
-                      ride.passengerRide.passengerRideId,
-                      ride.driverRide.driverRideId
-                    )
-                  }
-                >
-                  Confirm
-                </button>
-              )}
-              {showRevoke && (
-                <button
-                  onClick={() =>
-                    handleRevoke(
-                      ride.passengerRide.passengerRideId,
-                      ride.driverRide.driverRideId
-                    )
-                  }
-                  style={{ marginLeft: "10px" }}
-                >
-                  Revoke / Delete
-                </button>
-              )}
-            </div>
-          );
-        })
-      )}
-    </div>
+    //       return (
+    //         <div className="ride-card" key={ride.passengerRide.passengerRideId}>
+    //           <div className="ride-info">
+    //             <p>
+    //               <FaUser /> <strong>Driver:</strong> {driverName}
+    //             </p>
+    //             <p>
+    //               <FaPhone /> <strong>Phone:</strong> {driverPhone}
+    //             </p>
+    //             <p>
+    //               <FaMapMarkerAlt /> <strong>Start:</strong>{" "}
+    //               {ride.startLocation}
+    //             </p>
+    //             <p>
+    //               <FaRoute /> <strong>Destination:</strong> {ride.destination}
+    //             </p>
+    //             <p>
+    //               <FaMoneyBillWave /> <strong>Fare:</strong> ₹
+    //               {ride.driverRide?.fare || "N/A"}
+    //             </p>
+    //             <p>
+    //               <FaChair /> <strong>Seats Requested:</strong>{" "}
+    //               {ride.passengerRide?.seatsRequired || "N/A"}
+    //             </p>
+    //             <p>
+    //               <FaChair /> <strong>Seats Available:</strong>{" "}
+    //               {ride.driverRide?.seats || "N/A"}
+    //             </p>
+    //           </div>
+    //           <p className={`ride-status ${statusClass}`}>
+    //             <FaInfoCircle /> {message}
+    //           </p>
+    //           <div className="ride-actions">
+    //             {showConfirm && (
+    //               <button
+    //                 className="btn btn-confirm"
+    //                 onClick={() =>
+    //                   handleConfirm(
+    //                     ride.passengerRide.passengerRideId,
+    //                     ride.driverRide.driverRideId
+    //                   )
+    //                 }
+    //               >
+    //                 <FaCheckCircle /> Confirm
+    //               </button>
+    //             )}
+    //             {showRevoke && (
+    //               <button
+    //                 className="btn btn-revoke"
+    //                 onClick={() =>
+    //                   handleRevoke(
+    //                     ride.passengerRide.passengerRideId,
+    //                     ride.driverRide.driverRideId
+    //                   )
+    //                 }
+    //               >
+    //                 <FaTimesCircle /> Revoke / Delete
+    //               </button>
+    //             )}
+    //           </div>
+    //         </div>
+    //       );
+    //     })
+    //   )}
+    // </div>
+
+    <>
+      <div className="your-requested-rides-container">
+        <h2
+          className={`your-requested-rides-heading ${
+            isDark ? "text-white" : "text-dark"
+          }`}
+        >
+          Your Requested Rides
+        </h2>
+
+        {requestedRides.length === 0 ? (
+          <p
+            className={`your-requested-no-rides ${
+              isDark ? "text-light" : "text-secondary"
+            }`}
+          >
+            No requested rides found.
+          </p>
+        ) : (
+          requestedRides.map((ride) => {
+            const driverName =
+              ride.driverRide?.driver?.user?.fullName || "Unknown";
+            const driverPhone = ride.driverRide?.driver?.user?.phoneNo || "N/A";
+
+            let message = "";
+            let showConfirm = false;
+            let showRevoke = true;
+            let statusClass = "";
+
+            switch (ride.status) {
+              case "Requested":
+                message = "Waiting for driver to accept your request.";
+                statusClass = "yr-status-requested";
+                break;
+              case "Accepted":
+                message = "Request accepted. Confirm ASAP!";
+                showConfirm = true;
+                statusClass = "yr-status-accepted";
+                break;
+              case "Confirmed":
+                message =
+                  "You booked your seats. Driver can Start or Cancel Ride.";
+                showRevoke = false;
+                statusClass = "yr-status-confirmed";
+                break;
+              case "Rejected":
+                message = "Ride was cancelled or request rejected.";
+                statusClass = "yr-status-rejected";
+                break;
+              case "Finished":
+                message = "Ride completed.";
+                showRevoke = false;
+                statusClass = "yr-status-finished";
+                break;
+              default:
+                message = "Unknown status.";
+                statusClass = "yr-status-unknown";
+            }
+
+            return (
+              <div
+                className={`your-requested-card card mb-4 shadow-sm border ${
+                  isDark
+                    ? "bg-dark text-white border-secondary"
+                    : "bg-light text-dark border-dark"
+                }`}
+                key={ride.passengerRide.passengerRideId}
+              >
+                <div className="card-body">
+                  <p>
+                    <FaUser /> <strong>Driver:</strong> {driverName}
+                  </p>
+                  <p>
+                    <FaPhone /> <strong>Phone:</strong> {driverPhone}
+                  </p>
+                  <p>
+                    <FaMapMarkerAlt /> <strong>Start:</strong>{" "}
+                    {ride.startLocation}
+                  </p>
+                  <p>
+                    <FaRoute /> <strong>Destination:</strong> {ride.destination}
+                  </p>
+                  <p>
+                    <FaMoneyBillWave /> <strong>Fare:</strong> ₹
+                    {ride.driverRide?.fare || "N/A"}
+                  </p>
+                  <p>
+                    <FaChair /> <strong>Seats Requested:</strong>{" "}
+                    {ride.passengerRide?.seatsRequired || "N/A"}
+                  </p>
+                  <p>
+                    <FaChair /> <strong>Seats Available:</strong>{" "}
+                    {ride.driverRide?.seats || "N/A"}
+                  </p>
+
+                  <p className={`mt-3 your-requested-status ${statusClass}`}>
+                    <FaInfoCircle /> {message}
+                  </p>
+
+                  <div className="your-requested-actions d-flex gap-2 mt-3">
+                    {showConfirm && (
+                      <button
+                        className="btn btn-success"
+                        onClick={() =>
+                          handleConfirm(
+                            ride.passengerRide.passengerRideId,
+                            ride.driverRide.driverRideId
+                          )
+                        }
+                      >
+                        <FaCheckCircle /> Confirm
+                      </button>
+                    )}
+                    {showRevoke && (
+                      <button
+                        className="btn btn-danger"
+                        onClick={() =>
+                          handleRevoke(
+                            ride.passengerRide.passengerRideId,
+                            ride.driverRide.driverRideId
+                          )
+                        }
+                      >
+                        <FaTimesCircle /> Revoke / Delete
+                      </button>
+                    )}
+                  </div>
+                </div>
+              </div>
+            );
+          })
+        )}
+      </div>
+    </>
   );
 };
 

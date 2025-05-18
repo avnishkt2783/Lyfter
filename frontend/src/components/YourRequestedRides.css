@@ -1,0 +1,79 @@
+.your-requested-rides-container {
+  padding: 2rem;
+}
+
+.your-requested-rides-heading {
+  text-align: center;
+  font-size: 2rem;
+  font-weight: bold;
+  margin-bottom: 2rem;
+}
+
+.your-requested-no-rides {
+  text-align: center;
+  font-size: 1.2rem;
+  opacity: 0.75;
+}
+
+.your-requested-card {
+  border-radius: 1rem;
+  transition: transform 0.2s ease, box-shadow 0.3s ease;
+}
+
+.your-requested-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+}
+
+.your-requested-card .card-body p {
+  margin-bottom: 0.6rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.your-requested-status {
+  padding: 0.6rem 1rem;
+  border-radius: 8px;
+  font-weight: 500;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-top: 1rem;
+}
+
+.yr-status-requested {
+  background-color: #fff3cd;
+  color: #856404;
+}
+
+.yr-status-accepted {
+  background-color: #cce5ff;
+  color: #004085;
+}
+
+.yr-status-confirmed {
+  background-color: #d4edda;
+  color: #155724;
+}
+
+.yr-status-rejected {
+  background-color: #f8d7da;
+  color: #721c24;
+}
+
+.yr-status-finished {
+  background-color: #e2e3e5;
+  color: #383d41;
+}
+
+.yr-status-unknown {
+  background-color: #d6d8db;
+  color: #1b1e21;
+}
+
+.your-requested-actions {
+  margin-top: 1rem;
+  display: flex;
+  gap: 1rem;
+}
