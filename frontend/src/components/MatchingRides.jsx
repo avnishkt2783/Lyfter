@@ -17,6 +17,7 @@ const MatchingRides = () => {
   const passengerNamePhoneNo = JSON.parse(
     localStorage.getItem("passengerNamePhoneNo")
   );
+  const [requestedRideId, setRequestedRideId] = useState(null);
 
   useEffect(() => {
     const fetchMatchingRides = async () => {
@@ -69,7 +70,7 @@ const MatchingRides = () => {
   };
 
   const confirmRide = async (ride) => {
-    console.log("buttonclick", ride);
+    // console.log("buttonclick", ride);
 
     try {
       await axios.post(
@@ -89,6 +90,7 @@ const MatchingRides = () => {
           },
         }
       );
+      setRequestedRideId(ride.driverRideId); // set requested ride
     } catch (error) {
       console.error("Error confirming ride:", error);
     }
@@ -135,7 +137,15 @@ const MatchingRides = () => {
                 <strong>Departure:</strong>{" "}
                 {new Date(ride.departureTime).toLocaleString()}
               </p>
-              <button onClick={() => confirmRide(ride)}>Request Ride</button>
+              {/* <button onClick={() => confirmRide(ride)}>Request Ride</button> */}
+              <button
+                onClick={() => confirmRide(ride)}
+                disabled={requestedRideId === ride.driverRideId}
+              >
+                {requestedRideId === ride.driverRideId
+                  ? "Ride Requested Successfully"
+                  : "Request Ride"}
+              </button>
             </div>
           );
         })

@@ -1,0 +1,87 @@
+.your-offered-rides-container {
+  /* Base padding set via bootstrap px-4 py-3 */
+  font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+}
+
+.your-offered-rides-container.light {
+  background-color: #fff;
+  color: #212529;
+}
+
+.your-offered-rides-container.dark {
+  background-color: #121212;
+  color: #eee;
+}
+
+.your-offered-rides-heading {
+  font-size: 2rem;
+}
+
+.your-offered-loading p {
+  font-size: 1.1rem;
+}
+
+.your-offered-ride-cards {
+  gap: 1.5rem;
+}
+
+.your-offered-ride-card {
+  border-radius: 1rem;
+  transition: transform 0.2s ease, box-shadow 0.3s ease;
+}
+
+.your-offered-ride-card:hover {
+  transform: translateY(-6px);
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+}
+
+.your-offered-ride-title.text-secondary-light {
+  color: #adb5bd;
+}
+
+.your-offered-ride-details p {
+  margin-bottom: 0.5rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.your-offered-pending-badge {
+  cursor: pointer;
+}
+
+.your-offered-ride-buttons {
+  margin-top: 1rem;
+}
+
+.your-offered-accordion .accordion-button {
+  background-color: transparent;
+  color: inherit;
+}
+
+.your-offered-passenger p {
+  margin-bottom: 0.4rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+/* Modal dark mode */
+.modal-dark .modal-content {
+  background-color: #222;
+  color: #eee;
+  border-radius: 1rem;
+}
+
+.your-offered-modal-request {
+  font-size: 0.95rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+}
+
+.your-offered-modal-request p {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+}

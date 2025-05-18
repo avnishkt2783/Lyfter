@@ -1,7 +1,24 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
-import { Modal, Button, Badge, Card, Accordion } from "react-bootstrap";
 import { useAuth } from "../AuthContext";
+import {
+  Card,
+  Button,
+  Badge,
+  Accordion,
+  Modal,
+  Spinner,
+} from "react-bootstrap";
+import {
+  FaMapMarkerAlt,
+  FaClock,
+  FaChair,
+  FaUser,
+  FaPhone,
+  FaInfoCircle,
+} from "react-icons/fa";
+import { useTheme } from "../ThemeContext";
+import "./YourOfferedRides.css";
 
 // Function to convert coordinates to address
 const geocodeLatLng = async (lat, lng) => {
@@ -70,6 +87,9 @@ const YourOfferedRides = () => {
   const [loading, setLoading] = useState(true);
   const apiURL = import.meta.env.VITE_API_URL;
   const { token } = useAuth();
+
+  const { theme } = useTheme();
+  const isDark = theme === "dark";
   // console.log(token)
   // Fetch the offered rides for the driver
 
@@ -87,8 +107,6 @@ const YourOfferedRides = () => {
           try {
             const startCoords = JSON.parse(ride.startLocation);
             const endCoords = JSON.parse(ride.destination);
-            console.log(startCoords);
-            console.log(endCoords);
 
             const startAddress = await geocodeLatLng(
               startCoords.lat,
@@ -98,8 +116,6 @@ const YourOfferedRides = () => {
               endCoords.lat,
               endCoords.lng
             );
-            console.log(startAddress);
-            console.log(endAddress);
 
             // Fetch accepted or confirmed rides
             const acceptedRidesResponse = await axios.get(
@@ -108,16 +124,58 @@ const YourOfferedRides = () => {
                 headers: { Authorization: `Bearer ${token}` },
               }
             );
-            console.log(acceptedRidesResponse);
+
+            const acceptedRidesWithAddress = await Promise.all(
+              (acceptedRidesResponse.data.rides || []).map(
+                async (acceptedRide) => {
+                  try {
+                    const passengerRide = acceptedRide.passengerRide;
+
+                    if (passengerRide) {
+                      const passengerStartCoords = JSON.parse(
+                        passengerRide.startLocation
+                      );
+                      const passengerEndCoords = JSON.parse(
+                        passengerRide.destination
+                      );
+
+                      const passengerStartAddress = await geocodeLatLng(
+                        passengerStartCoords.lat,
+                        passengerStartCoords.lng
+                      );
+
+                      const passengerEndAddress = await geocodeLatLng(
+                        passengerEndCoords.lat,
+                        passengerEndCoords.lng
+                      );
+
+                      return {
+                        ...acceptedRide,
+                        passengerRide: {
+                          ...passengerRide,
+                          startLocation: passengerStartAddress,
+                          destination: passengerEndAddress,
+                        },
+                      };
+                    } else {
+                      return acceptedRide;
+                    }
+                  } catch (innerErr) {
+                    console.error("Error geocoding accepted ride:", innerErr);
+                    return acceptedRide;
+                  }
+                }
+              )
+            );
 
             return {
               ...ride,
               startLocation: startAddress,
               destination: endAddress,
-              acceptedRides: acceptedRidesResponse.data.rides || [],
+              acceptedRides: acceptedRidesWithAddress,
             };
           } catch (err) {
-            console.error("Error in geocoding:", err);
+            console.error("Error processing offered ride:", err);
             return { ...ride, acceptedRides: [] };
           }
         })
@@ -192,14 +250,6 @@ const YourOfferedRides = () => {
     driverRideId,
     status
   ) => {
-    console.log("------------------");
-
-    console.log(passengerRideId);
-    console.log(driverRideId); // printing undefined
-    console.log(status);
-
-    console.log("------------------");
-
     try {
       const response = await axios.post(
         `${apiURL}/rides/updaterequeststatus`,
@@ -210,14 +260,10 @@ const YourOfferedRides = () => {
       if (response.data.success) {
         if (status === "Accepted") {
           setSelectedRequest((prevRequests) =>
-            prevRequests.map((request) =>
-              request.passengerRideId === passengerRideId &&
-              request.driverRideId === driverRideId
-                ? { ...request, status: "Accepted" }
-                : request
+            prevRequests.filter(
+              (request) => !(request.passengerRideId === passengerRideId)
             )
           );
-          // alert("Ride accepted successfully!");
         }
 
         if (status === "Rejected") {
@@ -278,68 +324,105 @@ const YourOfferedRides = () => {
   };
 
   return (
-    <div>
-      <h1>Your Offered Rides</h1>
+    <div className={`your-offered-rides-container px-4 py-3`}>
+      <h2 className="your-offered-rides-heading mb-4 fw-bold text-center">
+        Your Offered Rides
+      </h2>
+
       {loading ? (
-        <p>Loading rides...</p>
+        <div className="your-offered-loading text-center py-5">
+          <Spinner animation="border" variant={isDark ? "light" : "primary"} />
+          <p className="mt-3">Loading rides...</p>
+        </div>
       ) : (
-        <div className="ride-cards-container">
+        <div className="your-offered-ride-cards d-flex flex-wrap gap-4 justify-content-center">
           {rides.map((ride) => (
             <Card
               key={ride.driverRideId}
-              className="ride-card"
-              style={{ position: "relative" }}
+              className={`your-offered-ride-card shadow rounded position-relative ${
+                isDark
+                  ? "bg-dark text-white border-secondary"
+                  : "bg-light text-dark border-dark"
+              }`}
+              style={{ width: "100%", maxWidth: "450px" }}
             >
               <Card.Body>
-                <Card.Title>Driver Ride ID: {ride.driverRideId}</Card.Title>
-                <Card.Text>
-                  <strong>Start Location:</strong> {ride.startLocation}
-                  <br />
-                  <strong>Destination:</strong> {ride.destination}
-                  <br />
-                  <strong>Departure Time:</strong>{" "}
-                  {new Date(ride.departureTime).toLocaleString()}
-                  <br />
-                  <strong>Seats Available:</strong> {ride.seats}
+                <Card.Title
+                  className={`your-offered-ride-title fw-semibold mb-3 ${
+                    isDark ? "text-secondary-light" : "text-secondary"
+                  }`}
+                >
+                  Ride ID: #{ride.driverRideId}
+                </Card.Title>
+
+                <Card.Text className="your-offered-ride-details">
+                  <p>
+                    <FaMapMarkerAlt /> <strong>From:</strong>{" "}
+                    {ride.startLocation}
+                  </p>
+                  <p>
+                    <FaMapMarkerAlt /> <strong>To:</strong> {ride.destination}
+                  </p>
+                  <p>
+                    <FaClock /> <strong>Departure:</strong>{" "}
+                    {new Date(ride.departureTime).toLocaleString()}
+                  </p>
+                  <p>
+                    <FaChair /> <strong>Seats:</strong> {ride.seats}
+                  </p>
+                  <p>
+                    <strong>Status:</strong>{" "}
+                    <Badge
+                      bg={
+                        ride.status === "Waiting"
+                          ? "warning"
+                          : ride.status === "Started"
+                          ? "primary"
+                          : ride.status === "Finished"
+                          ? "success"
+                          : "danger"
+                      }
+                      text={ride.status === "Waiting" ? "dark" : "light"}
+                    >
+                      {ride.status}
+                    </Badge>
+                  </p>
                 </Card.Text>
 
-                {/* Badge for pending requests */}
+                {/* Pending Requests Badge */}
                 {ride.pendingRequests > 0 && (
                   <Badge
+                    bg="warning"
                     pill
-                    variant="warning"
-                    style={{ position: "absolute", top: 10, right: 10 }}
+                    className="your-offered-pending-badge position-absolute top-0 end-0 m-2 text-dark"
                     onClick={() => handleBadgeClick(ride.driverRideId)}
+                    style={{ cursor: "pointer" }}
                   >
-                    {ride.pendingRequests} Request(s) Pending
+                    {ride.pendingRequests} Pending
                   </Badge>
                 )}
 
-                {/* Buttons: Start Ride, Cancel Ride, Finish Ride */}
-                {/* <div className="ride-buttons">
-                  <Button variant="primary" onClick={() => handleRideAction(ride.driverRideId, 'Start Ride')}>Start Ride</Button>
-                  <Button variant="danger" onClick={() => handleRideAction(ride.driverRideId, 'Cancel Ride')}>Cancel Ride</Button>
-                  <Button variant="success" onClick={() => handleRideAction(ride.driverRideId, 'Finish Ride')}>Finish Ride</Button>
-                </div> */}
-
-                <div className="ride-buttons">
+                {/* Ride Action Buttons */}
+                <div className="your-offered-ride-buttons mt-3 d-flex flex-wrap gap-2">
                   {ride.status === "Waiting" && (
                     <>
                       <Button
                         variant="primary"
+                        // size="sm"
                         onClick={() =>
                           handleRideAction(ride.driverRideId, "Start Ride")
                         }
                       >
-                        Start Ride
+                        Start
                       </Button>
                       <Button
                         variant="danger"
+                        // size="sm"
                         onClick={() =>
                           handleRideAction(ride.driverRideId, "Cancel Ride")
                         }
                       >
-                        Cancel Ride
+                        Cancel
                       </Button>
                     </>
                   )}
@@ -347,30 +430,25 @@ const YourOfferedRides = () => {
                   {ride.status === "Started" && (
                     <Button
                       variant="success"
+                      // size="sm"
                       onClick={() =>
                         handleRideAction(ride.driverRideId, "Finish Ride")
                       }
                     >
-                      Finish Ride
+                      Finish
                     </Button>
                   )}
 
-                  {ride.status === "Cancelled" && (
+                  {["Cancelled", "Finished"].includes(ride.status) && (
                     <Button variant="secondary" disabled>
-                      Ride Cancelled
-                    </Button>
-                  )}
-
-                  {ride.status === "Finished" && (
-                    <Button variant="secondary" disabled>
-                      Ride Finished
+                      {ride.status}
                     </Button>
                   )}
                 </div>
 
-                {/* Accordion for Accepted/Confirmed Rides */}
-                {ride.acceptedRides && ride.acceptedRides.length > 0 && (
-                  <Accordion defaultActiveKey={null} className="mt-3">
+                {/* Accepted Passengers Accordion */}
+                {ride.acceptedRides?.length > 0 && (
+                  <Accordion className="your-offered-accordion mt-3">
                     <Accordion.Item eventKey="0">
                       <Accordion.Header>
                         Accepted/Confirmed Passengers
@@ -379,47 +457,48 @@ const YourOfferedRides = () => {
                         {ride.acceptedRides.map((acceptedRide) => (
                           <div
                             key={acceptedRide.passengerRideDriverRideId}
-                            className="accepted-ride"
+                            className={`your-offered-passenger border-bottom pb-2 mb-3 ${
+                              isDark ? "border-secondary" : "border-dark"
+                            }`}
                           >
                             <p>
-                              <strong>Passenger Name:</strong>{" "}
+                              <FaUser /> <strong>Name:</strong>{" "}
                               {acceptedRide.passengerRide?.passengerName ||
                                 "Unknown"}
                             </p>
                             <p>
-                              <strong>Phone No:</strong>{" "}
+                              <FaPhone /> <strong>Phone:</strong>{" "}
                               {acceptedRide.passengerRide?.passengerPhoneNo ||
                                 "N/A"}
                             </p>
                             <p>
-                              <strong>Start Location:</strong>{" "}
+                              <FaMapMarkerAlt /> <strong>From:</strong>{" "}
                               {acceptedRide.passengerRide?.startLocation ||
                                 "N/A"}
                             </p>
                             <p>
-                              <strong>Destination:</strong>{" "}
+                              <FaMapMarkerAlt /> <strong>To:</strong>{" "}
                               {acceptedRide.passengerRide?.destination || "N/A"}
                             </p>
                             <p>
-                              <strong>Seats Required:</strong>{" "}
+                              <FaChair /> <strong>Seats:</strong>{" "}
                               {acceptedRide.passengerRide?.seatsRequired || 0}
                             </p>
                             <p>
-                              <strong>Status:</strong> {acceptedRide.status}
+                              <FaInfoCircle /> <strong>Status:</strong>{" "}
+                              {acceptedRide.status}
                             </p>
-                            <p>
-                              <strong>Created At:</strong>{" "}
+                            <p className="text-muted small">
+                              <strong>Created:</strong>{" "}
                               {new Date(
                                 acceptedRide.createdAt
                               ).toLocaleString()}
-                            </p>
-                            <p>
-                              <strong>Updated At:</strong>{" "}
+                              <br />
+                              <strong>Updated:</strong>{" "}
                               {new Date(
                                 acceptedRide.updatedAt
                               ).toLocaleString()}
                             </p>
-                            <hr />
                           </div>
                         ))}
                       </Accordion.Body>
@@ -432,36 +511,50 @@ const YourOfferedRides = () => {
         </div>
       )}
 
-      {/* Modal for displaying pending requests */}
-      <Modal show={showModal} onHide={() => setShowModal(false)}>
+      {/* Pending Requests Modal */}
+      <Modal
+        show={showModal}
+        onHide={() => setShowModal(false)}
+        centered
+        className={isDark ? "modal-dark" : ""}
+      >
         <Modal.Header closeButton>
           <Modal.Title>Pending Requests</Modal.Title>
         </Modal.Header>
         <Modal.Body>
-          {selectedRequest && selectedRequest.length > 0 ? (
+          {selectedRequest?.length > 0 ? (
             selectedRequest.map((request) => (
-              <div key={request.passengerRideId} className="request-info">
+              <div
+                key={request.passengerRideId}
+                className={`your-offered-modal-request mb-4 p-3 border rounded ${
+                  isDark ? "border-secondary text-white" : "border-dark"
+                }`}
+              >
                 <p>
-                  <strong>Passenger Name:</strong>{" "}
+                  <FaUser /> <strong>Name:</strong>{" "}
                   {request.passengerName || "Unknown"}
                 </p>
                 <p>
-                  <strong>Phone No:</strong> {request.passengerPhoneNo || "N/A"}
+                  <FaPhone /> <strong>Phone:</strong>{" "}
+                  {request.passengerPhoneNo || "N/A"}
                 </p>
                 <p>
-                  <strong>Start Location:</strong>{" "}
+                  <FaMapMarkerAlt /> <strong>From:</strong>{" "}
                   {request.startLocation || "N/A"}
                 </p>
                 <p>
-                  <strong>Destination:</strong> {request.destination || "N/A"}
+                  <FaMapMarkerAlt /> <strong>To:</strong>{" "}
+                  {request.destination || "N/A"}
                 </p>
                 <p>
-                  <strong>Seats Required:</strong> {request.seatsRequired || 0}
+                  <FaChair /> <strong>Seats:</strong>{" "}
+                  {request.seatsRequired || 0}
                 </p>
 
-                <div className="request-buttons">
+                <div className="d-flex gap-2 mt-2">
                   <Button
                     variant="success"
+                    // size="sm"
                     onClick={() =>
                       handleRequestStatusChange(
                         request.passengerRideId,
@@ -469,12 +562,12 @@ const YourOfferedRides = () => {
                         "Accepted"
                       )
                     }
-                    className="me-2"
                   >
                     Accept
                   </Button>
                   <Button
                     variant="danger"
+                    // size="sm"
                     onClick={() =>
                       handleRequestStatusChange(
                         request.passengerRideId,
