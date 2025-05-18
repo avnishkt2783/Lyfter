@@ -34,7 +34,12 @@ const MatchingRides = () => {
       try {
         const response = await axios.post(
           `${apiURL}/rides/matchingRides`,
-          { passengerStart: start, passengerEnd: dest, seatsRequired },
+          {
+            passengerStart: start,
+            passengerEnd: dest,
+            seatsRequired,
+            currentUserId: userId, // <-- Send current userId here
+          },
           {
             headers: {
               Authorization: `Bearer ${token}`,
@@ -57,13 +62,12 @@ const MatchingRides = () => {
     if (token) {
       fetchMatchingRides();
     }
-  }, [token]);
+  }, [token, userId]); // also add userId as dependency
 
   const handleNavigate = () => {
     navigate("/yourRequestedRides");
   };
 
-  // Dummy placeholder confirmRide until you pass the real one
   const confirmRide = async (ride) => {
     console.log("buttonclick", ride);
 

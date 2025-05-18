@@ -1,6 +1,6 @@
-import React, { useEffect, useState } from 'react';
-import axios from 'axios';
-import { Modal, Button, Badge, Card, Accordion } from 'react-bootstrap';
+import React, { useEffect, useState } from "react";
+import axios from "axios";
+import { Modal, Button, Badge, Card, Accordion } from "react-bootstrap";
 import { useAuth } from "../AuthContext";
 
 // Function to convert coordinates to address
@@ -29,23 +29,27 @@ const loadGoogleMapsScript = () => {
   return new Promise((resolve, reject) => {
     if (window.google && window.google.maps) return resolve();
 
-      // Check if a script with the same source already exists in the document
-    const existingScript = document.querySelector(`script[src*="maps.googleapis.com/maps/api/js"]`);
+    // Check if a script with the same source already exists in the document
+    const existingScript = document.querySelector(
+      `script[src*="maps.googleapis.com/maps/api/js"]`
+    );
     if (existingScript) {
       existingScript.onload = resolve;
       existingScript.onerror = reject;
       return;
     }
 
-     // Create a new script element to load the Google Maps API
+    // Create a new script element to load the Google Maps API
     const script = document.createElement("script");
-    script.src = `https://maps.googleapis.com/maps/api/js?key=${import.meta.env.VITE_GOOGLE_MAPS_API_KEY}&libraries=places`;
+    script.src = `https://maps.googleapis.com/maps/api/js?key=${
+      import.meta.env.VITE_GOOGLE_MAPS_API_KEY
+    }&libraries=places`;
     script.async = true;
     script.defer = true;
     // script.onload = resolve;
     // script.onerror = reject;
 
-     // Resolve or reject based on script load
+    // Resolve or reject based on script load
     script.onload = () => {
       console.log("Google Maps script loaded successfully.");
       resolve();
@@ -68,96 +72,112 @@ const YourOfferedRides = () => {
   const { token } = useAuth();
   // console.log(token)
   // Fetch the offered rides for the driver
+
+  const fetchOfferedRides = async () => {
+    try {
+      await loadGoogleMapsScript();
+
+      const response = await axios.get(`${apiURL}/rides/yourofferedrides`, {
+        headers: { Authorization: `Bearer ${token}` },
+      }); // API to get offered rides
+      console.log(response);
+      // Convert coordinates to text addresses
+      const ridesData = await Promise.all(
+        response.data.rides.map(async (ride) => {
+          try {
+            const startCoords = JSON.parse(ride.startLocation);
+            const endCoords = JSON.parse(ride.destination);
+            console.log(startCoords);
+            console.log(endCoords);
+
+            const startAddress = await geocodeLatLng(
+              startCoords.lat,
+              startCoords.lng
+            );
+            const endAddress = await geocodeLatLng(
+              endCoords.lat,
+              endCoords.lng
+            );
+            console.log(startAddress);
+            console.log(endAddress);
+
+            // Fetch accepted or confirmed rides
+            const acceptedRidesResponse = await axios.get(
+              `${apiURL}/rides/acceptedorconfirmed/${ride.driverRideId}`,
+              {
+                headers: { Authorization: `Bearer ${token}` },
+              }
+            );
+            console.log(acceptedRidesResponse);
+
+            return {
+              ...ride,
+              startLocation: startAddress,
+              destination: endAddress,
+              acceptedRides: acceptedRidesResponse.data.rides || [],
+            };
+          } catch (err) {
+            console.error("Error in geocoding:", err);
+            return { ...ride, acceptedRides: [] };
+          }
+        })
+      );
+
+      // setRides(response.data.rides);
+      setRides(ridesData);
+
+      setLoading(false);
+    } catch (error) {
+      console.error("Error fetching offered rides:", error);
+      setLoading(false);
+    }
+  };
+
   useEffect(() => {
-    const fetchOfferedRides = async () => {
-      try {
-
-        await loadGoogleMapsScript();
-
-        const response = await axios.get(`${apiURL}/rides/yourofferedrides`,{
-           headers: { Authorization: `Bearer ${token}` },
-        }); // API to get offered rides
-        console.log(response);
-         // Convert coordinates to text addresses
-        const ridesData = await Promise.all(
-          response.data.rides.map(async (ride) => {
-            try {
-              const startCoords = JSON.parse(ride.startLocation);
-              const endCoords = JSON.parse(ride.destination);
-              console.log(startCoords);
-              console.log(endCoords);
-              
-              const startAddress = await geocodeLatLng(startCoords.lat, startCoords.lng);
-              const endAddress = await geocodeLatLng(endCoords.lat, endCoords.lng);
-              console.log(startAddress);
-              console.log(endAddress);
-
-               // Fetch accepted or confirmed rides
-          const acceptedRidesResponse = await axios.get(
-            `${apiURL}/rides/acceptedorconfirmed/${ride.driverRideId}`, {
-              headers: { Authorization: `Bearer ${token}` },
-            }
-          );
-          console.log(acceptedRidesResponse);
-
-              return {
-                ...ride,
-                startLocation: startAddress,
-                destination: endAddress,
-                 acceptedRides: acceptedRidesResponse.data.rides || [],
-              };
-            } catch (err) {
-              console.error("Error in geocoding:", err);
-               return { ...ride, acceptedRides: [] };
-            }
-          })
-        );
-
-
-        // setRides(response.data.rides);
-        setRides(ridesData);
-        
-        setLoading(false);
-      } catch (error) {
-        console.error("Error fetching offered rides:", error);
-        setLoading(false);
-      }
-    };
     fetchOfferedRides();
   }, []);
 
   // Handle clicking on the badge to show pending requests
   const handleBadgeClick = async (driverRideId) => {
     try {
+      const response = await axios.get(
+        `${apiURL}/rides/pendingrequests/${driverRideId}`,
+        {
+          headers: { Authorization: `Bearer ${token}` },
+        }
+      ); // API to get pending requests for a ride
+      console.log("Pending Requests Response:", response.data);
+      const requestsData = await Promise.all(
+        response.data.requests.map(async (ride) => {
+          try {
+            const startCoords = JSON.parse(ride.startLocation);
+            const endCoords = JSON.parse(ride.destination);
+            console.log(startCoords);
+            console.log(endCoords);
 
+            const startAddress = await geocodeLatLng(
+              startCoords.lat,
+              startCoords.lng
+            );
+            const endAddress = await geocodeLatLng(
+              endCoords.lat,
+              endCoords.lng
+            );
+            console.log(startAddress);
+            console.log(endAddress);
 
-      const response = await axios.get(`${apiURL}/rides/pendingrequests/${driverRideId}`, {
-      headers: { Authorization: `Bearer ${token}` },}); // API to get pending requests for a ride
-       console.log("Pending Requests Response:", response.data);
-        const requestsData = await Promise.all(
-          response.data.requests.map(async (ride) => {
-            try {
-              const startCoords = JSON.parse(ride.startLocation);
-              const endCoords = JSON.parse(ride.destination);
-              console.log(startCoords);
-              console.log(endCoords);
-              
-              const startAddress = await geocodeLatLng(startCoords.lat, startCoords.lng);
-              const endAddress = await geocodeLatLng(endCoords.lat, endCoords.lng);
-              console.log(startAddress);
-              console.log(endAddress);
-
-              return {
-                ...ride,
-                startLocation: startAddress,
-                destination: endAddress,
-              };
-            } catch (err) {
-              console.error("Error in geocoding:", err);
-              return ride; // Return ride without changes if geocoding fails
-            }
-          })
-        );
+            return {
+              ...ride,
+              driverRideId,
+              startLocation: startAddress,
+              destination: endAddress,
+            };
+          } catch (err) {
+            console.error("Error in geocoding:", err);
+            return ride; // Return ride without changes if geocoding fails
+          }
+        })
+      );
 
       // setSelectedRequest(response.data.requests);
       setSelectedRequest(requestsData);
@@ -167,34 +187,65 @@ const YourOfferedRides = () => {
     }
   };
 
-  // Accept or reject a passenger request
-  const handleRequestStatusChange = async (passengerRideId, status) => {
+  const handleRequestStatusChange = async (
+    passengerRideId,
+    driverRideId,
+    status
+  ) => {
+    console.log("------------------");
+
+    console.log(passengerRideId);
+    console.log(driverRideId); // printing undefined
+    console.log(status);
+
+    console.log("------------------");
+
     try {
-      const response = await axios.post(`${apiURL}/rides/updaterequeststatus`, { passengerRideId, status },{ headers: { Authorization: `Bearer ${token}` } } );
+      const response = await axios.post(
+        `${apiURL}/rides/updaterequeststatus`,
+        { passengerRideId, driverRideId, status },
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+
       if (response.data.success) {
-          if (status === "Accepted") {
-        setSelectedRequest((prevRequests) =>
-          prevRequests.map((request) =>
-            request.passengerRideId === passengerRideId
-              ? { ...request, status: "Accepted" }
-              : request
-          )
+        if (status === "Accepted") {
+          setSelectedRequest((prevRequests) =>
+            prevRequests.map((request) =>
+              request.passengerRideId === passengerRideId &&
+              request.driverRideId === driverRideId
+                ? { ...request, status: "Accepted" }
+                : request
+            )
+          );
+          // alert("Ride accepted successfully!");
+        }
+
+        if (status === "Rejected") {
+          setSelectedRequest((prevRequests) =>
+            prevRequests.filter(
+              (request) =>
+                !(
+                  request.passengerRideId === passengerRideId &&
+                  request.driverRideId === driverRideId
+                )
+            )
+          );
+        }
+
+        // Update ride's pendingRequests count
+        setRides((prevRides) =>
+          prevRides.map((ride) => {
+            if (ride.driverRideId === driverRideId) {
+              return {
+                ...ride,
+                pendingRequests: Math.max(ride.pendingRequests - 1, 0),
+              };
+            }
+            return ride;
+          })
         );
-        alert("Ride accepted successfully!");
-      }
-         if (status === 'Rejected') {
-        setSelectedRequest((prevRequests) =>
-          prevRequests.filter((request) => request.passengerRideId !== passengerRideId)
-        );
-      }
-        setShowModal(false);
-        setRides(prevRides => prevRides.map(ride => {
-          if (ride.driverRideId === passengerRideId && status === 'Rejected') {
-            return { ...ride, pendingRequests: ride.pendingRequests - 1 };
-          }
-          return ride;
-        }));
-         console.log(`Request ${status} successfully.`);
+
+        console.log(`Request ${status} successfully.`);
       }
     } catch (error) {
       console.error("Error updating request status:", error);
@@ -204,10 +255,22 @@ const YourOfferedRides = () => {
   // Start, Cancel, and Finish Ride buttons logic
   const handleRideAction = async (driverRideId, action) => {
     try {
-      const response = await axios.post(`${apiURL}/rides/rideaction`, { driverRideId, action });
+      const response = await axios.post(
+        `${apiURL}/rides/rideAction`,
+        {
+          driverRideId,
+          action,
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`, // Make sure yourToken is retrieved from localStorage or context
+          },
+        }
+      );
       if (response.data.success) {
         // Optionally, handle UI changes like ride status update
         console.log(`${action} action successfully performed`);
+        fetchOfferedRides(); // Re-fetch the updated ride list
       }
     } catch (error) {
       console.error(`Error performing ${action} action:`, error);
@@ -222,7 +285,11 @@ const YourOfferedRides = () => {
       ) : (
         <div className="ride-cards-container">
           {rides.map((ride) => (
-            <Card key={ride.driverRideId} className="ride-card" style={{ position: 'relative' }}> 
+            <Card
+              key={ride.driverRideId}
+              className="ride-card"
+              style={{ position: "relative" }}
+            >
               <Card.Body>
                 <Card.Title>Driver Ride ID: {ride.driverRideId}</Card.Title>
                 <Card.Text>
@@ -230,7 +297,8 @@ const YourOfferedRides = () => {
                   <br />
                   <strong>Destination:</strong> {ride.destination}
                   <br />
-                  <strong>Departure Time:</strong> {new Date(ride.departureTime).toLocaleString()}
+                  <strong>Departure Time:</strong>{" "}
+                  {new Date(ride.departureTime).toLocaleString()}
                   <br />
                   <strong>Seats Available:</strong> {ride.seats}
                 </Card.Text>
@@ -240,46 +308,124 @@ const YourOfferedRides = () => {
                   <Badge
                     pill
                     variant="warning"
-                    style={{ position: 'absolute', top: 10, right: 10 }}
+                    style={{ position: "absolute", top: 10, right: 10 }}
                     onClick={() => handleBadgeClick(ride.driverRideId)}
                   >
                     {ride.pendingRequests} Request(s) Pending
                   </Badge>
                 )}
 
-                 {/* Buttons: Start Ride, Cancel Ride, Finish Ride */}
-                <div className="ride-buttons">
+                {/* Buttons: Start Ride, Cancel Ride, Finish Ride */}
+                {/* <div className="ride-buttons">
                   <Button variant="primary" onClick={() => handleRideAction(ride.driverRideId, 'Start Ride')}>Start Ride</Button>
                   <Button variant="danger" onClick={() => handleRideAction(ride.driverRideId, 'Cancel Ride')}>Cancel Ride</Button>
                   <Button variant="success" onClick={() => handleRideAction(ride.driverRideId, 'Finish Ride')}>Finish Ride</Button>
+                </div> */}
+
+                <div className="ride-buttons">
+                  {ride.status === "Waiting" && (
+                    <>
+                      <Button
+                        variant="primary"
+                        onClick={() =>
+                          handleRideAction(ride.driverRideId, "Start Ride")
+                        }
+                      >
+                        Start Ride
+                      </Button>
+                      <Button
+                        variant="danger"
+                        onClick={() =>
+                          handleRideAction(ride.driverRideId, "Cancel Ride")
+                        }
+                      >
+                        Cancel Ride
+                      </Button>
+                    </>
+                  )}
+
+                  {ride.status === "Started" && (
+                    <Button
+                      variant="success"
+                      onClick={() =>
+                        handleRideAction(ride.driverRideId, "Finish Ride")
+                      }
+                    >
+                      Finish Ride
+                    </Button>
+                  )}
+
+                  {ride.status === "Cancelled" && (
+                    <Button variant="secondary" disabled>
+                      Ride Cancelled
+                    </Button>
+                  )}
+
+                  {ride.status === "Finished" && (
+                    <Button variant="secondary" disabled>
+                      Ride Finished
+                    </Button>
+                  )}
                 </div>
 
                 {/* Accordion for Accepted/Confirmed Rides */}
-     {ride.acceptedRides && ride.acceptedRides.length > 0 && (
-  <Accordion defaultActiveKey={null} className="mt-3">
-    <Accordion.Item eventKey="0">
-      <Accordion.Header>Accepted/Confirmed Passengers</Accordion.Header>
-      <Accordion.Body>
-        {ride.acceptedRides.map((acceptedRide) => (
-          <div key={acceptedRide.passengerRideDriverRideId} className="accepted-ride">
-            <p><strong>Passenger Name:</strong> {acceptedRide.passengerRide?.passengerName || "Unknown"}</p>
-            <p><strong>Phone No:</strong> {acceptedRide.passengerRide?.passengerPhoneNo || "N/A"}</p>
-            <p><strong>Start Location:</strong> {acceptedRide.passengerRide?.startLocation || "N/A"}</p>
-            <p><strong>Destination:</strong> {acceptedRide.passengerRide?.destination || "N/A"}</p>
-            <p><strong>Seats Required:</strong> {acceptedRide.passengerRide?.seatsRequired || 0}</p>
-            <p><strong>Status:</strong> {acceptedRide.status}</p>
-            <p><strong>Created At:</strong> {new Date(acceptedRide.createdAt).toLocaleString()}</p>
-            <p><strong>Updated At:</strong> {new Date(acceptedRide.updatedAt).toLocaleString()}</p>
-            <hr />
-          </div>
-        ))}
-      </Accordion.Body>
-    </Accordion.Item>
-  </Accordion>
-)}
-
-
-               
+                {ride.acceptedRides && ride.acceptedRides.length > 0 && (
+                  <Accordion defaultActiveKey={null} className="mt-3">
+                    <Accordion.Item eventKey="0">
+                      <Accordion.Header>
+                        Accepted/Confirmed Passengers
+                      </Accordion.Header>
+                      <Accordion.Body>
+                        {ride.acceptedRides.map((acceptedRide) => (
+                          <div
+                            key={acceptedRide.passengerRideDriverRideId}
+                            className="accepted-ride"
+                          >
+                            <p>
+                              <strong>Passenger Name:</strong>{" "}
+                              {acceptedRide.passengerRide?.passengerName ||
+                                "Unknown"}
+                            </p>
+                            <p>
+                              <strong>Phone No:</strong>{" "}
+                              {acceptedRide.passengerRide?.passengerPhoneNo ||
+                                "N/A"}
+                            </p>
+                            <p>
+                              <strong>Start Location:</strong>{" "}
+                              {acceptedRide.passengerRide?.startLocation ||
+                                "N/A"}
+                            </p>
+                            <p>
+                              <strong>Destination:</strong>{" "}
+                              {acceptedRide.passengerRide?.destination || "N/A"}
+                            </p>
+                            <p>
+                              <strong>Seats Required:</strong>{" "}
+                              {acceptedRide.passengerRide?.seatsRequired || 0}
+                            </p>
+                            <p>
+                              <strong>Status:</strong> {acceptedRide.status}
+                            </p>
+                            <p>
+                              <strong>Created At:</strong>{" "}
+                              {new Date(
+                                acceptedRide.createdAt
+                              ).toLocaleString()}
+                            </p>
+                            <p>
+                              <strong>Updated At:</strong>{" "}
+                              {new Date(
+                                acceptedRide.updatedAt
+                              ).toLocaleString()}
+                            </p>
+                            <hr />
+                          </div>
+                        ))}
+                      </Accordion.Body>
+                    </Accordion.Item>
+                  </Accordion>
+                )}
               </Card.Body>
             </Card>
           ))}
@@ -292,18 +438,53 @@ const YourOfferedRides = () => {
           <Modal.Title>Pending Requests</Modal.Title>
         </Modal.Header>
         <Modal.Body>
-          { selectedRequest && selectedRequest.length > 0 ?(
+          {selectedRequest && selectedRequest.length > 0 ? (
             selectedRequest.map((request) => (
               <div key={request.passengerRideId} className="request-info">
-                <p><strong>Passenger Name:</strong> {request.passengerName || "Unknown"}</p>
-                <p><strong>Phone No:</strong> {request.passengerPhoneNo || "N/A"}</p>
-                <p><strong>Start Location:</strong> {request.startLocation || "N/A"}</p>
-                <p><strong>Destination:</strong> {request.destination || "N/A"}</p>
-                <p><strong>Seats Required:</strong> {request.seatsRequired || 0}</p>
+                <p>
+                  <strong>Passenger Name:</strong>{" "}
+                  {request.passengerName || "Unknown"}
+                </p>
+                <p>
+                  <strong>Phone No:</strong> {request.passengerPhoneNo || "N/A"}
+                </p>
+                <p>
+                  <strong>Start Location:</strong>{" "}
+                  {request.startLocation || "N/A"}
+                </p>
+                <p>
+                  <strong>Destination:</strong> {request.destination || "N/A"}
+                </p>
+                <p>
+                  <strong>Seats Required:</strong> {request.seatsRequired || 0}
+                </p>
 
                 <div className="request-buttons">
-                  <Button variant="success" onClick={() => handleRequestStatusChange(request.passengerRideId, 'Accepted')} className="me-2">Accept</Button>
-                  <Button variant="danger" onClick={() => handleRequestStatusChange(request.passengerRideId, 'Rejected')}>Reject</Button>
+                  <Button
+                    variant="success"
+                    onClick={() =>
+                      handleRequestStatusChange(
+                        request.passengerRideId,
+                        request.driverRideId,
+                        "Accepted"
+                      )
+                    }
+                    className="me-2"
+                  >
+                    Accept
+                  </Button>
+                  <Button
+                    variant="danger"
+                    onClick={() =>
+                      handleRequestStatusChange(
+                        request.passengerRideId,
+                        request.driverRideId,
+                        "Rejected"
+                      )
+                    }
+                  >
+                    Reject
+                  </Button>
                 </div>
               </div>
             ))

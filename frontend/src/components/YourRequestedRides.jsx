@@ -63,13 +63,22 @@ const loadGoogleMapsScript = () => {
 };
 
 const YourRequestedRides = () => {
-  const { token, user } = useAuth();
-  const userId = user.userId;
+  const { token, user, authLoading } = useAuth();
+  const userId = user?.userId;
   const apiURL = import.meta.env.VITE_API_URL;
   const [requestedRides, setRequestedRides] = useState([]);
+  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
+    if (authLoading) return; // wait for auth to finish
+
+    if (!userId || !token) {
+      setRequestedRides([]); // clear rides if no auth
+      return;
+    }
+
     const fetchRequestedRides = async () => {
+      setLoading(true);
       try {
         await loadGoogleMapsScript();
 
@@ -82,18 +91,12 @@ const YourRequestedRides = () => {
           }
         );
 
-        console.log("LAUDE KA RESPONSE-----------------------------");
-
-        console.log(response);
-
         // Convert coordinates to text addresses
         const ridesData = await Promise.all(
           response.data.rides.map(async (ride) => {
             try {
               const startCoords = JSON.parse(ride.driverRide?.startLocation);
               const endCoords = JSON.parse(ride.driverRide?.destination);
-              console.log(startCoords);
-              console.log(endCoords);
 
               const startAddress = await geocodeLatLng(
                 startCoords.lat,
@@ -103,8 +106,6 @@ const YourRequestedRides = () => {
                 endCoords.lat,
                 endCoords.lng
               );
-              console.log(startAddress);
-              console.log(endAddress);
 
               return {
                 ...ride,
@@ -121,21 +122,53 @@ const YourRequestedRides = () => {
         setRequestedRides(ridesData || []);
       } catch (error) {
         console.error("Error fetching requested rides:", error);
+      } finally {
+        setLoading(false); // ✅ MAKE SURE THIS IS CALLED NO MATTER WHAT
       }
     };
     fetchRequestedRides();
-  }, [userId, token]);
+  }, [authLoading, userId, token]);
 
-  const handleRevoke = async (rideId) => {
+  if (authLoading) return <p>Authenticating...</p>;
+  if (!userId || !token)
+    return <p>Please log in to see your requested rides.</p>;
+  if (loading) return <p>Loading rides...</p>;
+
+  // const handleRevoke = async (rideId) => {
+  //   try {
+  //     await axios.delete(`${apiURL}/rides/revoke/${rideId}`, {
+  //       headers: {
+  //         Authorization: `Bearer ${token}`,
+  //       },
+  //     });
+  //     setRequestedRides((prevRides) =>
+  //       prevRides.filter(
+  //         (ride) => ride.passengerRide.passengerRideId !== rideId
+  //       )
+  //     );
+  //   } catch (error) {
+  //     console.error("Error revoking ride:", error);
+  //   }
+  // };
+
+  const handleRevoke = async (passengerRideId, driverRideId) => {
     try {
-      await axios.delete(`${apiURL}/rides/revoke/${rideId}`, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
+      await axios.delete(
+        `${apiURL}/rides/revoke/${passengerRideId}/${driverRideId}`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+
       setRequestedRides((prevRides) =>
         prevRides.filter(
-          (ride) => ride.passengerRide.passengerRideId !== rideId
+          (ride) =>
+            !(
+              ride.passengerRide.passengerRideId === passengerRideId &&
+              ride.driverRide.driverRideId === driverRideId
+            )
         )
       );
     } catch (error) {
@@ -143,10 +176,10 @@ const YourRequestedRides = () => {
     }
   };
 
-  const handleConfirm = async (rideId) => {
+  const handleConfirm = async (passengerRideId, driverRideId) => {
     try {
-      await axios.post(
-        `${apiURL}/rides/confirm/${rideId}`,
+      const response = await axios.post(
+        `${apiURL}/rides/confirm/${passengerRideId}/${driverRideId}`,
         {},
         {
           headers: {
@@ -154,17 +187,42 @@ const YourRequestedRides = () => {
           },
         }
       );
+
+      // Success — update status
       setRequestedRides((prevRides) =>
         prevRides.map((ride) =>
-          ride.passengerRide.passengerRideId === rideId
+          ride.passengerRide.passengerRideId === passengerRideId &&
+          ride.driverRide.driverRideId === driverRideId
             ? { ...ride, status: "Confirmed" }
             : ride
         )
       );
-      alert("Ride confirmed successfully!");
+
+      // alert("Ride confirmed successfully!");
     } catch (error) {
-      console.error("Error confirming ride:", error);
-      alert("Failed to confirm the ride.");
+      if (
+        error.response &&
+        error.response.status === 400 &&
+        error.response.data?.error === "Insufficient seats available"
+      ) {
+        const shouldRevoke = window.confirm(
+          "Insufficient seats available. Click OK to revoke your request."
+        );
+        if (shouldRevoke) {
+          const ride = requestedRides.find(
+            (r) => r.passengerRide.passengerRideId === rideId
+          );
+          if (ride) {
+            await handleRevoke(
+              ride.passengerRide.passengerRideId,
+              ride.driverRide.driverRideId
+            );
+          }
+        }
+      } else {
+        console.error("Error confirming ride:", error);
+        alert("Failed to confirm the ride.");
+      }
     }
   };
 
@@ -178,23 +236,26 @@ const YourRequestedRides = () => {
           const driverName =
             ride.driverRide?.driver?.user?.fullName || "Unknown";
           const driverPhone = ride.driverRide?.driver?.user?.phoneNo || "N/A";
-          // const startLocation = JSON.parse(ride.driverRide?.startLocation || "{}");
-          // const destination = JSON.parse(ride.driverRide?.destination || "{}");
 
           let message = "";
           let showConfirm = false;
           let showRevoke = true;
 
           if (ride.status === "Requested") {
-            message = "Your request is pending. Waiting for driver to accept";
+            message = "Waiting for driver to accept your request.";
           } else if (ride.status === "Accepted") {
-            message = "Your request is accepted. Please confirm to start";
+            message =
+              "Your request was accepted by the Driver. Confirm ASAP before seats get occupied.";
             showConfirm = true;
           } else if (ride.status === "Confirmed") {
-            message = "Ride has been successfully confirmed";
+            message = "You booked your seats. Driver can Start or Cancel Ride.";
             showRevoke = false;
           } else if (ride.status === "Rejected") {
-            message = "Your Ride has been rejected";
+            message =
+              "The Ride was Cancelled or the request was Rejected by the Driver.";
+          } else if (ride.status === "Finished") {
+            message = "Your Ride has Finished.";
+            showRevoke = false;
           }
 
           return (
@@ -236,7 +297,10 @@ const YourRequestedRides = () => {
               {showConfirm && (
                 <button
                   onClick={() =>
-                    handleConfirm(ride.passengerRide.passengerRideId)
+                    handleConfirm(
+                      ride.passengerRide.passengerRideId,
+                      ride.driverRide.driverRideId
+                    )
                   }
                 >
                   Confirm
@@ -245,11 +309,14 @@ const YourRequestedRides = () => {
               {showRevoke && (
                 <button
                   onClick={() =>
-                    handleRevoke(ride.passengerRide.passengerRideId)
+                    handleRevoke(
+                      ride.passengerRide.passengerRideId,
+                      ride.driverRide.driverRideId
+                    )
                   }
                   style={{ marginLeft: "10px" }}
                 >
-                  Revoke
+                  Revoke / Delete
                 </button>
               )}
             </div>
