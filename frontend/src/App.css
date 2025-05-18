@@ -3,3 +3,25 @@ html, body {
   margin: 0;
   padding: 0;
 }
+
+.map-container {
+  width: 100%;
+  height: 100%; /* Or a fixed value like 500px */
+  flex-grow: 1;
+  overflow: hidden;
+  position: relative;
+}
+
+main {
+  flex-grow: 1;
+  overflow-y: auto;
+}
+
+/* styles.css */
+#start-location, #destination-location {
+  transition: border-color 0.3s ease;
+}
+button.btn:hover {
+  transform: scale(1.03);
+  transition: transform 0.2s ease-in-out;
+}

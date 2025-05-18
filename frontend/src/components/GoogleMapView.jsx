@@ -1,6 +1,12 @@
 import React, { useEffect, useRef, useState, useContext } from "react";
 import { darkMapStyle, lightMapStyle } from "../utils/MapStyles";
 import { ThemeContext, useTheme } from "../ThemeContext";
+import {
+  FaLocationArrow,
+  FaMapMarkedAlt,
+  FaSearch,
+  FaTimes,
+} from "react-icons/fa"; // react-icons for icons
 
 const GoogleMapView = () => {
   const mapRef = useRef(null);
@@ -384,54 +390,195 @@ const GoogleMapView = () => {
     }
   }, [startLocation, destination, map, directionsRenderer, useCurrentLocation]);
 
-  return (
-    <div>
-      <h3>Plan Your Route</h3>
+  // return (
+  //   <div className="container py-4">
+  //     <h3 className="text-center mb-4">Plan Your Route</h3>
 
-      <div>
-        <label>Start Location:</label>
-        <input
-          id="start-location"
-          type="text"
-          value={startLocation}
-          onChange={(e) => {
-            setStartLocation(e.target.value);
-            setUseCurrentLocation(false);
-          }}
-          placeholder="Enter start location"
-          style={{ padding: "10px", width: "300px", marginRight: "10px" }}
-        />
-        <button onClick={handleUseCurrentLocation}>Use Current Location</button>
-        <button onClick={() => handleSelectFromMap("start")}>
-          Show on Map
+  //     {/* Start Location */}
+  //     <div className="mb-3 row align-items-center">
+  //       <label
+  //         htmlFor="start-location"
+  //         className="col-sm-2 col-form-label fw-semibold"
+  //       >
+  //         Start Location:
+  //       </label>
+  //       <div className="col-sm-6 mb-2 mb-sm-0">
+  //         <input
+  //           id="start-location"
+  //           type="text"
+  //           className="form-control"
+  //           value={startLocation}
+  //           onChange={(e) => {
+  //             setStartLocation(e.target.value);
+  //             setUseCurrentLocation(false);
+  //           }}
+  //           placeholder="Enter start location"
+  //         />
+  //       </div>
+  //       <div className="col-sm-4 d-flex gap-2">
+  //         <button
+  //           className="btn btn-outline-primary"
+  //           onClick={handleUseCurrentLocation}
+  //         >
+  //           Use Current Location
+  //         </button>
+  //         <button
+  //           className="btn btn-outline-secondary"
+  //           onClick={() => handleSelectFromMap("start")}
+  //         >
+  //           Show on Map
+  //         </button>
+  //       </div>
+  //     </div>
+
+  //     {/* Destination */}
+  //     <div className="mb-3 row align-items-center">
+  //       <label
+  //         htmlFor="destination-location"
+  //         className="col-sm-2 col-form-label fw-semibold"
+  //       >
+  //         Destination:
+  //       </label>
+  //       <div className="col-sm-6 mb-2 mb-sm-0">
+  //         <input
+  //           id="destination-location"
+  //           type="text"
+  //           className="form-control"
+  //           value={destination}
+  //           onChange={(e) => setDestination(e.target.value)}
+  //           placeholder="Enter destination"
+  //         />
+  //       </div>
+  //       <div className="col-sm-4">
+  //         <button
+  //           className="btn btn-outline-secondary"
+  //           onClick={() => handleSelectFromMap("end")}
+  //         >
+  //           Show on Map
+  //         </button>
+  //       </div>
+  //     </div>
+
+  //     {/* Action Buttons */}
+  //     <div className="d-flex justify-content-center gap-3 mt-4">
+  //       <button className="btn btn-success" onClick={handleDirections}>
+  //         Show Directions
+  //       </button>
+  //       <button className="btn btn-danger" onClick={handleClearMap}>
+  //         Clear Directions
+  //       </button>
+  //     </div>
+
+  //     {/* Map Display */}
+  //     <div
+  //       ref={mapRef}
+  //       className="mt-4 rounded shadow"
+  //       style={{ height: "500px", width: "100%" }}
+  //     ></div>
+  //   </div>
+  // );
+
+  return (
+    <div className="container py-4">
+      {/* <h3 className="text-center mb-4">Plan Your Route</h3> */}
+
+      {/* Start Location */}
+      <div className="mb-3 row align-items-center">
+        <label
+          htmlFor="start-location"
+          className="col-sm-2 col-form-label fw-semibold"
+        >
+          Start Location:
+        </label>
+        <div className="col-sm-6 mb-2 mb-sm-0">
+          <input
+            id="start-location"
+            type="text"
+            className="form-control"
+            value={startLocation}
+            onChange={(e) => {
+              setStartLocation(e.target.value);
+              setUseCurrentLocation(false);
+            }}
+            placeholder="Enter start location"
+          />
+        </div>
+        <div className="col-sm-4 d-flex gap-2">
+          <button
+            className="btn btn-primary d-flex align-items-center gap-1"
+            onClick={handleUseCurrentLocation}
+          >
+            <FaLocationArrow /> Use My Location
+          </button>
+          <button
+            className="btn btn-secondary d-flex align-items-center gap-1"
+            onClick={() => handleSelectFromMap("start")}
+          >
+            <FaMapMarkedAlt /> Select on Map
+          </button>
+        </div>
+      </div>
+
+      {/* Destination */}
+      <div className="mb-3 row align-items-center">
+        <label
+          htmlFor="destination-location"
+          className="col-sm-2 col-form-label fw-semibold"
+        >
+          Destination:
+        </label>
+        <div className="col-sm-6 mb-2 mb-sm-0">
+          <input
+            id="destination-location"
+            type="text"
+            className="form-control"
+            value={destination}
+            onChange={(e) => setDestination(e.target.value)}
+            placeholder="Enter destination"
+          />
+        </div>
+        <div className="col-sm-4">
+          <button
+            className="btn btn-secondary d-flex align-items-center gap-1"
+            onClick={() => handleSelectFromMap("end")}
+          >
+            <FaMapMarkedAlt /> Select on Map
+          </button>
+        </div>
+      </div>
+
+      {/* Action Buttons */}
+      {/* <div className="d-flex justify-content-center gap-3 mt-4">
+        <button className="btn btn-success" onClick={handleDirections}>
+          Show Directions
+        </button>
+        <button className="btn btn-danger" onClick={handleClearMap}>
+          Clear Directions
+        </button>
+      </div> */}
+
+      {/* Action Buttons */}
+      <div className="d-flex justify-content-center gap-3 mt-4">
+        <button
+          className="btn btn-success d-flex align-items-center"
+          onClick={handleDirections}
+        >
+          <FaSearch className="me-2" /> Show Directions
+        </button>
+        <button
+          className="btn btn-danger d-flex align-items-center"
+          onClick={handleClearMap}
+        >
+          <FaTimes className="me-2" /> Clear Directions
         </button>
       </div>
 
-      <div>
-        <label>Destination:</label>
-        <input
-          id="destination-location"
-          type="text"
-          value={destination}
-          onChange={(e) => setDestination(e.target.value)}
-          placeholder="Enter destination"
-          style={{ padding: "10px", width: "300px", marginRight: "10px" }}
-        />
-        <button onClick={() => handleSelectFromMap("end")}>Show on Map</button>
-      </div>
-
-      <button onClick={handleDirections} style={{ marginTop: "20px" }}>
-        Show Directions
-      </button>
-
-      <button
-        onClick={handleClearMap}
-        style={{ marginTop: "10px", marginLeft: "10px" }}
-      >
-        Clear Directions
-      </button>
-
-      <div ref={mapRef} style={{ height: "500px", marginTop: "20px" }}></div>
+      {/* Map Display */}
+      <div
+        ref={mapRef}
+        className="mt-4 rounded shadow"
+        style={{ height: "500px", width: "100%" }}
+      ></div>
     </div>
   );
 };
