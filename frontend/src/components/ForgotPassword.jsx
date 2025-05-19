@@ -68,7 +68,7 @@ const ForgotPassword = () => {
   };
 
   return (
-    <div className="container mt-5" style={{ maxWidth: "500px" }}>
+    <div className="container my-5" style={{ maxWidth: "500px" }}>
       <h3 className="mb-4">Forgot Password</h3>
       {message && <div className="alert alert-info">{message}</div>}
 

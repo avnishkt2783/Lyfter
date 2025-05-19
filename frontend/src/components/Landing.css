@@ -1,0 +1,55 @@
+/* Top Carousel */
+.landing-carousel {
+  height: 80vh;
+  /* background: linear-gradient(to right, #343a40, #212529); */
+}
+
+.carousel-placeholder {
+  height: 100%;
+}
+
+/* CTA Button */
+.landing-btn-cta {
+  padding: 0.75rem 2rem;
+}
+
+/* Testimonials */
+.testimonial {
+  border-radius: 0.5rem;
+  /* background-color: #f8f9fa; */
+}
+
+/* Final CTA */
+.landing-cta-section {
+  background-image: linear-gradient(to right, #007bff, #0056b3);
+}
+
+/* Stats */
+.landing-stats-section h3 {
+  font-size: 2.5rem;
+}
+
+.landing-carousel {
+  max-height: 90vh;
+  overflow: hidden;
+}
+
+.landing-carousel-section {
+  /* width: 100%; */
+  margin: 10px;
+  padding: 0;
+}
+
+.landing-carousel-img {
+  width: 100%;
+  height: auto;
+  object-fit: cover;
+  display: block;
+  cursor: pointer;
+}
+
+.carousel-caption {
+  /* background-color: rgba(0, 0, 0, 0.4); */
+  padding: 1rem 2rem;
+  border-radius: 10px;
+}

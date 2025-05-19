@@ -2,10 +2,19 @@ import React, { useEffect, useState } from "react";
 import axios from "axios";
 import { useAuth } from "../AuthContext";
 import { useNavigate } from "react-router-dom";
+import { useTheme } from "../ThemeContext";
+import {
+  FaUser,
+  FaPhone,
+  FaMapMarkerAlt,
+  FaMapSigns,
+  FaChair,
+  FaSearch,
+  FaCarSide,
+} from "react-icons/fa";
 
 const RequestRideDetails = () => {
   const navigate = useNavigate();
-  const [userData, setUserData] = useState({});
   const [seats, setSeats] = useState(1);
   const [passengerName, setPassengerName] = useState("");
   const [passengerPhoneNo, setPassengerPhoneNo] = useState("");
@@ -17,6 +26,8 @@ const RequestRideDetails = () => {
 
   const apiURL = import.meta.env.VITE_API_URL;
   const { token } = useAuth();
+  const { theme } = useTheme();
+  const isDark = theme === "dark";
 
   useEffect(() => {
     axios
@@ -24,16 +35,14 @@ const RequestRideDetails = () => {
         headers: { Authorization: `Bearer ${token}` },
       })
       .then((res) => {
-        setUserData(res.data);
         if (res.data.fullName) setPassengerName(res.data.fullName);
         if (res.data.phoneNo) setPassengerPhoneNo(res.data.phoneNo);
       })
       .catch((err) => console.error("Error fetching user:", err));
   }, []);
 
-  const handleSubmit = async (e) => {
+  const handleSubmit = (e) => {
     e.preventDefault();
-
     if (
       !passengerName ||
       !passengerPhoneNo ||
@@ -59,50 +68,102 @@ const RequestRideDetails = () => {
   };
 
   return (
-    <form onSubmit={handleSubmit}>
-      <h2>Passenger Details</h2>
-      <div>
-        <label>Name:</label>
-        <input
-          type="text"
-          value={passengerName}
-          onChange={(e) => setPassengerName(e.target.value)}
-          placeholder="Enter your full name"
-          required
-        />
+    <div
+      className={`container py-5 ${
+        isDark ? "bg-dark text-light" : "text-dark"
+      }`}
+    >
+      <div
+        className={`card shadow mx-auto p-4 ${
+          isDark
+            ? "bg-dark text-white border-secondary"
+            : "bg-white border-dark"
+        }`}
+        style={{ maxWidth: "750px" }}
+      >
+        <div className="card-body">
+          <h3 className="card-title mb-4 text-center">
+            <FaCarSide className="me-2" />
+            Request a Ride
+          </h3>
+          <form onSubmit={handleSubmit}>
+            <div className="mb-3">
+              <label className="form-label">
+                <FaUser className="me-2" />
+                Full Name:
+              </label>
+              <input
+                type="text"
+                className="form-control"
+                value={passengerName}
+                onChange={(e) => setPassengerName(e.target.value)}
+                placeholder="Enter your full name"
+                required
+              />
+            </div>
+            <div className="mb-3">
+              <label className="form-label">
+                <FaPhone className="me-2" />
+                Phone Number:
+              </label>
+              <input
+                type="tel"
+                className="form-control"
+                value={passengerPhoneNo}
+                onChange={(e) => setPassengerPhoneNo(e.target.value)}
+                placeholder="Enter your phone number"
+                required
+              />
+            </div>
+            <div className="mb-3">
+              <label className="form-label">
+                <FaMapMarkerAlt className="me-2" />
+                Start Location:
+              </label>
+              <input
+                type="text"
+                className="form-control"
+                value={startLocationText}
+                disabled
+              />
+            </div>
+            <div className="mb-3">
+              <label className="form-label">
+                <FaMapSigns className="me-2" />
+                Destination:
+              </label>
+              <input
+                type="text"
+                className="form-control"
+                value={destinationText}
+                disabled
+              />
+            </div>
+            <div className="mb-3">
+              <label className="form-label">
+                <FaChair className="me-2" />
+                Seats Required:
+              </label>
+              <input
+                type="number"
+                className="form-control"
+                value={seats}
+                onChange={(e) => setSeats(Number(e.target.value))}
+                min="1"
+                placeholder="Seats Required"
+                required
+              />
+            </div>
+            <div className="text-center">
+              <button type="submit" className="btn btn-primary px-4">
+                <FaSearch className="me-2" />
+                Show Matching Rides
+              </button>
+            </div>
+          </form>
+        </div>
       </div>
-      <div>
-        <label>Phone Number:</label>
-        <input
-          type="tel"
-          value={passengerPhoneNo}
-          onChange={(e) => setPassengerPhoneNo(e.target.value)}
-          placeholder="Enter your phone number"
-          required
-        />
-      </div>
-      {/* Display start and destination from localStorage */} {/*DONE*/}
-      <div>
-        <label>Start Location:</label>
-        <input type="text" value={startLocationText} disabled />
-      </div>
-      <div>
-        <label>Destination:</label>
-        <input type="text" value={destinationText} disabled />
-      </div>
-      <div>
-        <label>Seats Required:</label>
-        <input
-          type="number"
-          value={seats}
-          onChange={(e) => setSeats(Number(e.target.value))}
-          min="1"
-          required
-          placeholder="Seats Required"
-        />
-      </div>
-      <button type="submit">Show Rides</button>
-    </form>
+    </div>
   );
 };
 

@@ -8,7 +8,7 @@ import ThemeToggle from "./ThemeToggle";
 import "./Navbar.css";
 
 const Navbar = () => {
-  const { token } = useAuth();
+  const { token, user } = useAuth();
   const { theme, toggleTheme } = useTheme();
 
   const isDark = theme === "dark";
@@ -29,26 +29,26 @@ const Navbar = () => {
           />
         </Link>
         <div className="d-flex align-items-center ms-auto d-lg-none me-2">
-      <ThemeToggle />
-    </div>
-          <button
-            className="navbar-toggler"
-            type="button"
-            data-bs-toggle="collapse"
-            data-bs-target="#navbarContent"
-            aria-controls="navbarContent"
-            aria-expanded="false"
-            aria-label="Toggle navigation"
-          >
-            <span className="navbar-toggler-icon"></span>
-          </button>
+          <ThemeToggle />
+        </div>
+        <button
+          className="navbar-toggler"
+          type="button"
+          data-bs-toggle="collapse"
+          data-bs-target="#navbarContent"
+          aria-controls="navbarContent"
+          aria-expanded="false"
+          aria-label="Toggle navigation"
+        >
+          <span className="navbar-toggler-icon"></span>
+        </button>
         <div
           className="collapse navbar-collapse justify-content-end"
           id="navbarContent"
         >
           <div className="d-none d-lg-block me-3">
-      <ThemeToggle />
-    </div>
+            <ThemeToggle />
+          </div>
           <ul className="navbar-nav align-items-end">
             <li className="nav-item me-2"></li>
             <li className="nav-item">
@@ -70,7 +70,11 @@ const Navbar = () => {
                 <li className="nav-item">
                   <Link className="nav-link" to="/profile">
                     <img
-                      src="default.jpg"
+                      src={user?.profileImg || "default.jpg"}
+                      onError={(e) => {
+                        e.target.onerror = null;
+                        e.target.src = "default.jpg";
+                      }}
                       alt="Profile"
                       className="rounded-circle"
                       height="35"

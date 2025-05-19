@@ -41,6 +41,9 @@ const User = sequelize.define("user", {
     type: DataTypes.STRING,
     allowNull: true,
   },
+  profileImgPublicId: {
+    type: DataTypes.STRING,
+  },
   isLoggedIn: {
     type: DataTypes.BOOLEAN,
     allowNull: false,

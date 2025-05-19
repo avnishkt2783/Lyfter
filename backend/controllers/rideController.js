@@ -169,6 +169,7 @@ export const matchingRides = async (req, res) => {
     seats: { [Op.gte]: parseInt(seatsRequired) },
     status: "Waiting",
   },
+  order: [['createdAt', 'DESC']],
   include: [
     {
       model: Driver,
@@ -281,17 +282,17 @@ export const getOfferedRides = async (req, res) => {
   export const getRequestedRides = async (req, res) => {
     const userId = req.user?.userId;
 
-    console.log("---------------------------------------------------");
-    console.log("userId: " + userId);
-    console.log("---------------------------------------------------");
+    // console.log("---------------------------------------------------");
+    // console.log("userId: " + userId);
+    // console.log("---------------------------------------------------");
 
     try {
       // Find the passenger by userId
       const passenger = await Passenger.findOne({ where: { userId } });
 
-      console.log("---------------------------------------------------");
-      console.log("Passenger object: ", passenger);
-      console.log("---------------------------------------------------");
+      // console.log("---------------------------------------------------");
+      // console.log("Passenger object: ", passenger);
+      // console.log("---------------------------------------------------");
 
       if (!passenger) {
         return res.status(404).json({ error: "Passenger not found" });
@@ -299,13 +300,14 @@ export const getOfferedRides = async (req, res) => {
 
       const passengerId = passenger.passengerId;
 
-      console.log("---------------------------------------------------");
-      console.log("Passenger ID: " + passengerId);
-      console.log("---------------------------------------------------");
+      // console.log("---------------------------------------------------");
+      // console.log("Passenger ID: " + passengerId);
+      // console.log("---------------------------------------------------");
 
       // Find all requested rides for the passenger
       const requestedRides = await PassengerRideDriverRide.findAll({
         attributes: ['status'], // Include the status from PassengerRideDriverRide
+        order: [['createdAt', 'DESC']],
         include: [
           {
             model: PassengerRide,
@@ -314,7 +316,7 @@ export const getOfferedRides = async (req, res) => {
           },
           {
             model: DriverRide,
-            attributes: ['driverRideId','startLocation', 'destination', 'fare', 'seats', 'driverId'],
+            attributes: ['driverRideId','startLocation', 'destination', 'fare', 'seats', 'driverId', 'departureTime'],
             include: [
               {
                 model: Driver,
@@ -330,9 +332,9 @@ export const getOfferedRides = async (req, res) => {
         ],
       });
 
-      console.log("---------------------------------------------------");
-      console.log("Requested Rides: ", requestedRides);
-      console.log("---------------------------------------------------");
+      // console.log("---------------------------------------------------");
+      // console.log("Requested Rides: ", requestedRides);
+      // console.log("---------------------------------------------------");
 
       if (!requestedRides || requestedRides.length === 0) {
         return res.status(404).json({ message: "No requested rides found" });
