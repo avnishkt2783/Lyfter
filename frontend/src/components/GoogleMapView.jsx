@@ -56,7 +56,10 @@ const GoogleMapView = () => {
   useEffect(() => {
     loadGoogleMapsScript()
       .then(() => {
+        console.log("origin-outside", origin);
+
         const initializeMap = (origin) => {
+          console.log("origin-inside", origin);
           const mapInstance = new window.google.maps.Map(mapRef.current, {
             zoom: 14,
             center: origin,
@@ -249,10 +252,24 @@ const GoogleMapView = () => {
     directionsRenderer.setDirections({ routes: [] });
 
     const geocodeAndRoute = (origin) => {
+      const destCoords = JSON.parse(
+        localStorage.getItem("destinationCoordinatesB")
+      );
+
+      if (!destCoords) {
+        console.error("No destination coordinates found in localStorage.");
+        return;
+      }
+
+      const destinationLatLng = new window.google.maps.LatLng(
+        destCoords.lat,
+        destCoords.lng
+      );
+
       directionsService.route(
         {
           origin,
-          destination,
+          destination: destinationLatLng,
           travelMode: window.google.maps.TravelMode.DRIVING,
         },
         (response, status) => {
@@ -390,94 +407,6 @@ const GoogleMapView = () => {
     }
   }, [startLocation, destination, map, directionsRenderer, useCurrentLocation]);
 
-  // return (
-  //   <div className="container py-4">
-  //     <h3 className="text-center mb-4">Plan Your Route</h3>
-
-  //     {/* Start Location */}
-  //     <div className="mb-3 row align-items-center">
-  //       <label
-  //         htmlFor="start-location"
-  //         className="col-sm-2 col-form-label fw-semibold"
-  //       >
-  //         Start Location:
-  //       </label>
-  //       <div className="col-sm-6 mb-2 mb-sm-0">
-  //         <input
-  //           id="start-location"
-  //           type="text"
-  //           className="form-control"
-  //           value={startLocation}
-  //           onChange={(e) => {
-  //             setStartLocation(e.target.value);
-  //             setUseCurrentLocation(false);
-  //           }}
-  //           placeholder="Enter start location"
-  //         />
-  //       </div>
-  //       <div className="col-sm-4 d-flex gap-2">
-  //         <button
-  //           className="btn btn-outline-primary"
-  //           onClick={handleUseCurrentLocation}
-  //         >
-  //           Use Current Location
-  //         </button>
-  //         <button
-  //           className="btn btn-outline-secondary"
-  //           onClick={() => handleSelectFromMap("start")}
-  //         >
-  //           Show on Map
-  //         </button>
-  //       </div>
-  //     </div>
-
-  //     {/* Destination */}
-  //     <div className="mb-3 row align-items-center">
-  //       <label
-  //         htmlFor="destination-location"
-  //         className="col-sm-2 col-form-label fw-semibold"
-  //       >
-  //         Destination:
-  //       </label>
-  //       <div className="col-sm-6 mb-2 mb-sm-0">
-  //         <input
-  //           id="destination-location"
-  //           type="text"
-  //           className="form-control"
-  //           value={destination}
-  //           onChange={(e) => setDestination(e.target.value)}
-  //           placeholder="Enter destination"
-  //         />
-  //       </div>
-  //       <div className="col-sm-4">
-  //         <button
-  //           className="btn btn-outline-secondary"
-  //           onClick={() => handleSelectFromMap("end")}
-  //         >
-  //           Show on Map
-  //         </button>
-  //       </div>
-  //     </div>
-
-  //     {/* Action Buttons */}
-  //     <div className="d-flex justify-content-center gap-3 mt-4">
-  //       <button className="btn btn-success" onClick={handleDirections}>
-  //         Show Directions
-  //       </button>
-  //       <button className="btn btn-danger" onClick={handleClearMap}>
-  //         Clear Directions
-  //       </button>
-  //     </div>
-
-  //     {/* Map Display */}
-  //     <div
-  //       ref={mapRef}
-  //       className="mt-4 rounded shadow"
-  //       style={{ height: "500px", width: "100%" }}
-  //     ></div>
-  //   </div>
-  // );
-
   return (
     <div className="container py-4">
       {/* <h3 className="text-center mb-4">Plan Your Route</h3> */}
@@ -546,16 +475,6 @@ const GoogleMapView = () => {
           </button>
         </div>
       </div>
-
-      {/* Action Buttons */}
-      {/* <div className="d-flex justify-content-center gap-3 mt-4">
-        <button className="btn btn-success" onClick={handleDirections}>
-          Show Directions
-        </button>
-        <button className="btn btn-danger" onClick={handleClearMap}>
-          Clear Directions
-        </button>
-      </div> */}
 
       {/* Action Buttons */}
       <div className="d-flex justify-content-center gap-3 mt-4">

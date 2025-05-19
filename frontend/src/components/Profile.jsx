@@ -1,6 +1,19 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
 import { useAuth } from "../AuthContext";
+import { useTheme } from "../ThemeContext"; // import your ThemeContext
+import {
+  FaUser,
+  FaEnvelope,
+  FaPhone,
+  FaCalendar,
+  FaMapMarkerAlt,
+  FaSave,
+  FaUpload,
+  FaPencilAlt,
+} from "react-icons/fa";
+import "bootstrap/dist/css/bootstrap.min.css";
+import "./Profile.css";
 
 const calculateAge = (dob) => {
   const birthDate = new Date(dob);
@@ -15,14 +28,15 @@ const calculateAge = (dob) => {
   ) {
     age--;
   }
-
   return age;
 };
 
 const Profile = () => {
   const apiURL = import.meta.env.VITE_API_URL;
-
   const { token } = useAuth();
+  const { theme } = useTheme(); // get theme
+  const isDark = theme === "dark";
+
   const [profile, setProfile] = useState(null);
   const [formData, setFormData] = useState({});
   const [profileImg, setProfileImg] = useState(null);
@@ -30,27 +44,27 @@ const Profile = () => {
   const [error, setError] = useState("");
   const [successMsg, setSuccessMsg] = useState("");
 
-  useEffect(() => {
-    const fetchProfile = async () => {
-      try {
-        const res = await axios.get(`${apiURL}/profile`, {
-          headers: { Authorization: `Bearer ${token}` },
-        });
-        setProfile(res.data);
-        setFormData({
-          ...res.data,
-          addressAddress: res.data.address?.address || "",
-          addressCity: res.data.address?.city || "",
-          addressState: res.data.address?.state || "",
-          addressPincode: res.data.address?.pincode || "",
-          addressCountry: res.data.address?.country || "",
-          dob: res.data.dob || "",
-        });
-      } catch (err) {
-        setError(err?.response?.data?.message || "Failed to load profile");
-      }
-    };
+  const fetchProfile = async () => {
+    try {
+      const res = await axios.get(`${apiURL}/profile`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      setProfile(res.data);
+      setFormData({
+        ...res.data,
+        addressAddress: res.data.address?.address || "",
+        addressCity: res.data.address?.city || "",
+        addressState: res.data.address?.state || "",
+        addressPincode: res.data.address?.pincode || "",
+        addressCountry: res.data.address?.country || "",
+        dob: res.data.dob || "",
+      });
+    } catch (err) {
+      setError(err?.response?.data?.message || "Failed to load profile");
+    }
+  };
 
+  useEffect(() => {
     if (token) fetchProfile();
   }, [token]);
 
@@ -66,10 +80,7 @@ const Profile = () => {
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setFormData((prev) => ({
-      ...prev,
-      [name]: value,
-    }));
+    setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
   const handleImageChange = (e) => {
@@ -92,7 +103,6 @@ const Profile = () => {
       if (profileImg) {
         data.append("profileImg", profileImg);
       }
-
       const res = await axios.put(`${apiURL}/profile/update`, data, {
         headers: {
           Authorization: `Bearer ${token}`,
@@ -100,146 +110,238 @@ const Profile = () => {
         },
       });
 
+      await fetchProfile(); // Re-fetch to get the fresh and correct data
       setSuccessMsg("Profile updated successfully!");
-      setProfile(res.data);
+      // setProfile(res.data);
     } catch (err) {
       setError(err?.response?.data?.message || "Failed to update profile");
     }
   };
 
-  if (error)
-    return <p style={{ color: "red", textAlign: "center" }}>{error}</p>;
-  if (!profile)
-    return <p style={{ textAlign: "center" }}>Loading profile...</p>;
+  if (error) return <p className="text-danger text-center">{error}</p>;
+  if (!profile) return <p className="text-center">Loading profile...</p>;
 
   const age = formData.dob ? calculateAge(formData.dob) : null;
-  const backendProfileURL = "http://localhost:3000";
 
   return (
-    <div style={{ maxWidth: "600px", margin: "0 auto", padding: "20px" }}>
-      <h2>Edit Profile</h2>
-      <h2>BUILD LOGIC FOR DELETION OF IMAGE WHENEVER NEW IMAGE IS UPLOADED</h2>
+    <div
+      className={`container profile-form my-4 p-4 rounded shadow ${
+        isDark ? "bg-dark text-white border-secondary" : "bg-white border-dark"
+      }`}
+    >
+      {/* <h2 className="text-center mb-4">Edit Profile</h2> */}
 
-      {successMsg && <p style={{ color: "green" }}>{successMsg}</p>}
-      {error && <p style={{ color: "red" }}>{error}</p>}
+      {successMsg && (
+        <div
+          className={`alert ${
+            isDark
+              ? "alert-success bg-success bg-opacity-25 text-white"
+              : "alert-success"
+          }`}
+        >
+          {successMsg}
+        </div>
+      )}
+      {error && (
+        <div
+          className={`alert ${
+            isDark
+              ? "alert-danger bg-danger bg-opacity-25 text-white"
+              : "alert-danger"
+          }`}
+        >
+          {error}
+        </div>
+      )}
 
       <form onSubmit={handleSubmit} encType="multipart/form-data">
-        <div style={{ marginBottom: "15px" }}>
-          <img
-            src={
-              previewImg ||
-              `${backendProfileURL}${profile.profileImg}` ||
-              "/default.jpg"
-            }
-            alt="Profile"
-            style={{ width: 120, height: 120, borderRadius: "50%" }}
-          />
-          <div>
-            <label>
-              Upload Image:
-              <input
-                type="file"
-                accept="image/*"
-                onChange={handleImageChange}
-                style={{ display: "block", marginTop: "5px" }}
-              />
-            </label>
-          </div>
+        {/* Profile image with pencil overlay */}
+        <div className="text-center mb-3">
+          <label
+            htmlFor="profileImageInput"
+            className="profile-image-wrapper"
+            style={{
+              cursor: "pointer",
+              display: "inline-block",
+              position: "relative",
+            }}
+            title="Change Profile Image"
+          >
+            <img
+              src={previewImg || profile.profileImg || "/default.jpg"}
+              alt="Profile"
+              className="rounded-circle"
+              style={{
+                width: "120px",
+                height: "120px",
+                objectFit: "cover",
+                display: "block",
+              }}
+            />
+            <div
+              className={`profile-image-overlay ${
+                isDark ? "overlay-dark" : "overlay-light"
+              }`}
+            >
+              <FaPencilAlt size={22} />
+            </div>
+            <input
+              id="profileImageInput"
+              type="file"
+              accept="image/*"
+              hidden
+              onChange={handleImageChange}
+            />
+          </label>
         </div>
 
-        <label>
-          Full Name:
+        {/* Input fields */}
+        <div className="form-group mb-3">
+          <label>
+            <FaUser className="me-2" />
+            Full Name
+          </label>
           <input
+            className={`form-control ${
+              isDark ? "text-white border-1 border-light" : ""
+            }`}
             name="fullName"
             value={formData.fullName || ""}
             onChange={handleChange}
             required
           />
-        </label>
+        </div>
 
-        <label>
-          Email:
+        <div className="form-group mb-3">
+          <label>
+            <FaEnvelope className="me-2" />
+            Email
+          </label>
           <input
+            className={`form-control ${
+              isDark ? "text-white border-1 border-light" : ""
+            }`}
             name="email"
             value={formData.email || ""}
             onChange={handleChange}
             disabled
           />
-        </label>
+        </div>
 
-        <label>
-          Phone No:
+        <div className="form-group mb-3">
+          <label>
+            <FaPhone className="me-2" />
+            Phone No.
+          </label>
           <input
+            className={`form-control ${
+              isDark ? "text-white border-1 border-light" : ""
+            }`}
             name="phoneNo"
             value={formData.phoneNo || ""}
             onChange={handleChange}
           />
-        </label>
+        </div>
 
-        <label>
-          Date of Birth:
+        <div className="form-group mb-3">
+          <label>
+            <FaCalendar className="me-2" />
+            Date of Birth{" "}
+            <span className="badge bg-danger">
+              Cannot be changed once entered.
+            </span>
+          </label>
           <input
             type="date"
+            className={`form-control ${
+              isDark ? "text-white border-1 border-light" : ""
+            }`}
             name="dob"
             value={formData.dob || ""}
             onChange={handleChange}
             disabled={!!profile.dob}
             required={!profile.dob}
           />
-        </label>
+        </div>
 
-        <label>
-          Age:
-          <input name="age" value={age || ""} disabled />
-        </label>
-
-        <h4>Address</h4>
-        <label>
-          Address:
+        <div className="form-group mb-3">
+          <label>Age</label>
           <input
+            className={`form-control ${
+              isDark ? "text-white border-1 border-light" : ""
+            }`}
+            value={age || ""}
+            disabled
+          />
+        </div>
+
+        <h5 className="mt-4 mb-3">
+          <FaMapMarkerAlt className="me-2" />
+          Location Details
+        </h5>
+
+        <div className="form-group mb-2">
+          <label>Address</label>
+          <input
+            className={`form-control ${
+              isDark ? "text-white border-1 border-light" : ""
+            }`}
             name="addressAddress"
             value={formData.addressAddress || ""}
             onChange={handleChange}
           />
-        </label>
+        </div>
 
-        <label>
-          City:
+        <div className="form-group mb-2">
+          <label>City</label>
           <input
+            className={`form-control ${
+              isDark ? "text-white border-1 border-light" : ""
+            }`}
             name="addressCity"
             value={formData.addressCity || ""}
             onChange={handleChange}
           />
-        </label>
+        </div>
 
-        <label>
-          State:
+        <div className="form-group mb-2">
+          <label>State</label>
           <input
+            className={`form-control ${
+              isDark ? "text-white border-1 border-light" : ""
+            }`}
             name="addressState"
             value={formData.addressState || ""}
             onChange={handleChange}
           />
-        </label>
+        </div>
 
-        <label>
-          Pincode:
+        <div className="form-group mb-2">
+          <label>Pincode</label>
           <input
+            className={`form-control ${
+              isDark ? "text-white border-1 border-light" : ""
+            }`}
             name="addressPincode"
             value={formData.addressPincode || ""}
             onChange={handleChange}
           />
-        </label>
+        </div>
 
-        <label>
-          Country:
+        <div className="form-group mb-4">
+          <label>Country</label>
           <input
+            className={`form-control ${
+              isDark ? "text-white border-1 border-light" : ""
+            }`}
             name="addressCountry"
             value={formData.addressCountry || ""}
             onChange={handleChange}
           />
-        </label>
+        </div>
 
-        <button type="submit" style={{ marginTop: "15px" }}>
+        <button type="submit" className={`btn btn-success w-100`}>
+          <FaSave className="me-2" />
           Save Profile
         </button>
       </form>

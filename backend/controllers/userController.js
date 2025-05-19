@@ -7,6 +7,7 @@ import User from "../models/user/user.js";
 import Auth from "../models/auth/auth.js";
 import OTPVerification from "../models/OTPVerification/OTPVerification.js";
 import sendMail from "../utils/sendMail.js";
+import { cloudinary } from "../middleware/upload.js";
 
 export const loginUser = async (req, res) => {
   const { email, password } = req.body;
@@ -30,6 +31,7 @@ export const loginUser = async (req, res) => {
         email: user.email,
         phoneNo: user.phoneNo,
         theme: user.theme,
+        profileImg: user.profileImg, // <- include this!
       },
       process.env.JWT_SECRET_KEY,
       { expiresIn: process.env.TOKEN_EXPIRY || "1h" }
@@ -118,16 +120,13 @@ export const logoutUser = async (req, res) => {
 };
 
 export const updateProfile = async (req, res) => {
-  const userId = req.user.userId;
-
   try {
-    const user = await User.findByPk(userId);
-    if (!user) return res.status(404).json({ message: "User not found" });
+    const userId = req.user.userId;
 
     const {
       fullName,
       phoneNo,
-      dob, // Received from frontend
+      dob,
       addressAddress,
       addressCity,
       addressState,
@@ -135,43 +134,44 @@ export const updateProfile = async (req, res) => {
       addressCountry,
     } = req.body;
 
-    const currentDob = user.dob ? new Date(user.dob) : null; 
+    const user = await User.findOne({ where: { userId } });
 
-    if (currentDob && dob && currentDob.toISOString().split("T")[0] !== dob) {
-      return res.status(400).json({ message: "DOB is already set and cannot be changed" });
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
     }
 
-    const profileImgPath = req.file ? `/uploads/${req.file.filename}` : user.profileImg;
-
-    const updatedAddress = {
-      address: addressAddress,
-      city: addressCity,
-      state: addressState,
-      pincode: addressPincode,
-      country: addressCountry,
-    };
-
-    const updatedDob = currentDob || (dob ? new Date(dob) : null); 
-
-    await user.update({
+    const updateData = {
       fullName,
       phoneNo,
-      dob: updatedDob,
-      profileImg: profileImgPath,
-      address: updatedAddress,
+      dob,
+      address: {
+        address: addressAddress,
+        city: addressCity,
+        state: addressState,
+        pincode: addressPincode,
+        country: addressCountry,
+      },
+    };
+
+    // If a new image is uploaded
+    if (req.file && req.file.path && req.file.filename) {
+      // Delete old image from Cloudinary
+      if (user.profileImgPublicId) {
+        await cloudinary.uploader.destroy(user.profileImgPublicId);
+      }
+
+      updateData.profileImg = req.file.path;               // URL
+      updateData.profileImgPublicId = req.file.filename;   // public_id
+    }
+
+    const updatedUser = await User.update(updateData, {
+      where: { userId },
+      returning: true,
     });
 
-    res.status(200).json({
-      message: "Profile updated successfully",
-      profileImageUrl: profileImgPath,
-      fullName: user.fullName,
-      email: user.email,
-      phoneNo: user.phoneNo,
-      dob: updatedDob,
-      address: updatedAddress,
-    });
-  } catch (error) {
-    console.error("Error updating profile:", error);
+    res.json(updatedUser[1][0]);
+  } catch (err) {
+    console.error("Update profile error:", err);
     res.status(500).json({ message: "Failed to update profile" });
   }
 };

@@ -25,6 +25,12 @@
   gap: 1.5rem;
 }
 
+.your-offered-no-rides {
+  text-align: center;
+  font-size: 1.2rem;
+  opacity: 0.75;
+}
+
 .your-offered-ride-card {
   border-radius: 1rem;
   transition: transform 0.2s ease, box-shadow 0.3s ease;

@@ -334,6 +334,14 @@ const YourOfferedRides = () => {
           <Spinner animation="border" variant={isDark ? "light" : "primary"} />
           <p className="mt-3">Loading rides...</p>
         </div>
+      ) : rides.length === 0 ? (
+        <p
+          className={`your-offered-no-rides ${
+            isDark ? "text-light" : "text-secondary"
+          }`}
+        >
+          No rides offered.
+        </p>
       ) : (
         <div className="your-offered-ride-cards d-flex flex-wrap gap-4 justify-content-center">
           {rides.map((ride) => (
@@ -364,11 +372,11 @@ const YourOfferedRides = () => {
                     <FaMapMarkerAlt /> <strong>To:</strong> {ride.destination}
                   </p>
                   <p>
-                    <FaClock /> <strong>Departure:</strong>{" "}
-                    {new Date(ride.departureTime).toLocaleString()}
+                    <FaChair /> <strong>Seats Available:</strong> {ride.seats}
                   </p>
                   <p>
-                    <FaChair /> <strong>Seats:</strong> {ride.seats}
+                    <FaClock /> <strong>Expected Departure:</strong>{" "}
+                    {new Date(ride.departureTime).toLocaleString()}
                   </p>
                   <p>
                     <strong>Status:</strong>{" "}
@@ -470,6 +478,14 @@ const YourOfferedRides = () => {
                               <FaPhone /> <strong>Phone:</strong>{" "}
                               {acceptedRide.passengerRide?.passengerPhoneNo ||
                                 "N/A"}
+                              {acceptedRide.passengerRide?.passengerPhoneNo && (
+                                <a
+                                  href={`tel:${acceptedRide.passengerRide?.passengerPhoneNo}`}
+                                  className="btn btn-sm btn-success ms-3"
+                                >
+                                  Call
+                                </a>
+                              )}
                             </p>
                             <p>
                               <FaMapMarkerAlt /> <strong>From:</strong>{" "}
@@ -481,14 +497,14 @@ const YourOfferedRides = () => {
                               {acceptedRide.passengerRide?.destination || "N/A"}
                             </p>
                             <p>
-                              <FaChair /> <strong>Seats:</strong>{" "}
+                              <FaChair /> <strong>Seats Requested:</strong>{" "}
                               {acceptedRide.passengerRide?.seatsRequired || 0}
                             </p>
                             <p>
                               <FaInfoCircle /> <strong>Status:</strong>{" "}
                               {acceptedRide.status}
                             </p>
-                            <p className="text-muted small">
+                            {/* <p className="text-muted small">
                               <strong>Created:</strong>{" "}
                               {new Date(
                                 acceptedRide.createdAt
@@ -498,7 +514,7 @@ const YourOfferedRides = () => {
                               {new Date(
                                 acceptedRide.updatedAt
                               ).toLocaleString()}
-                            </p>
+                            </p> */}
                           </div>
                         ))}
                       </Accordion.Body>
@@ -537,6 +553,14 @@ const YourOfferedRides = () => {
                 <p>
                   <FaPhone /> <strong>Phone:</strong>{" "}
                   {request.passengerPhoneNo || "N/A"}
+                  {request.passengerPhoneNo && (
+                    <a
+                      href={`tel:${request.passengerPhoneNo}`}
+                      className="btn btn-sm btn-success ms-3"
+                    >
+                      Call
+                    </a>
+                  )}
                 </p>
                 <p>
                   <FaMapMarkerAlt /> <strong>From:</strong>{" "}
@@ -547,7 +571,7 @@ const YourOfferedRides = () => {
                   {request.destination || "N/A"}
                 </p>
                 <p>
-                  <FaChair /> <strong>Seats:</strong>{" "}
+                  <FaChair /> <strong>Seats Requested:</strong>{" "}
                   {request.seatsRequired || 0}
                 </p>
 

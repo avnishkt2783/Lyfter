@@ -81,7 +81,11 @@ const Footer = () => {
                 <td className="icon-cell" aria-label="Address">
                   🏢 <strong>Address:</strong>
                 </td>
-                <td>Mahatma Gandhi Central University, Motihari, India</td>
+                <td>
+                  Mahatma Gandhi Central University,
+                  <br />
+                  Motihari, India
+                </td>
               </tr>
             </tbody>
           </table>
@@ -228,8 +232,9 @@ const Footer = () => {
           isDark ? "text-white border-light" : "text-dark border-dark"
         }`}
       >
-        © {new Date().getFullYear()} Lyfter. All rights reserved. | Made with ❤
-        by Lyfter Team
+        © {new Date().getFullYear()} Lyfter. All rights reserved.
+        <br />
+        Made with ❤ by Lyfter Team
       </div>
     </footer>
   );

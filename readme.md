@@ -8,28 +8,25 @@ A full-stack ride-sharing platform that allows users to request and offer rides,
 
 ### 🔧 Work in progress...
 
-- [ ] Consistent UI & UX Building.
-- [ ] Driver UI and functionality.
-- [ ] Ride booking system.
-- [ ] Admin panel for driver verification and system management.
-- [ ] Notifications and messaging between driver and passenger.
-- [ ] Payment integration.
-- [ ] Rating and review system.
-- [ ] Live tracking of rides.
+- [ ] Merge all Codes - (isVerified Badge, OfferRide Dropdown of your vehicles, vehicle information.).
+- [ ] Landing Page & About Page.
+- [ ] Page reload checking for newly added pages.
+- [ ] Reverse Lyfter Logic
+- [ ] Regex For all pages. any element. deep search.
+- [ ] Clean Code & Deploy
+- [ ] Report + PPT + Video PPT
 - [ ] Favicon for LYFTER, remove VITE logo.
 - [ ] LYFTER per alphabet vehicle symbol. (stylised banner for marketing)
-- [ ] Wheels Loading Animation (for better UX) {if possible}
-
----
-
-### ⏳ Work to be done *later*
-
-- [ ] Forgot password functionality and OTP Verification through email. DRIVER VERIFICATION PENDING, onSuccess -> MAIL REPLY.
-- [ ] Automatically delete old image when a new profile image is uploaded.
 
 ---
 
 ### ☑️ Completed tasks
+- [x] Admin panel for driver verification and system management.
+- [x] Driver UI and functionality.
+- [x] Ride booking system.
+- [x] Consistent UI & UX Building.
+- [x] Forgot password functionality and OTP Verification through email. DRIVER VERIFICATION PENDING, onSuccess -> MAIL REPLY.
+- [x] Automatically delete old image when a new profile image is uploaded. (Cloudinary Implemented)
 - [x] Matching Logic: map path matching, subset testing, distance comparison.
 - [x] Addition of Auto marking of location route in Google Maps.
 - [x] Google Maps Extra buttons removal.
@@ -39,6 +36,14 @@ A full-stack ride-sharing platform that allows users to request and offer rides,
 - [x] Google Maps bug (multiple clicks on "select on map" creates duplicate pins) FIX.
 - [x] Hamburger Closed Right Alignment, and Light-Dark toggle position fix.
 - [x] Google Maps: Remove `alert('something')`.
+
+---
+
+### ⏳ Work currently dropped
+- [x] Rating and review system.
+- [x] Live tracking of rides.
+- [x] Notifications and messaging between driver and passenger.
+- [x] Payment integration.
 
 ---
 📁 **Project Directory Structure**
