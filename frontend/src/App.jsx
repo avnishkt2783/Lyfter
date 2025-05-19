@@ -18,6 +18,16 @@ import MatchingRides from "./components/MatchingRides";
 import YourOfferedRides from "./components/YourOfferedRides";
 import YourRequestedRides from "./components/YourRequestedRides";
 import ForgotPassword from "./components/ForgotPassword";
+import BecomeDriver from "./components/BecomeDriverForm";
+import SubmitLicenseForm from "./components/SubmitLicenseForm";
+import DriverStatus from "./components/DriverStatus";
+import PendingDriversList from "./components/PendingDriversList";
+import DriverProfile from "./components/DriverProfile";
+import AddVehicleForm from "./components/AddVehicleForm";
+import AadhaarDriversList from "./components/AadhaarDriversList";
+import AdminDashboard from "./components/AdminDashboard";
+import DriverPage from "./components/DriverPage";
+import AdminRoute from "./AdminRoute";
 
 import "bootstrap/dist/css/bootstrap.min.css";
 import "bootstrap/dist/js/bootstrap.bundle.min.js";
@@ -58,6 +68,38 @@ function App() {
               path="/yourRequestedRides"
               element={<YourRequestedRides />}
             />
+            <Route path="/become-driver" element={<BecomeDriver />} />
+            <Route path="/submit-license" element={<SubmitLicenseForm />} />
+            <Route path="/driver-status" element={<DriverStatus />} />
+            {/* <Route path="/pending-drivers" element={<PendingDriversList />} /> */}
+            <Route path="/driver-profile" element={<DriverProfile />} />
+            <Route path="/add-vehicle" element={<AddVehicleForm />} />
+            {/* <Route path="/verify-aadhar" element={<AadhaarDriversList />} /> */}
+            <Route
+              path="/admin/dashboard"
+              element={
+                <AdminRoute>
+                  <AdminDashboard />
+                </AdminRoute>
+              }
+            />
+            <Route
+              path="/pending-drivers"
+              element={
+                <AdminRoute>
+                  <PendingDriversList />
+                </AdminRoute>
+              }
+            />
+            <Route
+              path="/verify-aadhar"
+              element={
+                <AdminRoute>
+                  <AadhaarDriversList />
+                </AdminRoute>
+              }
+            />
+            <Route path="/driver-dashboard" element={<DriverPage />} />
           </Route>
         </Routes>
       </main>

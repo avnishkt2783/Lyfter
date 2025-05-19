@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import axios from "axios";
 import { useAuth } from "../AuthContext";
 import { useTheme } from "../ThemeContext"; // import your ThemeContext
+import { Link } from "react-router-dom";
 import {
   FaUser,
   FaEnvelope,
@@ -345,6 +346,23 @@ const Profile = () => {
           Save Profile
         </button>
       </form>
+
+      <div style={{ marginTop: "20px", textAlign: "center" }}>
+        <Link
+          to="/driver-dashboard"
+          style={{
+            display: "inline-block",
+            backgroundColor: "#22c55e",
+            color: "white",
+            padding: "10px 20px",
+            borderRadius: "8px",
+            textDecoration: "none",
+            fontWeight: "bold",
+          }}
+        >
+          Go to Driver Dashboard
+        </Link>
+      </div>
     </div>
   );
 };

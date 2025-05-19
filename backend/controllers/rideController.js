@@ -11,7 +11,7 @@ import haversine from "haversine-distance";
 export const offerRideDetails = async (req, res) => {
   const {
     userId,
-    mode,
+    vehicleId,
     startLocation,
     destination,
     seats,
@@ -22,6 +22,11 @@ export const offerRideDetails = async (req, res) => {
   } = req.body;
 
   try {
+    // Convert startLocation and destination to JSON strings if necessary
+    const startLocationString = 
+      typeof startLocation === "string" ? startLocation : JSON.stringify(startLocation);
+    const destinationString = 
+      typeof destination === "string" ? destination : JSON.stringify(destination);
     const routePathString =
       typeof routePath === "string" ? routePath : JSON.stringify(routePath);
 
@@ -32,9 +37,9 @@ export const offerRideDetails = async (req, res) => {
 
     await DriverRide.create({
       driverId: driver.driverId,
-      mode,
-      startLocation,
-      destination,
+      vehicleId,
+      startLocation:startLocationString,
+      destination: destinationString,
       seats,
       fare,
       departureTime,

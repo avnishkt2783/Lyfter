@@ -29,6 +29,7 @@ export const loginUser = async (req, res) => {
         userId: user.userId,
         fullName: user.fullName,
         email: user.email,
+        role: user.role,
         phoneNo: user.phoneNo,
         theme: user.theme,
         profileImg: user.profileImg, // <- include this!

@@ -57,9 +57,17 @@ const User = sequelize.define("user", {
   isVerified: {
     type: DataTypes.BOOLEAN,
     defaultValue: false,  // This is important for OTP verification
-  }
+  // }
+    },
+role: {
+  type: DataTypes.STRING,
+  allowNull: false,
+  defaultValue: 'user', // other option: 'admin'
+},
 }, {
   freezeTableName: true,
 });
 
 export default User;
+
+//  update user set role = 'admin' where email='xyz@email.com';

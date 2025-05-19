@@ -5,10 +5,21 @@ import path from 'path';
 
 import userRoutes from "./routes/userRoutes.js";
 import rideRoutes from './routes/rideRoutes.js';
+import driverRoutes from './routes/driverRoutes.js';
+import vehicleRoutes from "./routes/vehicleRoutes.js";
 
 import sequelize from "./config/db.js"; 
+
+// ✅ Import models first
+import User from "./models/user/user.js";
+import Driver from "./models/driver/driver.js";
 import "./models/user/user.js"; 
 import "./models/auth/auth.js";
+import "./models/driver/vehicle.js";
+
+// ✅ Define associations AFTER importing models
+User.hasOne(Driver, { foreignKey: 'userId' });
+Driver.belongsTo(User, { foreignKey: "userId", onDelete: "CASCADE" });
 
 import authenticate from './middleware/authenticate.js';
 
@@ -31,6 +42,8 @@ app.use(authenticate);
 
 app.use('/api', userRoutes); 
 app.use('/api/rides', rideRoutes);
+app.use('/api/drivers', driverRoutes);
+app.use("/api/vehicle", vehicleRoutes);
 
 sequelize.sync()
   .then(() => {
