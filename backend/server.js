@@ -7,6 +7,7 @@ import userRoutes from "./routes/userRoutes.js";
 import rideRoutes from './routes/rideRoutes.js';
 import driverRoutes from './routes/driverRoutes.js';
 import vehicleRoutes from "./routes/vehicleRoutes.js";
+import adminRoutes from './routes/adminRoutes.js';
 
 import sequelize from "./config/db.js"; 
 
@@ -44,7 +45,9 @@ app.use('/api', userRoutes);
 app.use('/api/rides', rideRoutes);
 app.use('/api/drivers', driverRoutes);
 app.use("/api/vehicle", vehicleRoutes);
+app.use('/api/admin', adminRoutes);
 
+// sequelize.sync({ alter: true })
 sequelize.sync()
   .then(() => {
     console.log("✅ MySQL Database connected successfully!");

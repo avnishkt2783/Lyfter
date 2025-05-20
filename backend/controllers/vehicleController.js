@@ -2,30 +2,77 @@ import Vehicle from "../models/driver/vehicle.js";
 import Driver from "../models/driver/driver.js";
 
 
+// export const addVehicle = async (req, res) => {
+//   try {
+//     const userId = req.user.id; // pulled from token
+//     const driver = await Driver.findOne({ where: { userId } });
+
+
+//     if (!driver) {
+//       return res.status(403).json({ message: "Driver not found" });
+//     }
+
+
+//     const { brand, model, color, plateNumber } = req.body;
+//     const vehiclePhoto = req.file?.filename;
+
+
+//     if (!brand || !model || !color || !plateNumber || !vehiclePhoto) {
+//       return res.status(400).json({ message: "All vehicle fields required." });
+//     }
+//    // Check for existing plate number
+//     const existingVehicle = await Vehicle.findOne({ where: { plateNumber } });
+//     if (existingVehicle) {
+//       return res.status(400).json({ message: "Plate number already exists." });
+//     }
+
+// if (existingVehicle.vehiclePhotoPublicId) {
+//       await cloudinary.uploader.destroy(existingVehicle.vehiclePhotoPublicId);
+//     }
+    
+//     await Vehicle.create({
+//       driverId: driver.driverId,
+//       brand,
+//       model,
+//       color,
+//       plateNumber,
+//       vehiclePhoto,
+//     });
+
+
+//     res.status(201).json({ message: "Vehicle added successfully." });
+//   } catch (err) {
+//     console.error(err);
+//     res.status(500).json({ message: "Failed to add vehicle." });
+//   }
+// };
+
 export const addVehicle = async (req, res) => {
   try {
-    const userId = req.user.id; // pulled from token
+    const userId = req.user.id; // from JWT
     const driver = await Driver.findOne({ where: { userId } });
-
 
     if (!driver) {
       return res.status(403).json({ message: "Driver not found" });
     }
 
-
     const { brand, model, color, plateNumber } = req.body;
-    const vehiclePhoto = req.file?.filename;
 
-
-    if (!brand || !model || !color || !plateNumber || !vehiclePhoto) {
-      return res.status(400).json({ message: "All vehicle fields required." });
+    if (!req.file) {
+      return res.status(400).json({ message: "Vehicle photo is required." });
     }
-   // Check for existing plate number
+
+    const vehiclePhoto = req.file.path; // Cloudinary URL
+    const vehiclePhotoPublicId = req.file.filename; // Cloudinary public_id
+
+    if (!brand || !model || !color || !plateNumber) {
+      return res.status(400).json({ message: "All vehicle fields are required." });
+    }
+
     const existingVehicle = await Vehicle.findOne({ where: { plateNumber } });
     if (existingVehicle) {
       return res.status(400).json({ message: "Plate number already exists." });
     }
-
 
     await Vehicle.create({
       driverId: driver.driverId,
@@ -34,12 +81,12 @@ export const addVehicle = async (req, res) => {
       color,
       plateNumber,
       vehiclePhoto,
+      vehiclePhotoPublicId,
     });
-
 
     res.status(201).json({ message: "Vehicle added successfully." });
   } catch (err) {
-    console.error(err);
+    console.error("Add Vehicle Error:", err);
     res.status(500).json({ message: "Failed to add vehicle." });
   }
 };

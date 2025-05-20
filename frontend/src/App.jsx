@@ -19,8 +19,8 @@ import YourOfferedRides from "./components/YourOfferedRides";
 import YourRequestedRides from "./components/YourRequestedRides";
 import ForgotPassword from "./components/ForgotPassword";
 import BecomeDriver from "./components/BecomeDriverForm";
-import SubmitLicenseForm from "./components/SubmitLicenseForm";
-import DriverStatus from "./components/DriverStatus";
+// import SubmitLicenseForm from "./components/SubmitLicenseForm";
+// import DriverStatus from "./components/DriverStatus";
 import PendingDriversList from "./components/PendingDriversList";
 import DriverProfile from "./components/DriverProfile";
 import AddVehicleForm from "./components/AddVehicleForm";
@@ -69,8 +69,8 @@ function App() {
               element={<YourRequestedRides />}
             />
             <Route path="/become-driver" element={<BecomeDriver />} />
-            <Route path="/submit-license" element={<SubmitLicenseForm />} />
-            <Route path="/driver-status" element={<DriverStatus />} />
+            {/* <Route path="/submit-license" element={<SubmitLicenseForm />} /> */}
+            {/* <Route path="/driver-status" element={<DriverStatus />} /> */}
             {/* <Route path="/pending-drivers" element={<PendingDriversList />} /> */}
             <Route path="/driver-profile" element={<DriverProfile />} />
             <Route path="/add-vehicle" element={<AddVehicleForm />} />

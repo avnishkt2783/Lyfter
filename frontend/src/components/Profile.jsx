@@ -74,7 +74,7 @@ const Profile = () => {
       const timer = setTimeout(() => {
         setError("");
         setSuccessMsg("");
-      }, 5000);
+      }, 2000);
       return () => clearTimeout(timer);
     }
   }, [error, successMsg]);

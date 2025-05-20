@@ -19,26 +19,26 @@ import {
 const router = express.Router();
 
 // Become a driver (Aadhar only)
-router.post("/request", authenticate, upload.single("aadharPhoto"), requestDriver);
+router.post("/request", upload.single("aadharPhoto"), requestDriver);
 
 // Submit License (after Aadhar)
-router.post("/submit-license", authenticate, upload.single("licensePhoto"), submitLicense);
+router.post("/submit-license", upload.single("licensePhoto"), submitLicense);
 
 // Check driver verification status
-router.get("/status", authenticate, checkDriverStatus);
+router.get("/status", checkDriverStatus);
 
 // ADMIN: Verify driver manually
-router.put("/verify/:driverId", authenticate, isAdmin, verifyDriverByAdmin);
+router.put("/verify/:driverId", isAdmin, verifyDriverByAdmin);
 
 // List of all pending drivers (admin only)
-router.get("/pending", authenticate, isAdmin, getPendingDrivers);
+router.get("/pending", isAdmin, getPendingDrivers);
 
-router.get("/profile", authenticate, getDriverProfile);
+router.put('/reject/:driverId', rejectDriver);
 
-router.put('/reject/:driverId', authenticate, rejectDriver);
+router.get("/profile", getDriverProfile);
 
 // Get all drivers who have submitted Aadhaar & photo and are pending verification
-router.get("/aadhaar-submitted", authenticate, getDriversWithAadhaar);
+router.get("/aadhaar-submitted", getDriversWithAadhaar);
 
 router.put('/verify-aadhaar/:driverId', verifyAadhaar);
 router.put('/reject-aadhaar/:driverId', rejectAadhaar);

@@ -35,7 +35,7 @@ const DriverPage = () => {
   };
   useEffect(() => {
     fetchProfile();
-  }, [navigate, apiURL]);
+  }, []);
 
   const handleDeleteVehicle = async (vehicleId) => {
     if (!window.confirm("Are you sure you want to delete this vehicle?"))
@@ -95,7 +95,7 @@ const DriverPage = () => {
     }
   };
 
-  if (loading) return <div className="p-4">Loading driver dashboard...</div>;
+  if (loading) return <div className="p-4">Loading Driver Page...</div>;
   if (!profile) return null;
 
   const {
@@ -106,14 +106,14 @@ const DriverPage = () => {
     isVerified,
     user = {},
     vehicles = [],
-    aadharPhoto,
+    aadharImg,
   } = profile;
 
   const { fullName, email, phoneNo } = user;
 
   return (
     <div className="container mx-auto max-w-4xl py-12 px-4">
-      <h2 className="text-3xl font-bold text-center mb-8">Driver Dashboard</h2>
+      <h2 className="text-3xl font-bold text-center mb-8">Driver Page</h2>
 
       <div className="bg-white rounded-lg shadow p-6 mb-8">
         <h3 className="text-xl font-semibold mb-4">Driver Profile</h3>
@@ -137,9 +137,9 @@ const DriverPage = () => {
           <div>
             <strong>Aadhar Photo:</strong>
             <br />
-            {aadharPhoto ? (
+            {aadharImg ? (
               <img
-                src={`${photoBase}/${aadharPhoto}`}
+                src={`${aadharImg}`}
                 alt="Aadhar"
                 className="w-60 border rounded"
               />
@@ -157,7 +157,7 @@ const DriverPage = () => {
             <br />
             {licensePhoto ? (
               <img
-                src={`${photoBase}/${licensePhoto}`}
+                src={`${licensePhoto}`}
                 alt="License"
                 className="w-60 border rounded"
               />
@@ -234,7 +234,7 @@ const DriverPage = () => {
                   <strong>Plate:</strong> {v.plateNumber}
                 </p>
                 <img
-                  src={`${photoBase}/${v.vehiclePhoto}`}
+                  src={`${v.vehiclePhoto}`}
                   alt={`${v.brand} ${v.model}`}
                   className="w-56 h-auto border rounded mt-2"
                 />

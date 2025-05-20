@@ -2,7 +2,6 @@ import { DataTypes } from "sequelize";
 import sequelize from "../../config/db.js";
 // import User from "../user/user.js";
 
-// const driver = sequelize.define("driver", {
 const Driver = sequelize.define("driver", {
   driverId: {
     type: DataTypes.INTEGER,
@@ -12,13 +11,36 @@ const Driver = sequelize.define("driver", {
   userId: {
     type: DataTypes.INTEGER,
     allowNull: false,
-  //   unique: true, // Ensures one user cannot register as driver multiple times
-  // }
+    unique: true, // Prevent multiple driver entries for one user
   },
-  aadharNumber: DataTypes.STRING,
-  aadharPhoto: DataTypes.STRING,
-  licenseNumber: DataTypes.STRING,
-  licensePhoto: DataTypes.STRING,
+
+  // Aadhaar fields
+  aadharNumber: {
+    type: DataTypes.STRING,
+    allowNull: false,
+  },
+  aadharImg: {
+  type: DataTypes.STRING,
+  allowNull: false,
+  },
+  aadharImgPublicId: {
+    type: DataTypes.STRING,
+    allowNull: false,
+  },
+
+
+  // License fields (used in later step)
+  licenseNumber: {
+    type: DataTypes.STRING,
+  },
+  licensePhoto: {
+    type: DataTypes.STRING, // Cloudinary URL
+  },
+  licensePhotoPublicId: {
+    type: DataTypes.STRING, // Cloudinary public_id for deletion
+  },
+
+  // Verification status
   isVerified: {
     type: DataTypes.BOOLEAN,
     defaultValue: false,
@@ -30,21 +52,13 @@ const Driver = sequelize.define("driver", {
   licenseVerified: {
     type: DataTypes.BOOLEAN,
     defaultValue: false,
-  }  
+  }
 }, {
   timestamps: true,
   freezeTableName: true,
 });
 
-// driver.belongsTo(User, {
-//   foreignKey: "userId",
-//   onDelete: "CASCADE",
-// });
-
-// User.hasOne(driver, {
-//   foreignKey: "userId",
-// });
-
-// export default driver;
+// Driver.belongsTo(User, { foreignKey: 'userId' });
+// User.hasOne(Driver, { foreignKey: 'userId' });
 
 export default Driver;

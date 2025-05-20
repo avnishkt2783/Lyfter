@@ -15,10 +15,14 @@ const AadhaarDriversList = () => {
       });
 
       const formattedDrivers = res.data.map((d) => {
-        const cleanPhoto = d.aadharPhoto?.replace(/^uploads\//, "") || null;
+        // const cleanPhoto = d.aadharPhoto?.replace(/^uploads\//, "") || null;
+        // return {
+        //   ...d,
+        //   aadharPhotoUrl: cleanPhoto ? `${apiURL}/uploads/${cleanPhoto}` : null,
+        // };
         return {
           ...d,
-          aadharPhotoUrl: cleanPhoto ? `${apiURL}/uploads/${cleanPhoto}` : null,
+          aadharPhotoUrl: d.aadharImg || null,
         };
       });
 
@@ -47,6 +51,9 @@ const AadhaarDriversList = () => {
   };
 
   const rejectAadhaar = async (driverId) => {
+    console.log("'''''''''''''''''");
+    console.log(driverId);
+
     if (
       !window.confirm(
         "Reject this driver's Aadhaar? This will delete Aadhaar number and photo."
@@ -102,7 +109,7 @@ const AadhaarDriversList = () => {
                 <td className="border px-2 py-1">{d.user?.email || "N/A"}</td>
                 <td className="border px-2 py-1">{d.user?.phoneNo || "N/A"}</td>
                 <td className="border px-2 py-1">{d.aadharNumber}</td>
-                <td className="border px-2 py-1">
+                {/* <td className="border px-2 py-1">
                   {d.aadharPhoto ? (
                     <a
                       href={`${photoBase}/${d.aadharPhoto}`}
@@ -122,7 +129,29 @@ const AadhaarDriversList = () => {
                   ) : (
                     "No Photo"
                   )}
+                </td> */}
+                <td className="border px-2 py-1">
+                  {d.aadharPhotoUrl ? (
+                    <a
+                      href={d.aadharPhotoUrl}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                    >
+                      <img
+                        src={d.aadharPhotoUrl}
+                        alt="Aadhaar"
+                        className="h-16 w-16 object-cover rounded"
+                        onError={(e) => {
+                          e.target.onerror = null;
+                          e.target.src = "/default-placeholder.png";
+                        }}
+                      />
+                    </a>
+                  ) : (
+                    "No Photo"
+                  )}
                 </td>
+
                 <td className="border px-2 py-1 flex space-x-2 justify-center">
                   <button
                     onClick={() => verifyDriver(d.driverId)}

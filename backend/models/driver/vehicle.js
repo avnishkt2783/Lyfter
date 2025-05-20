@@ -13,6 +13,7 @@ const Vehicle = sequelize.define(
     color:        {type:DataTypes.STRING, allowNull: false},
     plateNumber:  {type:DataTypes.STRING, allowNull: false, unique: true,},
     vehiclePhoto: {type:DataTypes.STRING, allowNull: false},
+    vehiclePhotoPublicId: {type:DataTypes.STRING, allowNull: false},
   },
   { timestamps: true, freezeTableName: true }
 );
