@@ -7,7 +7,7 @@ import {
   FaCar,
   FaPhone,
   FaUser,
-  FaRupeeSign,
+  FaCheckCircle,
   FaMoneyBillWave,
   FaClock,
   FaChair,
@@ -60,6 +60,9 @@ const MatchingRides = () => {
             },
           }
         );
+
+        console.log("response", response);
+
         setRides(
           response.data.success && Array.isArray(response.data.rides)
             ? response.data.rides
@@ -137,6 +140,7 @@ const MatchingRides = () => {
           {rides.map((ride) => {
             const driverName = ride.driver?.user?.fullName;
             const driverPhone = ride.driver?.user?.phoneNo;
+            const profileImg = ride.driver?.user?.profileImg;
 
             return (
               <div className="col-md-6 col-lg-4 mb-4" key={ride.rideId}>
@@ -148,10 +152,57 @@ const MatchingRides = () => {
                   }`}
                 >
                   <div className="card-body">
-                    <h5 className="card-title">
+                    <h5 className="card-title d-flex align-items-center">
+                      {/* Profile Image */}
+                      {profileImg ? (
+                        <img
+                          src={profileImg}
+                          alt="Driver Profile"
+                          className="me-2 rounded-circle"
+                          style={{
+                            width: "40px",
+                            height: "40px",
+                            objectFit: "cover",
+                            border: "2px solid #AAA",
+                          }}
+                        />
+                      ) : (
+                        <img
+                          src="default.jpg"
+                          alt="Driver Profile"
+                          className="me-2 rounded-circle"
+                          style={{
+                            width: "40px",
+                            height: "40px",
+                            objectFit: "cover",
+                            border: "2px solid #AAA",
+                          }}
+                        />
+                      )}
+
+                      {/* Driver Name */}
+                      {driverName || "Unknown Driver"}
+
+                      {/* Verified Badge */}
+                      {ride.driver?.isVerified && (
+                        <FaCheckCircle
+                          className={`ms-2 text-success `} // for tooltip
+                          style={{ fontSize: "1.5rem" }}
+                        />
+                      )}
+                    </h5>
+                    {/* <h5 className="card-title d-flex align-items-center">
                       <FaUser className="me-2" />
                       {driverName || "Unknown Driver"}
-                    </h5>
+                      {ride.driver?.isVerified && (
+                        <FaCheckCircle
+                          className="ms-2 text-success"
+                          title="Verified Driver"
+                          style={{ fontSize: "1.3rem" }}
+                        />
+                      )}
+                    </h5> */}
+
                     <p className="card-text">
                       <FaPhone className="me-2" />
                       <strong>Phone:</strong> {driverPhone || "N/A"}
@@ -177,6 +228,30 @@ const MatchingRides = () => {
                       <strong>Expected Departure:</strong>{" "}
                       {new Date(ride.departureTime).toLocaleString()}
                     </p>
+
+                    <hr />
+                    <h6 className="mt-3">
+                      <strong>Vehicle Information</strong>
+                    </h6>
+                    <p className="card-text">
+                      <strong>Vehicle: </strong>
+                      {ride.vehicle?.brand || "N/A"}{" "}
+                      {ride.vehicle?.model || "N/A"} <br />
+                      <strong>Color:</strong> {ride.vehicle?.color || "N/A"}{" "}
+                      <br />
+                      <strong>Plate:</strong>{" "}
+                      {ride.vehicle?.plateNumber || "N/A"}
+                    </p>
+                    {ride.vehicle?.vehiclePhoto && (
+                      <div className="text-center mb-2">
+                        <img
+                          src={ride.vehicle.vehiclePhoto}
+                          alt="Vehicle"
+                          className="img-fluid rounded"
+                          style={{ maxHeight: "120px", objectFit: "cover" }}
+                        />
+                      </div>
+                    )}
                   </div>
                   <div className="card-footer text-center">
                     <button

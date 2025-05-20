@@ -8,19 +8,22 @@ A full-stack ride-sharing platform that allows users to request and offer rides,
 
 ### 🔧 Work in progress...
 
-- [ ] Merge all Codes - (isVerified Badge, OfferRide Dropdown of your vehicles, vehicle information.).
 - [ ] Landing Page & About Page.
-- [ ] Page reload checking for newly added pages.
 - [ ] Reverse Lyfter Logic
 - [ ] Regex For all pages. any element. deep search.
 - [ ] Clean Code & Deploy
 - [ ] Report + PPT + Video PPT
 - [ ] Favicon for LYFTER, remove VITE logo.
 - [ ] LYFTER per alphabet vehicle symbol. (stylised banner for marketing)
+- [ ] Check Group for ERRORS and BUGS provided by our Expert Testers.
 
 ---
 
 ### ☑️ Completed tasks
+- [x] making code work and seamlessly for the codes we want to do. 
+- [x] CSS and BS, pathing for all codes from arobh and simran. 
+- [x] Page reload checking for newly added pages.
+- [x] Merge all Codes - (isVerified Badge, OfferRide Dropdown of your vehicles, vehicle information.).
 - [x] Admin panel for driver verification and system management.
 - [x] Driver UI and functionality.
 - [x] Ride booking system.

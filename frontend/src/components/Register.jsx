@@ -162,10 +162,8 @@ const Register = () => {
                     <input
                       type="text"
                       className={`form-control ${
-                        isDark
-                          ? "bg-secondary text-white"
-                          : "bg-white text-dark"
-                      } border-0`}
+                        isDark ? "text-white" : "text-dark"
+                      } border-secondary`}
                       name="fullName"
                       value={formData.fullName}
                       onChange={handleChange}
@@ -175,11 +173,9 @@ const Register = () => {
                   <div className="mb-3">
                     <label className="form-label">Gender:</label>
                     <select
-                      className={`form-control ${
-                        isDark
-                          ? "bg-secondary text-white"
-                          : "bg-white text-dark"
-                      } border-0`}
+                      className={`form-select ${
+                        isDark ? "text-white" : "bg-white text-dark"
+                      } border-secondary`}
                       name="gender"
                       value={formData.gender}
                       onChange={handleChange}
@@ -196,10 +192,8 @@ const Register = () => {
                     <input
                       type="email"
                       className={`form-control ${
-                        isDark
-                          ? "bg-secondary text-white"
-                          : "bg-white text-dark"
-                      } border-0`}
+                        isDark ? "text-white" : "bg-white text-dark"
+                      } border-secondary`}
                       name="email"
                       value={formData.email}
                       onChange={handleChange}
@@ -211,10 +205,8 @@ const Register = () => {
                     <input
                       type="text"
                       className={`form-control ${
-                        isDark
-                          ? "bg-secondary text-white"
-                          : "bg-white text-dark"
-                      } border-0`}
+                        isDark ? "text-white" : "bg-white text-dark"
+                      } border-secondary`}
                       name="phoneNo"
                       value={formData.phoneNo}
                       onChange={handleChange}
@@ -226,10 +218,8 @@ const Register = () => {
                     <input
                       type="password"
                       className={`form-control ${
-                        isDark
-                          ? "bg-secondary text-white"
-                          : "bg-white text-dark"
-                      } border-0`}
+                        isDark ? "text-white" : "bg-white text-dark"
+                      } border-secondary`}
                       name="password"
                       value={formData.password}
                       onChange={handleChange}
@@ -241,10 +231,8 @@ const Register = () => {
                     <input
                       type="password"
                       className={`form-control ${
-                        isDark
-                          ? "bg-secondary text-white"
-                          : "bg-white text-dark"
-                      } border-0`}
+                        isDark ? "text-white" : "bg-white text-dark"
+                      } border-secondary`}
                       name="confirmPassword"
                       value={formData.confirmPassword}
                       onChange={handleChange}
@@ -276,10 +264,8 @@ const Register = () => {
                       type="text"
                       name="otp"
                       className={`form-control ${
-                        isDark
-                          ? "bg-secondary text-white"
-                          : "bg-white text-dark"
-                      } border-0`}
+                        isDark ? "text-white" : "bg-white text-dark"
+                      } border-secondary`}
                       value={otp}
                       onChange={(e) => setOtp(e.target.value)}
                       required

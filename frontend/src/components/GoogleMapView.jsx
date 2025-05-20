@@ -261,6 +261,10 @@ const GoogleMapView = () => {
         return;
       }
 
+      const originLatLng = JSON.parse(
+        localStorage.getItem("startLocationCoordinatesA")
+      );
+
       const destinationLatLng = new window.google.maps.LatLng(
         destCoords.lat,
         destCoords.lng
@@ -268,7 +272,7 @@ const GoogleMapView = () => {
 
       directionsService.route(
         {
-          origin,
+          origin: originLatLng,
           destination: destinationLatLng,
           travelMode: window.google.maps.TravelMode.DRIVING,
         },

@@ -1,5 +1,6 @@
-import React, { useState } from "react";
+import React, { useState, useContext } from "react";
 import axios from "axios";
+import { ThemeContext } from "../ThemeContext";
 
 const AddVehicleForm = () => {
   const [formData, setFormData] = useState({
@@ -10,6 +11,9 @@ const AddVehicleForm = () => {
     plateNumber: "",
     vehiclePhoto: null,
   });
+
+  const { theme } = useContext(ThemeContext);
+  const isDark = theme === "dark";
 
   const [message, setMessage] = useState("");
   const apiURL = import.meta.env.VITE_API_URL;
@@ -30,8 +34,6 @@ const AddVehicleForm = () => {
     if (!token) return alert("Please log in");
 
     const form = new FormData();
-
-    // Save model based on dropdown or custom input
     const modelToSave =
       formData.model === "Other" ? formData.customModel : formData.model;
 
@@ -51,7 +53,6 @@ const AddVehicleForm = () => {
       alert(res.data.message);
       setMessage("");
     } catch (err) {
-      // Handle backend validation message or generic error
       const errorMessage =
         err.response?.data?.message || "Failed to add vehicle.";
       alert(errorMessage);
@@ -60,77 +61,103 @@ const AddVehicleForm = () => {
   };
 
   return (
-    <div className="max-w-md mx-auto mt-10 p-6 border rounded-lg shadow">
-      <h2 className="text-xl font-bold mb-4">Add Vehicle</h2>
+    <div
+      className={`container my-5 p-4 rounded shadow ${
+        isDark
+          ? "bg-dark text-light border border-secondary"
+          : "bg-light text-dark border"
+      }`}
+      style={{ maxWidth: "500px" }}
+    >
+      <h2 className="mb-4 text-center">Add Vehicle</h2>
 
-      {/* {message && <p className="mb-4 text-blue-600">{message}</p>} */}
-
-      <form onSubmit={handleSubmit} className="grid gap-4">
-        {/* Vehicle Brand */}
-        <input
-          type="text"
-          name="brand"
-          placeholder="Vehicle Brand"
-          value={formData.brand}
-          onChange={handleChange}
-          className="border p-2 rounded"
-          required
-        />
-
-        {/* Model Dropdown */}
-        <select
-          name="model"
-          value={formData.model}
-          onChange={handleChange}
-          className="border p-2 rounded"
-          required
-        >
-          <option value="">Select Vehicle Type</option>
-          <option value="Bike">Bike</option>
-          <option value="Tempo">Tempo</option>
-          <option value="4 Wheeler">4 Wheeler</option>
-          <option value="Bus">Bus</option>
-          <option value="Other">Other</option>
-        </select>
-
-        {/* Custom model input if 'Other' is selected */}
-        {formData.model === "Other" && (
+      <form onSubmit={handleSubmit} className="row g-3">
+        {/* Brand */}
+        <div className="col-12">
+          <label className="form-label fw-semibold">
+            Vehicle Brand and Name:
+          </label>
           <input
             type="text"
-            name="customModel"
-            placeholder="Specify vehicle type"
-            value={formData.customModel}
+            name="brand"
+            placeholder="e.g. Hyundai Creta"
+            value={formData.brand}
             onChange={handleChange}
-            className="border p-2 rounded"
+            className="form-control"
             required
           />
+        </div>
+
+        {/* Model */}
+        <div className="col-12">
+          <label className="form-label fw-semibold">Type of Vehicle</label>
+          <select
+            name="model"
+            value={formData.model}
+            onChange={handleChange}
+            className="form-select"
+            required
+          >
+            <option value="" disabled>
+              Select Vehicle Type:
+            </option>
+            <option value="Car">Car</option>
+            <option value="Bike">Bike</option>
+            <option value="Auto rickshaw">Auto rickshaw</option>
+            <option value="Van">Van</option>
+            <option value="Bus">Bus</option>
+            <option value="Other">Other</option>
+          </select>
+        </div>
+
+        {/* Custom model */}
+        {formData.model === "Other" && (
+          <div className="col-12">
+            <input
+              type="text"
+              name="customModel"
+              placeholder="Specify vehicle type"
+              value={formData.customModel}
+              onChange={handleChange}
+              className="form-control"
+              required
+            />
+          </div>
         )}
 
         {/* Color */}
-        <input
-          type="text"
-          name="color"
-          placeholder="Color"
-          value={formData.color}
-          onChange={handleChange}
-          className="border p-2 rounded"
-          required
-        />
+        <div className="col-12">
+          <label className="form-label fw-semibold">Color:</label>
+          <input
+            type="text"
+            name="color"
+            placeholder="e.g. Red"
+            value={formData.color}
+            onChange={handleChange}
+            className="form-control"
+            required
+          />
+        </div>
 
-        {/* Plate Number */}
-        <input
-          type="text"
-          name="plateNumber"
-          placeholder="License Plate Number"
-          value={formData.plateNumber}
-          onChange={handleChange}
-          className="border p-2 rounded"
-          required
-        />
+        {/* Plate number */}
+        <div className="col-12">
+          <label className="form-label fw-semibold">
+            License Plate Number:
+          </label>
+          <input
+            type="text"
+            name="plateNumber"
+            placeholder="e.g. BR12AB3456"
+            value={formData.plateNumber}
+            onChange={handleChange}
+            className="form-control"
+            required
+          />
+        </div>
 
-        {/* Vehicle Photo */}
-        <div>
-          <label className="block mb-1 font-medium">
+        {/* Vehicle photo */}
+        <div className="col-12">
+          <label className="form-label fw-semibold">
             Upload Vehicle Photo:
           </label>
           <input
@@ -138,17 +165,16 @@ const AddVehicleForm = () => {
             name="vehiclePhoto"
             accept="image/*"
             onChange={handleChange}
-            className="border p-2 rounded w-full"
+            className="form-control"
             required
           />
         </div>
 
-        <button
-          type="submit"
-          className="bg-blue-600 text-white py-2 px-4 rounded hover:bg-blue-700"
-        >
-          Submit Vehicle
-        </button>
+        <div className="col-12 d-grid">
+          <button type="submit" className="btn btn-primary btn-lg">
+            Submit Vehicle
+          </button>
+        </div>
       </form>
     </div>
   );

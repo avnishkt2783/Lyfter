@@ -1,11 +1,13 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useContext } from "react";
+import { useNavigate } from "react-router-dom"; // ✅ Make sure this is imported
 import axios from "axios";
+import { ThemeContext } from "../ThemeContext";
 
 const AadhaarDriversList = () => {
+  const navigate = useNavigate(); // ✅ You need this
   const [drivers, setDrivers] = useState([]);
+  const { theme } = useContext(ThemeContext);
   const apiURL = import.meta.env.VITE_API_URL;
-  const apiHost = import.meta.env.VITE_API_URL.replace(/\/api\/?$/, "");
-  const photoBase = `${apiHost}/uploads`;
 
   const fetchDrivers = async () => {
     try {
@@ -14,17 +16,10 @@ const AadhaarDriversList = () => {
         headers: { Authorization: `Bearer ${token}` },
       });
 
-      const formattedDrivers = res.data.map((d) => {
-        // const cleanPhoto = d.aadharPhoto?.replace(/^uploads\//, "") || null;
-        // return {
-        //   ...d,
-        //   aadharPhotoUrl: cleanPhoto ? `${apiURL}/uploads/${cleanPhoto}` : null,
-        // };
-        return {
-          ...d,
-          aadharPhotoUrl: d.aadharImg || null,
-        };
-      });
+      const formattedDrivers = res.data.map((d) => ({
+        ...d,
+        aadharPhotoUrl: d.aadharImg || null,
+      }));
 
       setDrivers(formattedDrivers);
     } catch (err) {
@@ -38,9 +33,7 @@ const AadhaarDriversList = () => {
       await axios.put(
         `${apiURL}/drivers/verify-aadhaar/${driverId}`,
         {},
-        {
-          headers: { Authorization: `Bearer ${token}` },
-        }
+        { headers: { Authorization: `Bearer ${token}` } }
       );
       alert("Aadhaar verified successfully.");
       setDrivers((prev) => prev.filter((d) => d.driverId !== driverId));
@@ -51,23 +44,19 @@ const AadhaarDriversList = () => {
   };
 
   const rejectAadhaar = async (driverId) => {
-    console.log("'''''''''''''''''");
-    console.log(driverId);
-
     if (
       !window.confirm(
         "Reject this driver's Aadhaar? This will delete Aadhaar number and photo."
       )
     )
       return;
+
     try {
       const token = localStorage.getItem("token");
       await axios.put(
         `${apiURL}/drivers/reject-aadhaar/${driverId}`,
         {},
-        {
-          headers: { Authorization: `Bearer ${token}` },
-        }
+        { headers: { Authorization: `Bearer ${token}` } }
       );
       alert("Aadhaar rejected and data deleted.");
       setDrivers((prev) => prev.filter((d) => d.driverId !== driverId));
@@ -82,94 +71,93 @@ const AadhaarDriversList = () => {
   }, []);
 
   return (
-    <div className="p-4">
-      <h2 className="text-xl font-bold mb-4">Drivers with Aadhaar Submitted</h2>
-      {drivers.length === 0 ? (
-        <p>No drivers found.</p>
-      ) : (
-        <table className="w-full table-auto border-collapse border border-gray-300">
-          <thead>
-            <tr className="bg-gray-100">
-              <th className="border px-2 py-1">ID</th>
-              <th className="border px-2 py-1">Name</th>
-              <th className="border px-2 py-1">Email</th>
-              <th className="border px-2 py-1">Phone</th>
-              <th className="border px-2 py-1">Aadhar #</th>
-              <th className="border px-2 py-1">Aadhar Photo</th>
-              <th className="border px-2 py-1">Action</th>
-            </tr>
-          </thead>
-          <tbody>
-            {drivers.map((d) => (
-              <tr key={d.driverId}>
-                <td className="border px-2 py-1 text-center">{d.driverId}</td>
-                <td className="border px-2 py-1">
-                  {d.user?.fullName || "N/A"}
-                </td>
-                <td className="border px-2 py-1">{d.user?.email || "N/A"}</td>
-                <td className="border px-2 py-1">{d.user?.phoneNo || "N/A"}</td>
-                <td className="border px-2 py-1">{d.aadharNumber}</td>
-                {/* <td className="border px-2 py-1">
-                  {d.aadharPhoto ? (
-                    <a
-                      href={`${photoBase}/${d.aadharPhoto}`}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                    >
-                      <img
-                        src={`${photoBase}/${d.aadharPhoto}`}
-                        alt="Aadhar"
-                        className="h-16 w-16 object-cover rounded"
-                        onError={(e) => {
-                          e.target.onerror = null;
-                          e.target.src = "/default-placeholder.png";
-                        }}
-                      />
-                    </a>
-                  ) : (
-                    "No Photo"
-                  )}
-                </td> */}
-                <td className="border px-2 py-1">
-                  {d.aadharPhotoUrl ? (
-                    <a
-                      href={d.aadharPhotoUrl}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                    >
-                      <img
-                        src={d.aadharPhotoUrl}
-                        alt="Aadhaar"
-                        className="h-16 w-16 object-cover rounded"
-                        onError={(e) => {
-                          e.target.onerror = null;
-                          e.target.src = "/default-placeholder.png";
-                        }}
-                      />
-                    </a>
-                  ) : (
-                    "No Photo"
-                  )}
-                </td>
+    <div
+      className={`container py-4 ${
+        theme === "dark" ? "bg-dark text-light" : "bg-light text-dark"
+      }`}
+    >
+      <button
+        onClick={() => navigate("/admin/dashboard")}
+        className="btn btn-primary mb-4"
+      >
+        ← Back to Admin Dashboard
+      </button>
 
-                <td className="border px-2 py-1 flex space-x-2 justify-center">
-                  <button
-                    onClick={() => verifyDriver(d.driverId)}
-                    className="bg-green-600 text-white px-3 py-1 rounded"
-                  >
-                    Verify
-                  </button>
-                  <button
-                    onClick={() => rejectAadhaar(d.driverId)}
-                    className="bg-red-600 text-white px-3 py-1 rounded"
-                  >
-                    Reject
-                  </button>
-                </td>
+      <h2 className="mb-4">Verify Aadhaar Requests</h2>
+
+      {drivers.length === 0 ? (
+        <p>No requests found.</p>
+      ) : (
+        <div className="table-responsive">
+          <table
+            className={`table table-bordered ${
+              theme === "dark" ? "table-dark" : "table-light"
+            }`}
+          >
+            <thead className={theme === "dark" ? "table-dark" : "table-light"}>
+              <tr>
+                <th>ID</th>
+                <th>Name</th>
+                <th>Email</th>
+                <th>Phone</th>
+                <th>Aadhaar Number</th>
+                <th>Aadhaar Photo</th>
+                <th>Action</th>
               </tr>
-            ))}
-          </tbody>
-        </table>
+            </thead>
+            <tbody>
+              {drivers.map((d) => (
+                <tr key={d.driverId}>
+                  <td className="text-center">{d.driverId}</td>
+                  <td>{d.user?.fullName || "N/A"}</td>
+                  <td>{d.user?.email || "N/A"}</td>
+                  <td>{d.user?.phoneNo || "N/A"}</td>
+                  <td>{d.aadharNumber}</td>
+                  <td>
+                    {d.aadharPhotoUrl ? (
+                      <a
+                        href={d.aadharPhotoUrl}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                      >
+                        <img
+                          src={d.aadharPhotoUrl}
+                          alt="Aadhaar"
+                          className="img-thumbnail"
+                          style={{
+                            height: "64px",
+                            width: "64px",
+                            objectFit: "cover",
+                          }}
+                          onError={(e) => {
+                            e.target.onerror = null;
+                            e.target.src = "/default-placeholder.png";
+                          }}
+                        />
+                      </a>
+                    ) : (
+                      "No Photo"
+                    )}
+                  </td>
+                  <td className="d-flex flex-column gap-2">
+                    <button
+                      onClick={() => verifyDriver(d.driverId)}
+                      className="btn btn-success"
+                    >
+                      Verify
+                    </button>
+                    <button
+                      onClick={() => rejectAadhaar(d.driverId)}
+                      className="btn btn-danger"
+                    >
+                      Reject
+                    </button>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
       )}
     </div>
   );

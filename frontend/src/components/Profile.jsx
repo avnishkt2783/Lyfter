@@ -130,8 +130,25 @@ const Profile = () => {
         isDark ? "bg-dark text-white border-secondary" : "bg-white border-dark"
       }`}
     >
-      {/* <h2 className="text-center mb-4">Edit Profile</h2> */}
-
+      <div className="mb-3">
+        <Link
+          to="/driver-dashboard"
+          style={{
+            display: "inline-block",
+            backgroundColor: "#22c55e",
+            color: "white",
+            padding: "10px 20px",
+            borderRadius: "8px",
+            textDecoration: "none",
+            fontWeight: "bold",
+          }}
+        >
+          Go to Driver Dashboard
+        </Link>
+      </div>
+      <hr />
+      <h2 className="text-center mb-4">Profile Page</h2>
+      {/* <hr /> */}
       {successMsg && (
         <div
           className={`alert ${
@@ -346,23 +363,6 @@ const Profile = () => {
           Save Profile
         </button>
       </form>
-
-      <div style={{ marginTop: "20px", textAlign: "center" }}>
-        <Link
-          to="/driver-dashboard"
-          style={{
-            display: "inline-block",
-            backgroundColor: "#22c55e",
-            color: "white",
-            padding: "10px 20px",
-            borderRadius: "8px",
-            textDecoration: "none",
-            fontWeight: "bold",
-          }}
-        >
-          Go to Driver Dashboard
-        </Link>
-      </div>
     </div>
   );
 };
