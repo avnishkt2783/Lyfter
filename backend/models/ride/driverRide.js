@@ -1,6 +1,7 @@
 import { DataTypes } from "sequelize";
 import sequelize from "../../config/db.js";
 import Driver from "../driver/driver.js";
+import Vehicle from "../driver/vehicle.js";
 
 const DriverRide = sequelize.define("driverRide", {
   driverRideId: {
@@ -12,9 +13,13 @@ const DriverRide = sequelize.define("driverRide", {
     type: DataTypes.INTEGER,
     allowNull: false,
   },
-  mode: {
-    type: DataTypes.STRING,
+   vehicleId: {    // <-- add this new field
+    type: DataTypes.INTEGER,
     allowNull: false,
+    references: {
+      model: 'vehicle',
+      key: 'vehicleId',
+    },
   },
   startLocation: {
     type: DataTypes.STRING,
@@ -56,6 +61,14 @@ DriverRide.belongsTo(Driver, {
 
 Driver.hasMany(DriverRide, {
   foreignKey: "driverId",
+});
+
+DriverRide.belongsTo(Vehicle, {
+  foreignKey: "vehicleId",
+  onDelete: "CASCADE",
+});
+Vehicle.hasMany(DriverRide, {
+  foreignKey: "vehicleId",
 });
 
 export default DriverRide;

@@ -23,7 +23,8 @@ const OfferRideDetails = () => {
   const isDark = theme === "dark";
 
   const [user, setUser] = useState({});
-  const [mode, setMode] = useState("Car");
+  const [vehicles, setVehicles] = useState([]); // To store vehicles fetched from the database
+  const [selectedVehicle, setSelectedVehicle] = useState(""); // To store the selected vehicle ID
   const [seats, setSeats] = useState(1);
   const [fare, setFare] = useState("");
   const [departureTime, setDepartureTime] = useState("");
@@ -59,6 +60,29 @@ const OfferRideDetails = () => {
       .catch((err) => console.error("Error fetching user:", err));
   }, []);
 
+  // Fetch vehicles owned by the driver
+  useEffect(() => {
+    const fetchVehicles = async () => {
+      try {
+        console.log(user.userId);
+
+        const res = await axios.get(`${apiURL}/vehicle/getvehicles`, {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+
+        console.log("-------------------");
+        console.log(res.data);
+        console.log("-------------------");
+
+        setVehicles(res.data);
+      } catch (err) {
+        console.error("Error fetching vehicles:", err);
+        alert("Failed to load vehicles.");
+      }
+    };
+    fetchVehicles();
+  }, []);
+
   const handleSubmit = async (e) => {
     e.preventDefault();
 
@@ -67,7 +91,7 @@ const OfferRideDetails = () => {
       !phone ||
       !startLocation ||
       !destination ||
-      !mode ||
+      !selectedVehicle ||
       !seats ||
       !fare ||
       !departureTime ||
@@ -80,11 +104,11 @@ const OfferRideDetails = () => {
     try {
       const rideData = {
         userId: user.userId,
-        mode,
+        vehicleId: selectedVehicle,
         startLocation,
         destination,
         seats,
-        fare,
+        fare: parseFloat(fare),
         departureTime,
         routePath,
         status: "Waiting",
@@ -139,7 +163,7 @@ const OfferRideDetails = () => {
           />
         </div>
 
-        <div className="mb-3">
+        {/* <div className="mb-3">
           <label className="form-label">
             <FaCar className="me-2" /> Mode of Transport:
           </label>
@@ -153,6 +177,24 @@ const OfferRideDetails = () => {
             <option value="Bike">Bike 🏍️</option>
             <option value="Auto">Auto 🚖</option>
             <option value="Van">Van 🚐</option>
+          </select>
+        </div> */}
+
+        {/* Dropdown to select the vehicle */}
+        <div className="mb-3">
+          <label className="form-label">Mode of Transport:</label>
+          <select
+            value={selectedVehicle}
+            onChange={(e) => setSelectedVehicle(e.target.value)}
+            required
+            className="form-control"
+          >
+            <option value="">Select Your Vehicle</option>
+            {vehicles.map((vehicle) => (
+              <option key={vehicle.vehicleId} value={vehicle.vehicleId}>
+                {vehicle.brand} {vehicle.model} ({vehicle.plateNumber})
+              </option>
+            ))}
           </select>
         </div>
 
