@@ -1,8 +1,12 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useContext } from "react";
 import axios from "axios";
 import { useNavigate, Link } from "react-router-dom";
+import { useTheme } from "../ThemeContext"; // import your ThemeContext
+// import styles from "./DriverPage.module.css"; // CSS module for scoped styles
 
 const DriverPage = () => {
+  const { theme } = useTheme(); // get theme
+  const isDark = theme === "dark";
   const navigate = useNavigate();
   const [profile, setProfile] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -13,6 +17,7 @@ const DriverPage = () => {
   const apiURL = import.meta.env.VITE_API_URL;
   const apiHost = apiURL.replace(/\/api\/?$/, "");
   const photoBase = `${apiHost}/uploads`;
+
   const fetchProfile = async () => {
     try {
       const token = localStorage.getItem("token");
@@ -33,6 +38,7 @@ const DriverPage = () => {
       setLoading(false);
     }
   };
+
   useEffect(() => {
     fetchProfile();
   }, []);
@@ -40,7 +46,6 @@ const DriverPage = () => {
   const handleDeleteVehicle = async (vehicleId) => {
     if (!window.confirm("Are you sure you want to delete this vehicle?"))
       return;
-
     try {
       const token = localStorage.getItem("token");
       await axios.delete(`${apiURL}/vehicle/${vehicleId}`, {
@@ -65,7 +70,6 @@ const DriverPage = () => {
     }
 
     setUploading(true);
-
     const formData = new FormData();
     formData.append("licenseNumber", licenseNumberInput);
     formData.append("licensePhoto", licensePhotoFile);
@@ -112,140 +116,184 @@ const DriverPage = () => {
   const { fullName, email, phoneNo } = user;
 
   return (
-    <div className="container mx-auto max-w-4xl py-12 px-4">
-      <h2 className="text-3xl font-bold text-center mb-8">Driver Page</h2>
+    // <div
+    //   className={`container py-5 ${
+    //     theme === "dark" ? "bg-dark text-light" : "bg-light text-dark"
+    //   } ${styles.driverPage}`}
+    // >
+    <div
+      className={`container profile-form my-4 p-4 rounded shadow ${
+        isDark ? "bg-dark text-white border-secondary" : "bg-white border-dark"
+      }`}
+    >
+      <div className="mb-3">
+        <Link
+          to="/profile"
+          style={{
+            display: "inline-block",
+            backgroundColor: "#0d6efd",
+            color: "white",
+            padding: "10px 20px",
+            borderRadius: "8px",
+            textDecoration: "none",
+            fontWeight: "bold",
+          }}
+        >
+          Go to Profile Page
+        </Link>
+      </div>
+      <hr />
+      <h2 className="text-center mb-4">Driver Dashboard</h2>
 
-      <div className="bg-white rounded-lg shadow p-6 mb-8">
-        <h3 className="text-xl font-semibold mb-4">Driver Profile</h3>
-        <div className="grid gap-4">
-          <p>
-            <strong>Driver ID:</strong> {driverId}
-          </p>
-          <p>
-            <strong>Name:</strong> {fullName}
-          </p>
-          <p>
-            <strong>Email:</strong> {email}
-          </p>
-          <p>
-            <strong>Phone:</strong> {phoneNo}
-          </p>
-          <p>
-            <strong>Aadhar Number:</strong> {aadharNumber}
-          </p>
-
-          <div>
-            <strong>Aadhar Photo:</strong>
-            <br />
-            {aadharImg ? (
-              <img
-                src={`${aadharImg}`}
-                alt="Aadhar"
-                className="w-60 border rounded"
-              />
-            ) : (
-              <p className="text-gray-500">No Aadhar photo uploaded.</p>
-            )}
+      {/* Profile Info */}
+      <div
+        className={`card shadow-sm mb-5 ${
+          theme === "dark" ? "bg-dark text-light" : ""
+        }`}
+      >
+        <div className="card-body">
+          <h5 className="card-title">Driver Profile</h5>
+          <div className="row g-3">
+            <div className="col-md-6">
+              <strong>Driver ID:</strong> {driverId}
+            </div>
+            <div className="col-md-6">
+              <strong>Name:</strong> {fullName}
+            </div>
+            <div className="col-md-6">
+              <strong>Email:</strong> {email}
+            </div>
+            <div className="col-md-6">
+              <strong>Phone:</strong> {phoneNo}
+            </div>
+            <div className="col-md-6">
+              <strong>Aadhar Number:</strong> {aadharNumber}
+            </div>
+            <div className="col-md-6">
+              <strong>Aadhar Photo:</strong>
+              <br />
+              {aadharImg ? (
+                <img
+                  src={aadharImg}
+                  alt="Aadhar"
+                  className="img-fluid rounded border"
+                  style={{ maxWidth: "240px" }}
+                />
+              ) : (
+                <p className="text-muted">No Aadhar photo uploaded.</p>
+              )}
+            </div>
+            <div className="col-md-6">
+              <strong>License Number:</strong> {licenseNumber || "Not provided"}
+            </div>
+            <div className="col-md-6">
+              <strong>License Photo:</strong>
+              <br />
+              {licensePhoto ? (
+                <img
+                  src={licensePhoto}
+                  alt="License"
+                  className="img-fluid rounded border"
+                  style={{ maxWidth: "240px" }}
+                />
+              ) : (
+                <p className="text-muted">No License photo uploaded.</p>
+              )}
+            </div>
+            <div className="col-md-12 mt-3">
+              <div
+                className={`p-3 rounded ${
+                  isVerified
+                    ? "bg-success bg-opacity-25"
+                    : "bg-warning bg-opacity-25"
+                }`}
+              >
+                <strong>Verification Status:</strong>{" "}
+                <span
+                  className={`isVerified ? "text-success" : "text-warning"`}
+                >
+                  {isVerified ? "Verified" : "Pending"}
+                </span>
+              </div>
+            </div>
           </div>
 
-          <p>
-            <strong>License Number:</strong> {licenseNumber || "Not provided"}
-          </p>
-
-          <div>
-            <strong>License Photo:</strong>
-            <br />
-            {licensePhoto ? (
-              <img
-                src={`${licensePhoto}`}
-                alt="License"
-                className="w-60 border rounded"
-              />
-            ) : (
-              <p className="text-gray-500">No License photo uploaded.</p>
-            )}
-          </div>
-
+          {/* License Submission */}
           {(!licenseNumber || !licensePhoto) && (
             <form
               onSubmit={handleLicenseSubmit}
-              className="mt-4 space-y-4 bg-gray-50 p-4 rounded-lg border"
+              className="mt-4 border-top pt-3"
             >
-              <h4 className="text-lg font-medium">Submit License Info</h4>
-              <input
-                type="text"
-                placeholder="License Number"
-                value={licenseNumberInput}
-                onChange={(e) => setLicenseNumberInput(e.target.value)}
-                className="w-full border px-4 py-2 rounded"
-                required
-              />
-              <input
-                type="file"
-                accept="image/*"
-                onChange={(e) => setLicensePhotoFile(e.target.files[0])}
-                className="w-full"
-                required
-              />
+              <h6>Submit License Info</h6>
+              <div className="mb-2">
+                <input
+                  type="text"
+                  className="form-control"
+                  placeholder="License Number"
+                  value={licenseNumberInput}
+                  onChange={(e) => setLicenseNumberInput(e.target.value)}
+                  required
+                />
+              </div>
+              <div className="mb-3">
+                <input
+                  type="file"
+                  accept="image/*"
+                  onChange={(e) => setLicensePhotoFile(e.target.files[0])}
+                  className="form-control"
+                  required
+                />
+              </div>
               <button
                 type="submit"
+                className="btn btn-warning"
                 disabled={uploading}
-                className="bg-yellow-600 text-white px-5 py-2 rounded hover:bg-yellow-700 transition"
               >
                 {uploading ? "Uploading..." : "Submit License Info"}
               </button>
             </form>
           )}
-
-          <p>
-            <strong>Verification Status:</strong>{" "}
-            <span className={isVerified ? "text-green-600" : "text-red-600"}>
-              {isVerified ? "Verified" : "Pending"}
-            </span>
-          </p>
         </div>
       </div>
 
-      <div className="mb-6">
-        <Link
-          to="/add-vehicle"
-          className="inline-block bg-indigo-600 text-white px-6 py-3 rounded-lg shadow hover:bg-indigo-700 transition"
-        >
+      {/* Add Vehicle Button */}
+      <div className="text-end mb-4">
+        <Link to="/add-vehicle" className="btn btn-primary">
           Add Vehicle
         </Link>
       </div>
 
+      {/* Vehicles List */}
       {vehicles.length > 0 && (
-        <div className="bg-white rounded-lg shadow p-6">
-          <h3 className="text-xl font-semibold mb-4">Your Vehicles</h3>
-          <div className="grid gap-6 sm:grid-cols-2">
-            {vehicles.map((v) => (
-              <div key={v.vehicleId} className="border rounded p-4 shadow">
-                <p>
-                  <strong>Brand:</strong> {v.brand}
-                </p>
-                <p>
-                  <strong>Model:</strong> {v.model}
-                </p>
-                <p>
-                  <strong>Color:</strong> {v.color}
-                </p>
-                <p>
-                  <strong>Plate:</strong> {v.plateNumber}
-                </p>
-                <img
-                  src={`${v.vehiclePhoto}`}
-                  alt={`${v.brand} ${v.model}`}
-                  className="w-56 h-auto border rounded mt-2"
-                />
-                <button
-                  onClick={() => handleDeleteVehicle(v.vehicleId)}
-                  className="mt-4 bg-red-600 text-white px-4 py-2 rounded hover:bg-red-700 transition"
-                >
-                  Delete Vehicle
-                </button>
-              </div>
-            ))}
+        <div
+          className={`card shadow ${
+            theme === "dark" ? "bg-dark text-light" : ""
+          }`}
+        >
+          <div className="card-body">
+            <h5 className="card-title">Your Vehicles</h5>
+            <div className="row">
+              {vehicles.map((v) => (
+                <div key={v.vehicleId} className="col-md-6 mb-4">
+                  <div className="border rounded p-3 h-100">
+                    <strong>Vehicle:</strong> {v.brand} {v.model} <br />
+                    <strong>Color:</strong> {v.color} <br />
+                    <strong>Plate:</strong> {v.plateNumber} <br />
+                    <img
+                      src={v.vehiclePhoto}
+                      alt="Vehicle"
+                      className="img-fluid border rounded mb-2"
+                    />
+                    <button
+                      onClick={() => handleDeleteVehicle(v.vehicleId)}
+                      className="btn btn-danger"
+                    >
+                      Delete Vehicle
+                    </button>
+                  </div>
+                </div>
+              ))}
+            </div>
           </div>
         </div>
       )}

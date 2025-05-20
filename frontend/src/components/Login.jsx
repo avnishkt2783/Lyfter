@@ -82,8 +82,8 @@ const Login = () => {
                   <input
                     type="email"
                     className={`form-control ${
-                      isDark ? "bg-secondary text-white" : "bg-white text-dark"
-                    } border-0`}
+                      isDark ? "text-white" : "bg-white text-dark"
+                    } border-secondary`}
                     name="email"
                     value={formData.email}
                     onChange={handleChange}
@@ -95,8 +95,8 @@ const Login = () => {
                   <input
                     type="password"
                     className={`form-control ${
-                      isDark ? "bg-secondary text-white" : "bg-white text-dark"
-                    } border-0`}
+                      isDark ? "text-white" : "bg-white text-dark"
+                    } border-secondary`}
                     name="password"
                     value={formData.password}
                     onChange={handleChange}

@@ -4,6 +4,7 @@ import DriverRide from "../models/ride/driverRide.js";
 import Passenger from "../models/passenger/passenger.js";
 import PassengerRide from "../models/ride/passengerRide.js";
 import PassengerRideDriverRide from "../models/ride/passengerRideDriverRide.js";
+import Vehicle from "../models/driver/vehicle.js";
 
 import { Op } from 'sequelize';
 import haversine from "haversine-distance";
@@ -144,31 +145,6 @@ export const matchingRides = async (req, res) => {
   }
 
   try {
-    // const allRides = await DriverRide.findAll({
-    //   where: {
-    //     seats: {
-    //       [Op.gte]: parseInt(seatsRequired),
-    //     },
-    //     status: "Waiting",
-    //   },
-    //   include: [
-    //     {
-    //       model: Driver,
-    //       include: [
-    //         {
-    //           model: User,
-    //           attributes: ["userId", "fullName", "phoneNo"],
-    //           where: {
-    //             userId: {
-    //               [Op.ne]: currentUserId, 
-    //             },
-    //           },
-    //         },
-    //       ],
-    //     },
-    //   ]
-    // });
-
     const allRides = await DriverRide.findAll({
   where: {
     seats: { [Op.gte]: parseInt(seatsRequired) },
@@ -182,11 +158,23 @@ export const matchingRides = async (req, res) => {
       include: [
         {
           model: User,
-          attributes: ["userId", "fullName", "phoneNo"],
+          attributes: ["userId", "fullName", "phoneNo", "profileImg"],
           // no where here, just attributes
         },
       ],
     },
+    {
+      model: Vehicle, // Include the vehicle details here
+      attributes: [
+        "vehicleId",
+        "brand",
+        "model",
+        "color",
+        "plateNumber",
+        "vehiclePhoto",
+        "vehiclePhotoPublicId"
+      ],
+    }
   ],
 });
 
@@ -266,6 +254,10 @@ export const getOfferedRides = async (req, res) => {
                         },
                     ],
                 },
+                {
+      model: Vehicle, // Include vehicle directly with DriverRide
+      // attributes: ['vehicleId', 'brand', 'model', 'color', 'plateNumber', 'vehiclePhoto'],
+    },
             ],
     });
 
@@ -328,9 +320,13 @@ export const getOfferedRides = async (req, res) => {
                 include: [
                   {
                     model: User,
-                    attributes: ['fullName', 'phoneNo'],
+                    attributes: ['fullName', 'phoneNo', 'profileImg', 'isVerified'],
                   },
                 ],
+              },
+              {
+                model: Vehicle, // 👈 Vehicle model inclusion
+                // attributes: ['vehicleNumber', 'vehicleModel', 'vehicleType', 'vehicleColor'],
               },
             ],
           },

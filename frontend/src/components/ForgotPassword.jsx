@@ -53,7 +53,7 @@ const ForgotPassword = () => {
       if (!res.ok) throw new Error(data.message || "Password reset failed");
 
       setMessage("Password reset successfully. Redirecting to login...");
-      setStep(1);
+      setStep(0);
       setEmail("");
       setOtp("");
       setNewPassword("");
@@ -61,7 +61,7 @@ const ForgotPassword = () => {
 
       setTimeout(() => {
         navigate("/login");
-      }, 2000);
+      }, 2500);
     } catch (err) {
       setMessage(err.message);
     }

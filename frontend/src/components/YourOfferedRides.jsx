@@ -16,6 +16,7 @@ import {
   FaUser,
   FaPhone,
   FaInfoCircle,
+  FaMoneyBillWave,
 } from "react-icons/fa";
 import { useTheme } from "../ThemeContext";
 import "./YourOfferedRides.css";
@@ -375,9 +376,68 @@ const YourOfferedRides = () => {
                     <FaChair /> <strong>Seats Available:</strong> {ride.seats}
                   </p>
                   <p>
+                    <FaMoneyBillWave /> <strong>One Seat @ </strong> ₹
+                    {ride.fare || "N/A"}
+                  </p>
+                  <p>
                     <FaClock /> <strong>Expected Departure:</strong>{" "}
                     {new Date(ride.departureTime).toLocaleString()}
                   </p>
+
+                  {/* <hr />
+                  <h6 className="mt-3">
+                    <strong>Vehicle Information</strong>
+                  </h6>
+                  <p className="card-text">
+                    <strong>Vehicle: </strong>
+                    {ride.vehicle.brand || "N/A"} {ride.vehicle?.model || "N/A"}{" "}
+                    <br />
+                    <strong>Color:</strong> {ride.vehicle?.color || "N/A"}{" "}
+                    <br />
+                    <strong>Plate:</strong> {ride.vehicle?.plateNumber || "N/A"}
+                  </p>
+                  {ride.vehicle?.vehiclePhoto && (
+                    <div className="text-center mb-2">
+                      <img
+                        src={ride.vehicle?.vehiclePhoto}
+                        alt="Vehicle"
+                        className="img-fluid rounded"
+                        style={{ maxHeight: "120px", objectFit: "cover" }}
+                      />
+                    </div>
+                  )}
+                   */}
+
+                  <hr />
+                  <h6 className="mt-3">
+                    <strong>Vehicle Information</strong>
+                  </h6>
+
+                  <div className="d-flex flex-column align-items-start mb-2">
+                    <p className="mb-1">
+                      <strong>Vehicle:</strong> {ride.vehicle?.brand || "N/A"}{" "}
+                      {ride.vehicle?.model || "N/A"}
+                    </p>
+                    <p className="mb-1">
+                      <strong>Color:</strong> {ride.vehicle?.color || "N/A"}
+                    </p>
+                    <p className="mb-3">
+                      <strong>Plate:</strong>{" "}
+                      {ride.vehicle?.plateNumber || "N/A"}
+                    </p>
+
+                    {ride.vehicle?.vehiclePhoto && (
+                      <div className="text-center w-100">
+                        <img
+                          src={ride.vehicle.vehiclePhoto}
+                          alt="Vehicle"
+                          className="img-fluid rounded"
+                          style={{ maxHeight: "150px", objectFit: "cover" }}
+                        />
+                      </div>
+                    )}
+                  </div>
+
                   <p>
                     <strong>Status:</strong>{" "}
                     <Badge
@@ -535,7 +595,7 @@ const YourOfferedRides = () => {
         className={isDark ? "modal-dark" : ""}
       >
         <Modal.Header closeButton>
-          <Modal.Title>Pending Requests</Modal.Title>
+          <Modal.Title>Passenger Requests</Modal.Title>
         </Modal.Header>
         <Modal.Body>
           {selectedRequest?.length > 0 ? (

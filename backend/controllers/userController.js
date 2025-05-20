@@ -33,6 +33,7 @@ export const loginUser = async (req, res) => {
         phoneNo: user.phoneNo,
         theme: user.theme,
         profileImg: user.profileImg, // <- include this!
+        isVerified: user.isVerified,
       },
       process.env.JWT_SECRET_KEY,
       { expiresIn: process.env.TOKEN_EXPIRY || "1h" }
@@ -53,6 +54,8 @@ export const loginUser = async (req, res) => {
       email: user.email,
       phoneNo: user.phoneNo,
       theme: user.theme,
+      profileImg: user.profileImg,
+      isVerified: user.isVerified,
       token
     });
 

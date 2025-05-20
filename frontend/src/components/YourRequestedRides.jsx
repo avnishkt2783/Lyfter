@@ -137,6 +137,8 @@ const YourRequestedRides = () => {
           })
         );
 
+        console.log(ridesData);
+
         setRequestedRides(ridesData || []);
       } catch (error) {
         console.error("Error fetching requested rides:", error);
@@ -230,9 +232,15 @@ const YourRequestedRides = () => {
           "Insufficient seats available. Click OK to revoke your request."
         );
         if (shouldRevoke) {
+          // const ride = requestedRides.find(
+          //   (r) => r.passengerRide.passengerRideId === rideId
+          // );
           const ride = requestedRides.find(
-            (r) => r.passengerRide.passengerRideId === rideId
+            (r) =>
+              r.passengerRide.passengerRideId === passengerRideId &&
+              r.driverRide.driverRideId === driverRideId
           );
+
           if (ride) {
             await handleRevoke(
               ride.passengerRide.passengerRideId,
@@ -271,6 +279,7 @@ const YourRequestedRides = () => {
             const driverName =
               ride.driverRide?.driver?.user?.fullName || "Unknown";
             const driverPhone = ride.driverRide?.driver?.user?.phoneNo || "N/A";
+            const profileImg = ride.driverRide?.driver?.user?.profileImg;
 
             let message = "";
             let showConfirm = false;
@@ -317,9 +326,50 @@ const YourRequestedRides = () => {
                 key={ride.passengerRide.passengerRideId}
               >
                 <div className="card-body">
-                  <p>
+                  {/* <p>
                     <FaUser /> <strong>Driver:</strong> {driverName}
-                  </p>
+                  </p> */}
+
+                  <h5 className="card-title d-flex align-items-center">
+                    {/* Profile Image */}
+                    {profileImg ? (
+                      <img
+                        src={profileImg}
+                        alt="Driver Profile"
+                        className="me-2 rounded-circle"
+                        style={{
+                          width: "40px",
+                          height: "40px",
+                          objectFit: "cover",
+                          border: "2px solid #AAA",
+                        }}
+                      />
+                    ) : (
+                      <img
+                        src="default.jpg"
+                        alt="Driver Profile"
+                        className="me-2 rounded-circle"
+                        style={{
+                          width: "40px",
+                          height: "40px",
+                          objectFit: "cover",
+                          border: "2px solid #AAA",
+                        }}
+                      />
+                    )}
+
+                    {/* Driver Name */}
+                    {driverName || "Unknown Driver"}
+
+                    {/* Verified Badge */}
+                    {ride.driverRide?.driver?.isVerified && (
+                      <FaCheckCircle
+                        className={`ms-2 text-success `} // for tooltip
+                        style={{ fontSize: "1.5rem" }}
+                      />
+                    )}
+                  </h5>
+
                   <p>
                     <FaPhone /> <strong>Phone:</strong> {driverPhone}
                     {driverPhone && (
@@ -355,6 +405,67 @@ const YourRequestedRides = () => {
                     <strong>Expected Departure:</strong>{" "}
                     {new Date(ride.driverRide?.departureTime).toLocaleString()}
                   </p>
+                  {/*                   
+                  <hr />
+                  <h6 className="mt-3">
+                    <strong>Vehicle Information</strong>
+                  </h6>
+                  <p className="card-text">
+                    <strong>Vehicle: </strong>
+                    {ride.driverRide?.vehicle?.brand || "N/A"}{" "}
+                    {ride.driverRide?.vehicle?.model || "N/A"} <br />
+                    <strong>Color:</strong>{" "}
+                    {ride.driverRide?.vehicle?.color || "N/A"} <br />
+                    <strong>Plate:</strong>{" "}
+                    {ride.driverRide?.vehicle?.plateNumber || "N/A"}
+                  </p>
+                  {ride.driverRide?.vehicle?.vehiclePhoto && (
+                    <div className="text-center mb-2">
+                      <img
+                        src={ride.driverRide.vehicle.vehiclePhoto}
+                        alt="Vehicle"
+                        className="img-fluid rounded"
+                        style={{ maxHeight: "120px", objectFit: "cover" }}
+                      />
+                    </div>
+                  )} */}
+
+                  <div className="card mt-3">
+                    <div className="card-body">
+                      <h6 className="card-title">
+                        <strong>Vehicle Information</strong>
+                      </h6>
+                      <div className="row align-items-center">
+                        <div className="col-md-8 mb-3">
+                          <p className="mb-1">
+                            <strong>Vehicle: </strong>
+                            {ride.driverRide?.vehicle?.brand || "N/A"}{" "}
+                            {ride.driverRide?.vehicle?.model || "N/A"}
+                          </p>
+                          <p className="mb-1">
+                            <strong>Color:</strong>{" "}
+                            {ride.driverRide?.vehicle?.color || "N/A"}
+                          </p>
+                          <p className="mb-0">
+                            <strong>Plate:</strong>{" "}
+                            {ride.driverRide?.vehicle?.plateNumber || "N/A"}
+                          </p>
+                        </div>
+                        <div className="col-md-4 text-center my-3">
+                          {ride.driverRide?.vehicle?.vehiclePhoto ? (
+                            <img
+                              src={ride.driverRide.vehicle.vehiclePhoto}
+                              alt="Vehicle"
+                              className="img-fluid rounded shadow"
+                              style={{ maxHeight: "120px", objectFit: "cover" }}
+                            />
+                          ) : (
+                            <div className="text-muted">No Image</div>
+                          )}
+                        </div>
+                      </div>
+                    </div>
+                  </div>
 
                   <p className={`mt-3 your-requested-status ${statusClass}`}>
                     <FaInfoCircle /> {message}

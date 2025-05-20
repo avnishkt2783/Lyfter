@@ -3,11 +3,11 @@ import axios from "axios";
 import { useAuth } from "../AuthContext";
 import { useNavigate } from "react-router-dom";
 import { useTheme } from "../ThemeContext";
-
+import { Link } from "react-router-dom";
 import {
   FaUser,
   FaPhone,
-  FaCar,
+  FaPlus,
   FaMotorcycle,
   FaUsers,
   FaMoneyBillAlt,
@@ -181,7 +181,7 @@ const OfferRideDetails = () => {
         </div> */}
 
         {/* Dropdown to select the vehicle */}
-        <div className="mb-3">
+        {/* <div className="mb-3">
           <label className="form-label">Mode of Transport:</label>
           <select
             value={selectedVehicle}
@@ -196,6 +196,35 @@ const OfferRideDetails = () => {
               </option>
             ))}
           </select>
+        </div> */}
+
+        <div className="mb-3">
+          <label className="form-label">Mode of Transport:</label>
+          <div className="d-flex align-items-center gap-2">
+            <select
+              value={selectedVehicle}
+              onChange={(e) => setSelectedVehicle(e.target.value)}
+              required
+              className="form-select"
+              style={{ flex: 1 }}
+            >
+              <option value="">Select Your Vehicle</option>
+              {vehicles.map((vehicle) => (
+                <option key={vehicle.vehicleId} value={vehicle.vehicleId}>
+                  {vehicle.brand} {vehicle.model} ({vehicle.plateNumber})
+                </option>
+              ))}
+            </select>
+
+            <Link
+              to="/add-vehicle"
+              className="btn btn-outline-secondary d-flex align-items-center justify-content-center"
+              title="Add Vehicle"
+              style={{ height: "38px", width: "38px", padding: 0 }}
+            >
+              <FaPlus />
+            </Link>
+          </div>
         </div>
 
         <div className="mb-3">
