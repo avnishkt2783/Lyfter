@@ -1,6 +1,6 @@
 import { DataTypes } from "sequelize";
 import sequelize from "../../config/db.js";
-// import User from "../user/user.js";
+import User from "../user/user.js";
 
 const Driver = sequelize.define("driver", {
   driverId: {
@@ -58,7 +58,7 @@ const Driver = sequelize.define("driver", {
   freezeTableName: true,
 });
 
-// Driver.belongsTo(User, { foreignKey: 'userId' });
-// User.hasOne(Driver, { foreignKey: 'userId' });
+Driver.belongsTo(User, { foreignKey: 'userId' });
+User.hasOne(Driver, { foreignKey: 'userId' });
 
 export default Driver;

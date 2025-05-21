@@ -70,9 +70,9 @@ const OfferRideDetails = () => {
           headers: { Authorization: `Bearer ${token}` },
         });
 
-        console.log("-------------------");
-        console.log(res.data);
-        console.log("-------------------");
+        // console.log("-------------------");
+        // console.log(res.data);
+        // console.log("-------------------");
 
         setVehicles(res.data);
       } catch (err) {

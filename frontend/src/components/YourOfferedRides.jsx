@@ -20,6 +20,7 @@ import {
 } from "react-icons/fa";
 import { useTheme } from "../ThemeContext";
 import "./YourOfferedRides.css";
+import { Link } from "react-router-dom";
 
 // Function to convert coordinates to address
 const geocodeLatLng = async (lat, lng) => {
@@ -64,10 +65,6 @@ const loadGoogleMapsScript = () => {
     }&libraries=places`;
     script.async = true;
     script.defer = true;
-    // script.onload = resolve;
-    // script.onerror = reject;
-
-    // Resolve or reject based on script load
     script.onload = () => {
       console.log("Google Maps script loaded successfully.");
       resolve();
@@ -83,8 +80,11 @@ const loadGoogleMapsScript = () => {
 
 const YourOfferedRides = () => {
   const [rides, setRides] = useState([]);
+  // const [passengers, setPassengers] = useState([]);
   const [showModal, setShowModal] = useState(false);
-  const [selectedRequest, setSelectedRequest] = useState(null);
+  const [showModalFP, setShowModalFP] = useState(false);
+  const [selectedRequest, setSelectedRequest] = useState([]); // <-- This must not be null
+  const [selectedRequestFP, setSelectedRequestFP] = useState([]); // <-- This must not be null
   const [loading, setLoading] = useState(true);
   const apiURL = import.meta.env.VITE_API_URL;
   const { token } = useAuth();
@@ -196,6 +196,74 @@ const YourOfferedRides = () => {
     fetchOfferedRides();
   }, []);
 
+  const handleFindPassenger = async (driverRideId) => {
+    // console.log(driverRideId);
+
+    try {
+      const response = await axios.post(
+        `${apiURL}/rides/matchingPassengers`,
+        {
+          driverRideId,
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+
+      // console.log("matchingPassengers", response);
+
+      const requests = response.data?.passengers;
+
+      if (!Array.isArray(requests)) {
+        console.error(
+          "Invalid response: `requests` is not an array",
+          response.data
+        );
+        setSelectedRequestFP([]);
+        return;
+      }
+
+      const requestsData = await Promise.all(
+        requests.map(async (ride) => {
+          try {
+            const startCoords = JSON.parse(ride.startLocation);
+            const endCoords = JSON.parse(ride.destination);
+
+            const startAddress = await geocodeLatLng(
+              startCoords.lat,
+              startCoords.lng
+            );
+            const endAddress = await geocodeLatLng(
+              endCoords.lat,
+              endCoords.lng
+            );
+
+            return {
+              ...ride,
+              driverRideId,
+              startLocation: startAddress,
+              destination: endAddress,
+            };
+          } catch (err) {
+            console.error("Error in geocoding:", err);
+            return ride; // Return ride without changes if geocoding fails
+          }
+        })
+      );
+
+      console.log("FIND PASSENGER DATA");
+      console.log(requestsData);
+
+      setSelectedRequestFP(requestsData);
+      setShowModalFP(true);
+    } catch (error) {
+      console.error("Error fetching matching passengers:", error);
+      setSelectedRequestFP([]);
+    }
+  };
+
   // Handle clicking on the badge to show pending requests
   const handleBadgeClick = async (driverRideId) => {
     try {
@@ -251,6 +319,10 @@ const YourOfferedRides = () => {
     driverRideId,
     status
   ) => {
+    console.log("inside handle request status change");
+    console.log("PRID: ", passengerRideId);
+    console.log("DRID: ", driverRideId);
+
     try {
       const response = await axios.post(
         `${apiURL}/rides/updaterequeststatus`,
@@ -260,23 +332,34 @@ const YourOfferedRides = () => {
 
       if (response.data.success) {
         if (status === "Accepted") {
-          setSelectedRequest((prevRequests) =>
-            prevRequests.filter(
-              (request) => !(request.passengerRideId === passengerRideId)
-            )
-          );
+          if (selectedRequest) {
+            setSelectedRequest((prevRequests) =>
+              prevRequests.filter(
+                (request) => !(request.passengerRideId === passengerRideId)
+              )
+            );
+          }
+          if (selectedRequestFP) {
+            setSelectedRequestFP((prevRequests) =>
+              prevRequests.filter(
+                (request) => !(request.passengerRideId === passengerRideId) // MAY NOT BE CORRECT ACCESSING
+              )
+            );
+          }
         }
 
         if (status === "Rejected") {
-          setSelectedRequest((prevRequests) =>
-            prevRequests.filter(
-              (request) =>
-                !(
-                  request.passengerRideId === passengerRideId &&
-                  request.driverRideId === driverRideId
-                )
-            )
-          );
+          if (selectedRequest) {
+            setSelectedRequest((prevRequests) =>
+              prevRequests.filter(
+                (request) =>
+                  !(
+                    request.passengerRideId === passengerRideId &&
+                    request.driverRideId === driverRideId
+                  )
+              )
+            );
+          }
         }
 
         // Update ride's pendingRequests count
@@ -384,30 +467,6 @@ const YourOfferedRides = () => {
                     {new Date(ride.departureTime).toLocaleString()}
                   </p>
 
-                  {/* <hr />
-                  <h6 className="mt-3">
-                    <strong>Vehicle Information</strong>
-                  </h6>
-                  <p className="card-text">
-                    <strong>Vehicle: </strong>
-                    {ride.vehicle.brand || "N/A"} {ride.vehicle?.model || "N/A"}{" "}
-                    <br />
-                    <strong>Color:</strong> {ride.vehicle?.color || "N/A"}{" "}
-                    <br />
-                    <strong>Plate:</strong> {ride.vehicle?.plateNumber || "N/A"}
-                  </p>
-                  {ride.vehicle?.vehiclePhoto && (
-                    <div className="text-center mb-2">
-                      <img
-                        src={ride.vehicle?.vehiclePhoto}
-                        alt="Vehicle"
-                        className="img-fluid rounded"
-                        style={{ maxHeight: "120px", objectFit: "cover" }}
-                      />
-                    </div>
-                  )}
-                   */}
-
                   <hr />
                   <h6 className="mt-3">
                     <strong>Vehicle Information</strong>
@@ -454,6 +513,16 @@ const YourOfferedRides = () => {
                     >
                       {ride.status}
                     </Badge>
+                    {ride.status === "Waiting" && (
+                      <Badge
+                        bg="info"
+                        text={ride.status === "Waiting" ? "dark" : "light"}
+                        onClick={() => handleFindPassenger(ride.driverRideId)}
+                        style={{ cursor: "pointer" }}
+                      >
+                        Find Passengers
+                      </Badge>
+                    )}
                   </p>
                 </Card.Text>
 
@@ -564,17 +633,6 @@ const YourOfferedRides = () => {
                               <FaInfoCircle /> <strong>Status:</strong>{" "}
                               {acceptedRide.status}
                             </p>
-                            {/* <p className="text-muted small">
-                              <strong>Created:</strong>{" "}
-                              {new Date(
-                                acceptedRide.createdAt
-                              ).toLocaleString()}
-                              <br />
-                              <strong>Updated:</strong>{" "}
-                              {new Date(
-                                acceptedRide.updatedAt
-                              ).toLocaleString()}
-                            </p> */}
                           </div>
                         ))}
                       </Accordion.Body>
@@ -590,7 +648,10 @@ const YourOfferedRides = () => {
       {/* Pending Requests Modal */}
       <Modal
         show={showModal}
-        onHide={() => setShowModal(false)}
+        onHide={() => {
+          setShowModal(false);
+          fetchOfferedRides();
+        }}
         centered
         className={isDark ? "modal-dark" : ""}
       >
@@ -651,7 +712,6 @@ const YourOfferedRides = () => {
                   </Button>
                   <Button
                     variant="danger"
-                    // size="sm"
                     onClick={() =>
                       handleRequestStatusChange(
                         request.passengerRideId,
@@ -667,6 +727,79 @@ const YourOfferedRides = () => {
             ))
           ) : (
             <p>No pending requests.</p>
+          )}
+        </Modal.Body>
+      </Modal>
+
+      {/* Find Passengers Modal */}
+      <Modal
+        show={showModalFP}
+        onHide={() => {
+          setShowModalFP(false);
+          fetchOfferedRides();
+        }}
+        centered
+        className={isDark ? "modal-dark" : ""}
+      >
+        <Modal.Header closeButton>
+          <Modal.Title>Find Passenger</Modal.Title>
+        </Modal.Header>
+        <Modal.Body>
+          {selectedRequestFP?.length > 0 ? (
+            selectedRequestFP.map((request) => (
+              <div
+                key={request.passengerRideId}
+                className={`your-offered-modal-request mb-4 p-3 border rounded ${
+                  isDark ? "border-secondary text-white" : "border-dark"
+                }`}
+              >
+                <p>
+                  <FaUser /> <strong>Name:</strong>{" "}
+                  {request.passengerName || "Unknown"}
+                </p>
+                <p>
+                  <FaPhone /> <strong>Phone:</strong>{" "}
+                  {request.passengerPhoneNo || "N/A"}
+                  {request.passengerPhoneNo && (
+                    <a
+                      href={`tel:${request.passengerPhoneNo}`}
+                      className="btn btn-sm btn-success ms-3"
+                    >
+                      Call
+                    </a>
+                  )}
+                </p>
+                <p>
+                  <FaMapMarkerAlt /> <strong>From:</strong>{" "}
+                  {request.startLocation || "N/A"}
+                </p>
+                <p>
+                  <FaMapMarkerAlt /> <strong>To:</strong>{" "}
+                  {request.destination || "N/A"}
+                </p>
+                <p>
+                  <FaChair /> <strong>Seats Requested:</strong>{" "}
+                  {request.seatsRequired || 0}
+                </p>
+
+                <div className="d-flex gap-2 mt-2">
+                  <Button
+                    variant="success"
+                    onClick={() =>
+                      handleRequestStatusChange(
+                        request.passengerRideId,
+                        request.driverRideId,
+                        "Accepted"
+                      )
+                    }
+                  >
+                    Accept
+                  </Button>
+                </div>
+              </div>
+            ))
+          ) : (
+            <p>No passengers found on your route.</p>
           )}
         </Modal.Body>
       </Modal>

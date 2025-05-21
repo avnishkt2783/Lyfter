@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import axios from "axios";
 import { useAuth } from "../AuthContext";
 import { useNavigate } from "react-router-dom";
@@ -33,60 +33,133 @@ const MatchingRides = () => {
   const passengerNamePhoneNo = JSON.parse(
     localStorage.getItem("passengerNamePhoneNo")
   );
+  const hasRun = useRef(false);
+
+  const createPassengerRide = async () => {
+    // console.log("userId", userId);
+    // console.log(
+    //   "passengerNamePhoneNo.passengerName",
+    //   passengerNamePhoneNo.passengerName
+    // );
+    // console.log(
+    //   "passengerNamePhoneNo.passengerPhoneNo",
+    //   passengerNamePhoneNo.passengerPhoneNo
+    // );
+    // console.log("startLocation", startLocation);
+    // console.log("destination", destination);
+    // console.log("seatsRequired", seatsRequired);
+    try {
+      await axios.post(
+        `${apiURL}/rides/createPassengerRide`,
+        {
+          //input variables to send in backend
+          userId,
+          passengerName: passengerNamePhoneNo.passengerName,
+          passengerPhoneNo: passengerNamePhoneNo.passengerPhoneNo,
+          startLocation,
+          destination,
+          seatsRequired,
+          // driverRideId: ride?.driverRideId,
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+    } catch (error) {
+      console.error("Error creating ride frontend:", error);
+    }
+  };
+
+  const fetchMatchingRides = async () => {
+    // console.log("🚀 Fetching matching rides...");
+    const start = JSON.parse(startLocation);
+    const dest = JSON.parse(destination);
+
+    if (!start || !dest) {
+      console.error("Start or destination coordinates are missing.");
+      setLoading(false);
+      return;
+    }
+
+    try {
+      const response = await axios.post(
+        `${apiURL}/rides/matchingRides`,
+        {
+          passengerStart: start,
+          passengerEnd: dest,
+          seatsRequired,
+          currentUserId: userId,
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+
+      setRides(
+        response.data.success && Array.isArray(response.data.rides)
+          ? response.data.rides
+          : []
+      );
+    } catch (error) {
+      console.error("❌ Error fetching matching rides:", error);
+      setRides([]);
+    } finally {
+      console.log("🟢 fetchMatchingRides() completed.");
+      setLoading(false);
+    }
+  };
 
   useEffect(() => {
-    const fetchMatchingRides = async () => {
-      const start = JSON.parse(startLocation);
-      const dest = JSON.parse(destination);
+    if (!user || hasRun.current) return;
+    hasRun.current = true;
+    createPassengerRide();
+    fetchMatchingRides();
+  }, [user]);
 
-      if (!start || !dest) {
-        console.error("Start or destination coordinates are missing.");
-        setLoading(false);
-        return;
-      }
+  // useEffect(() => {
+  //   if (hasRun.current) return; // If it has already run, exit early
+  //   hasRun.current = true;
+  //   createPassengerRide();
+  //   fetchMatchingRides();
+  // }, []);
 
-      try {
-        const response = await axios.post(
-          `${apiURL}/rides/matchingRides`,
-          {
-            passengerStart: start,
-            passengerEnd: dest,
-            seatsRequired,
-            currentUserId: userId,
-          },
-          {
-            headers: {
-              Authorization: `Bearer ${token}`,
-            },
-          }
-        );
+  // useEffect(() => {
+  //   createPassengerRide()
+  //     .then(() => fetchMatchingRides())
+  //     .catch((error) => {
+  //       console.error("Error in ride creation or fetching:", error);
+  //     });
+  // }, []);
 
-        console.log("response", response);
+  // useEffect(() => {
 
-        setRides(
-          response.data.success && Array.isArray(response.data.rides)
-            ? response.data.rides
-            : []
-        );
-      } catch (error) {
-        console.error("Error fetching matching rides:", error);
-        setRides([]);
-      } finally {
-        setLoading(false);
-      }
-    };
+  //   const executeAsync = async () => {
+  //     await createPassengerRide();
+  //     await fetchMatchingRides();
+  //   };
 
-    if (token) {
-      fetchMatchingRides();
-    }
-  }, [token, userId]);
-
-  const handleNavigate = () => {
-    navigate("/yourRequestedRides");
-  };
+  //   executeAsync();
+  // }, []);
 
   const confirmRide = async (ride) => {
     try {
+      // console.log("userId", userId);
+      // console.log(
+      //   "passengerNamePhoneNo.passengerName",
+      //   passengerNamePhoneNo.passengerName
+      // );
+      // console.log(
+      //   "passengerNamePhoneNo.passengerPhoneNo",
+      //   passengerNamePhoneNo.passengerPhoneNo
+      // );
+      // console.log("startLocation", startLocation);
+      // console.log("destination", destination);
+      // console.log("seatsRequired", seatsRequired);
+      // console.log("ride?.driverRideId", ride?.driverRideId);
       await axios.post(
         `${apiURL}/rides/requestRideDetails`,
         {
@@ -106,8 +179,12 @@ const MatchingRides = () => {
       );
       setRequestedRideId(ride.driverRideId);
     } catch (error) {
-      console.error("Error confirming ride:", error);
+      console.error("Error confirming ride frontend:", error);
     }
+  };
+
+  const handleNavigate = () => {
+    navigate("/yourRequestedRides");
   };
 
   return (
