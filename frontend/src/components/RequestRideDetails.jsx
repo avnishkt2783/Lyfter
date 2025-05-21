@@ -155,9 +155,17 @@ const RequestRideDetails = () => {
               />
             </div>
             <div className="text-center">
+              {/* <button
+                type="button"
+                className="btn btn-secondary px-4 me-3"
+                onClick={handleRequestOnly}
+              >
+                <FaSearch className="me-2" />
+                Request Only
+              </button> */}
               <button type="submit" className="btn btn-primary px-4">
                 <FaSearch className="me-2" />
-                Show Matching Rides
+                Request & Find Rides
               </button>
             </div>
           </form>

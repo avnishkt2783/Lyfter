@@ -47,12 +47,58 @@ export const offerRideDetails = async (req, res) => {
       routePath: routePathString,
       status, // Waiting, Started, Finished, Cancelled
     });
-
+    
     res.status(200).json({ message: "Ride offered successfully" });
   } catch (err) {
     console.error(err);
     res.status(500).json({ error: "Failed to offer ride" });
   }
+};
+
+export const createPassengerRide = async (req, res) => {
+  const {
+      userId,
+      passengerName,
+      passengerPhoneNo,
+      startLocation,
+      destination,
+      seatsRequired,
+      // driverRideId,
+  } = req.body;
+
+  let passenger = await Passenger.findOne({ where: { userId } });
+    if (!passenger) {
+      passenger = await Passenger.create({ userId });
+    }
+    const passengerId = passenger.passengerId;
+
+    // Check for an existing request with the same route
+    const passengerRide = await PassengerRide.findOne({
+      where: {
+        passengerId,
+        passengerName,
+        passengerPhoneNo,
+        startLocation,
+        destination,
+        seatsRequired,
+      },
+    });
+
+    var savedPassengerRide;
+    if (passengerRide) {
+      // console.log(`You have already requested a ride for this route. passengerRideId: ${passengerRide.passengerRideId}`);
+      savedPassengerRide = passengerRide; 
+    }
+    else{
+      savedPassengerRide = await PassengerRide.create({
+        passengerId,
+        passengerName,
+        passengerPhoneNo,
+        startLocation,
+        destination,
+        seatsRequired,
+      });
+    } 
 };
 
 export const requestRideDetails = async (req, res) => {
@@ -66,6 +112,10 @@ export const requestRideDetails = async (req, res) => {
     driverRideId,
   } = req.body;
 
+  // console.log("------------------------------------------------------------------");
+  // console.log("Checking if its recieved or not.. ", passengerPhoneNo);
+  // console.log("------------------------------------------------------------------");
+  
   try {
     let passenger = await Passenger.findOne({ where: { userId } });
     if (!passenger) {
@@ -87,7 +137,7 @@ export const requestRideDetails = async (req, res) => {
 
     var savedPassengerRide;
     if (passengerRide) {
-      console.log(`You have already requested a ride for this route. passengerRideId: ${passengerRide.passengerRideId}`);
+      // console.log(`You have already requested a ride for this route. passengerRideId: ${passengerRide.passengerRideId}`);
       savedPassengerRide = passengerRide; 
     }
     else{
@@ -100,7 +150,7 @@ export const requestRideDetails = async (req, res) => {
         seatsRequired,
       });
     } 
-    console.log(savedPassengerRide.passengerRideId);
+    // console.log(savedPassengerRide.passengerRideId);
 
     const existingPRDR = await PassengerRideDriverRide.findOne({
       where: {
@@ -111,14 +161,14 @@ export const requestRideDetails = async (req, res) => {
 
     var savedPRDR;
     if(existingPRDR){
-      console.log(`Ride already created, Go to Your Requested Rides.`);
+      // console.log(`Ride already created, Go to Your Requested Rides.`);
       savedPRDR = existingPRDR; 
     }
     else{
       savedPRDR = await PassengerRideDriverRide.create({
         passengerRideId: savedPassengerRide.passengerRideId,
         driverRideId,
-        status: "Requested", //Requested, Accepted, Rejected, Confirmed
+        status: "Requested", //Requested, Accepted, Rejected, Confirmed, Finished
       }) 
     }
 
@@ -219,8 +269,202 @@ export const matchingRides = async (req, res) => {
   }
 };
 
+export const matchingPassengers = async (req, res) => {
+  const { driverRideId } = req.body;
 
-// Controller to get all offered rides for the driver
+  console.log("----------");
+  console.log("driverRideId", driverRideId);  
+
+  if (!driverRideId) {
+    return res.status(400).json({ success: false, message: "Missing driverRideId" });
+  }
+
+  try {
+    // 1. Get the specific driver ride and route path
+    const driverRide = await DriverRide.findByPk(driverRideId, {
+      include: [
+        {
+          model: Driver,
+          include: [
+            {
+              model: User,
+              // attributes: ['userId', 'fullName', 'email'] // Whatever you need
+            }
+          ]
+        }
+      ]
+    });
+
+  // console.log("----------");
+  // console.log("driverRide", driverRide);
+
+    if (!driverRide) {
+      return res.status(404).json({ success: false, message: "Driver ride not found" });
+    }
+
+    const driverUserId = driverRide.driver?.user?.userId;
+    // console.log("----------");
+    // console.log("driverUserId", driverUserId);
+    // console.log("----------");
+    // console.dir(driverRide.toJSON(), { depth: null });
+
+    if (!driverUserId) {
+      return res.status(500).json({ success: false, message: "Driver's user ID not found" });
+    }
+
+
+    let route;
+    try {
+      route = JSON.parse(driverRide.routePath);
+
+  // console.log("----------");
+  //     console.log("route", route);
+  // console.log("----------");
+  //     console.log("!Array.isArray(route)", !Array.isArray(route));
+
+      if (!Array.isArray(route)) throw new Error();
+    } catch (e) {
+      return res.status(400).json({ success: false, message: "Invalid routePath" });
+    }
+
+    const toleranceMeters = 200;
+
+    const allPassengerRides = await PassengerRide.findAll({
+      include: [{
+        model: Passenger,
+        include: [{
+          model: User,
+          attributes: ["userId", "fullName", "phoneNo", "profileImg"]
+        }]
+      }]
+    });
+
+  // console.log("----------");
+  //   console.log("allPassengerRides", allPassengerRides); // i get all rides till here. 
+  // 3. Build Set A: PassengerRides that match the route
+  const setA = new Set();
+  
+  allPassengerRides.forEach((passengerRide) => {
+      // const start = passengerRide.startLocation;
+      // const end = passengerRide.destination;
+      const start = JSON.parse(passengerRide.startLocation);
+      const end = JSON.parse(passengerRide.destination);
+      
+      
+      // console.log("----------");
+      // console.log("start", start);
+      // console.log("end", end);
+      
+
+      if (!start || !end) return;
+
+      let startIndex = -1;
+      let endIndex = -1;
+
+      route.forEach((point, index) => {
+        const distToStart = haversine(start, point);
+        const distToEnd = haversine(end, point);
+        if (distToStart < toleranceMeters && startIndex === -1) {
+          startIndex = index;
+        }
+        if (distToEnd < toleranceMeters && endIndex === -1) {
+          endIndex = index;
+        }
+      });
+
+      if (startIndex !== -1 && endIndex !== -1 && startIndex < endIndex) {
+        setA.add(passengerRide.passengerRideId);
+      }
+    });
+
+    const prdrEntries = await PassengerRideDriverRide.findAll({
+      where: {
+        passengerRideId: Array.from(setA),
+      },
+    });
+
+
+    console.log("----------");
+console.log("A",setA);
+
+  console.log("----------");
+    console.log("prdrEntries", prdrEntries);
+
+
+    // 5. Create Set B and Set C
+    const setB = new Set(); // status: requested, accepted
+    const setC = new Set(); // status: confirmed, finished
+
+    prdrEntries.forEach((entry) => {
+      const pid = entry.passengerRideId;
+      if (["Requested", "Accepted"].includes(entry.status)) {
+        setB.add(pid);
+      } else if (["Confirmed", "Finished"].includes(entry.status)) {
+        setC.add(pid);
+      }
+    });
+
+    
+    console.log("----------");
+console.log("B",setB);
+    console.log("----------");
+console.log("C",setC);
+
+    // 6. Compute (A - C) ∪ B
+    const finalSet = new Set();
+
+    // A - C
+    setA.forEach((id) => {
+      if (!setC.has(id)) {
+        finalSet.add(id);
+      }
+    });
+
+    // ∪ B
+    setB.forEach((id) => finalSet.add(id));    
+    
+    console.log("----------");
+console.log("finalSet",finalSet);
+
+    // 7. Fetch relevant PassengerRide data for result
+    const matchedPassengerRides = await PassengerRide.findAll({
+      where: {
+        passengerRideId: {
+          [Op.in]: Array.from(finalSet),
+        },
+      },
+      include: [{
+        model: Passenger,
+        include: [{
+          model: User,
+          attributes: ["userId", "fullName", "phoneNo", "profileImg"]
+        }]
+      }]
+    });
+
+  // console.log("----------");
+  // console.log("matchedPassengerRides", matchedPassengerRides[0].passenger?.);
+  
+  // 8. Filter out passenger rides where passenger userId matches the driver userId
+  
+  // console.log("----------");
+  // console.log("driverUserId", driverUserId);  
+  // console.log("EQUALS OR NOT EQUALS");
+  // console.log("matchedPassengerRides[0].Passenger?.User?.userId", matchedPassengerRides[0].Passenger?.User?.userId);
+  const filteredRides = matchedPassengerRides.filter(
+      (ride) => ride.passenger?.user?.userId !== driverUserId
+    );
+
+  // console.log("----------");
+  //   console.log("filteredRides", filteredRides);
+
+    res.status(200).json({ success: true, passengers: filteredRides });
+  } catch (err) {
+    console.error("❌ Error in matchingPassengers:", err);
+    res.status(500).json({ success: false, message: "Server error", error: err.message });
+  }
+};
+
 export const getOfferedRides = async (req, res) => {
 
   try {
@@ -264,7 +508,7 @@ export const getOfferedRides = async (req, res) => {
     // For each ride, count the pending requests
       const rideData = rides.map(ride => {
             const pendingRequests = Array.isArray(ride.passengerRideDriverRides) ? ride.passengerRideDriverRides.length : 0;
-             console.log(`Ride ID: ${ride.driverRideId}, Pending Requests: ${pendingRequests}`);
+            //  console.log(`Ride ID: ${ride.driverRideId}, Pending Requests: ${pendingRequests}`);
             return { ...ride.dataValues, pendingRequests };
         });
 
@@ -275,79 +519,77 @@ export const getOfferedRides = async (req, res) => {
   }
 };
 
+export const getRequestedRides = async (req, res) => {
+  const userId = req.user?.userId;
 
-  export const getRequestedRides = async (req, res) => {
-    const userId = req.user?.userId;
+  // console.log("---------------------------------------------------");
+  // console.log("userId: " + userId);
+  // console.log("---------------------------------------------------");
+
+  try {
+    // Find the passenger by userId
+    const passenger = await Passenger.findOne({ where: { userId } });
 
     // console.log("---------------------------------------------------");
-    // console.log("userId: " + userId);
+    // console.log("Passenger object: ", passenger);
     // console.log("---------------------------------------------------");
 
-    try {
-      // Find the passenger by userId
-      const passenger = await Passenger.findOne({ where: { userId } });
-
-      // console.log("---------------------------------------------------");
-      // console.log("Passenger object: ", passenger);
-      // console.log("---------------------------------------------------");
-
-      if (!passenger) {
-        return res.status(404).json({ error: "Passenger not found" });
-      }
-
-      const passengerId = passenger.passengerId;
-
-      // console.log("---------------------------------------------------");
-      // console.log("Passenger ID: " + passengerId);
-      // console.log("---------------------------------------------------");
-
-      // Find all requested rides for the passenger
-      const requestedRides = await PassengerRideDriverRide.findAll({
-        attributes: ['status'], // Include the status from PassengerRideDriverRide
-        order: [['createdAt', 'DESC']],
-        include: [
-          {
-            model: PassengerRide,
-            where: { passengerId }, // Filter by passengerId within the associated PassengerRide
-            attributes: ['passengerRideId', 'startLocation', 'destination', 'seatsRequired'],
-          },
-          {
-            model: DriverRide,
-            attributes: ['driverRideId','startLocation', 'destination', 'fare', 'seats', 'driverId', 'departureTime'],
-            include: [
-              {
-                model: Driver,
-                include: [
-                  {
-                    model: User,
-                    attributes: ['fullName', 'phoneNo', 'profileImg', 'isVerified'],
-                  },
-                ],
-              },
-              {
-                model: Vehicle, // 👈 Vehicle model inclusion
-                // attributes: ['vehicleNumber', 'vehicleModel', 'vehicleType', 'vehicleColor'],
-              },
-            ],
-          },
-        ],
-      });
-
-      // console.log("---------------------------------------------------");
-      // console.log("Requested Rides: ", requestedRides);
-      // console.log("---------------------------------------------------");
-
-      if (!requestedRides || requestedRides.length === 0) {
-        return res.status(404).json({ message: "No requested rides found" });
-      }
-
-      res.status(200).json({ rides: requestedRides });
-    } catch (err) {
-      console.error("Error fetching requested rides:", err);
-      res.status(500).json({ error: "Failed to fetch requested rides" });
+    if (!passenger) {
+      return res.status(404).json({ error: "Passenger not found" });
     }
-  };
 
+    const passengerId = passenger.passengerId;
+
+    // console.log("---------------------------------------------------");
+    // console.log("Passenger ID: " + passengerId);
+    // console.log("---------------------------------------------------");
+
+    // Find all requested rides for the passenger
+    const requestedRides = await PassengerRideDriverRide.findAll({
+      attributes: ['status'], // Include the status from PassengerRideDriverRide
+      order: [['createdAt', 'DESC']],
+      include: [
+        {
+          model: PassengerRide,
+          where: { passengerId }, // Filter by passengerId within the associated PassengerRide
+          attributes: ['passengerRideId', 'startLocation', 'destination', 'seatsRequired'],
+        },
+        {
+          model: DriverRide,
+          attributes: ['driverRideId','startLocation', 'destination', 'fare', 'seats', 'driverId', 'departureTime'],
+          include: [
+            {
+              model: Driver,
+              include: [
+                {
+                  model: User,
+                  attributes: ['fullName', 'phoneNo', 'profileImg', 'isVerified'],
+                },
+              ],
+            },
+            {
+              model: Vehicle, // 👈 Vehicle model inclusion
+              // attributes: ['vehicleNumber', 'vehicleModel', 'vehicleType', 'vehicleColor'],
+            },
+          ],
+        },
+      ],
+    });
+
+    // console.log("---------------------------------------------------");
+    // console.log("Requested Rides: ", requestedRides);
+    // console.log("---------------------------------------------------");
+
+    if (!requestedRides || requestedRides.length === 0) {
+      return res.status(404).json({ message: "No requested rides found" });
+    }
+
+    res.status(200).json({ rides: requestedRides });
+  } catch (err) {
+    console.error("Error fetching requested rides:", err);
+    res.status(500).json({ error: "Failed to fetch requested rides" });
+  }
+};
 
 export const getPendingRequests = async (req, res) => {
   
@@ -374,7 +616,7 @@ export const getPendingRequests = async (req, res) => {
       return res.status(400).json({ error: "Invalid request: Missing driverRideId" });
     }
 
-    console.log(`✅ Fetching pending requests for driverRideId: ${driverRideId}`);
+    // console.log(`✅ Fetching pending requests for driverRideId: ${driverRideId}`);
 
         // const driverId = driver.driverId;
         // const driverRideId = await DriverRide.findOne({ where: { driverId }})
@@ -388,7 +630,7 @@ export const getPendingRequests = async (req, res) => {
   ]
     });
 
-    console.log("✅ Raw Pending Requests: ", JSON.stringify(requests, null, 2));
+    // console.log("✅ Raw Pending Requests: ", JSON.stringify(requests, null, 2));
 
      // Check if the requests array is empty or contains null entries
     if (!requests || requests.length === 0) {
@@ -408,7 +650,7 @@ export const getPendingRequests = async (req, res) => {
       };
     });
 
-    console.log("✅ Fetched Pending Requests: ", pendingRequests);
+    // console.log("✅ Fetched Pending Requests: ", pendingRequests);
     if (!pendingRequests || pendingRequests.length === 0) {
       return res.status(404).json({ message: "No pending requests found" });
     }
@@ -419,41 +661,6 @@ export const getPendingRequests = async (req, res) => {
     res.status(500).json({ error: "Failed to fetch pending requests" });
   }
 };
-
-// // Update request status (Accept/Reject)
-// export const updateRequestStatus = async (req, res) => {
-//   const { passengerRideId, status } = req.body;
-  
-//   try {
-//      if (status === "Accepted") {
-//       // Update the status in the database
-//       await PassengerRideDriverRide.update({ status }, {
-//         where: { passengerRideId },
-//       });
-
-//       res.status(200).json({ success: true, message: "Ride accepted successfully" });
-//     } 
-//     else if (status === "Rejected") {
-//       // If status is 'Rejected', delete the entry from the table
-//      await PassengerRideDriverRide.update({ status }, {
-//         where: { passengerRideId },
-//       });
-
-//       console.log(`Request with ID ${passengerRideId} rejected.`);
-//        res.status(200).json({ success: true, message: "Ride rejected successfully" });
-//     } else {
-//       // Otherwise, update the status
-//     await PassengerRideDriverRide.update({ status }, {
-//       where: { passengerRideId }
-//     });
-//      console.log(`Request with ID ${passengerRideId} updated to ${status}.`);
-//     }
-//     res.status(200).json({ success: true });
-//   } catch (err) {
-//     console.error("Error updating request status:", err);
-//     res.status(500).json({ error: "Failed to update request status" });
-//   }
-// };
 
 export const updateRequestStatus = async (req, res) => {
   const { passengerRideId, driverRideId, status } = req.body;
@@ -474,7 +681,7 @@ export const updateRequestStatus = async (req, res) => {
       }
     );
 
-    console.log(`Request with passengerRideId ${passengerRideId} and driverRideId ${driverRideId} updated to ${status}.`);
+    // console.log(`Request with passengerRideId ${passengerRideId} and driverRideId ${driverRideId} updated to ${status}.`);
     res.status(200).json({ success: true, message: `Ride ${status.toLowerCase()} successfully` });
 
   } catch (err) {
@@ -482,72 +689,6 @@ export const updateRequestStatus = async (req, res) => {
     res.status(500).json({ error: "Failed to update request status" });
   }
 };
-
-// export const confirmRide = async (req, res) => {
-//   const { passengerRideId } = req.params;
-
-//   try {
-//     // Update the status to "Confirmed"
-//     await PassengerRideDriverRide.update(
-//       { status: "Confirmed" },
-//       { where: { passengerRideId } }
-//     );
-
-//     res.status(200).json({ success: true, message: "Ride confirmed successfully" });
-//   } catch (err) {
-//     console.error("Error confirming ride:", err);
-//     res.status(500).json({ error: "Failed to confirm ride" });
-//   }
-// };
-
-// export const confirmRide = async (req, res) => {
-//   const { passengerRideId } = req.params;
-
-//   try {
-//     // Fetch the ride details
-//     const ride = await PassengerRideDriverRide.findOne({
-//       where: { passengerRideId },
-//       include: [
-//         {
-//           model: PassengerRide,
-//           as: "passengerRide",
-//         },
-//         {
-//           model: DriverRide,
-//           as: "driverRide",
-//         },
-//       ],
-//     });
-
-//     if (!ride) {
-//       return res.status(404).json({ error: "Ride not found" });
-//     }
-
-//     const seatsRequested = ride.passengerRide?.seatsRequired;
-//     const availableSeats = ride.driverRide?.seats;
-
-//     if (availableSeats < seatsRequested) {
-//       return res.status(400).json({
-//         error: "Insufficient seats available",
-//         availableSeats,
-//       });
-//     }
-
-//     // Deduct seats and confirm the ride
-//     await ride.driverRide.update({
-//       seats: availableSeats - seatsRequested,
-//     });
-
-//     await ride.update({
-//       status: "Confirmed",
-//     });
-
-//     return res.status(200).json({ success: true, message: "Ride confirmed" });
-//   } catch (err) {
-//     console.error("Error confirming ride:", err);
-//     return res.status(500).json({ error: "Failed to confirm ride" });
-//   }
-// };
 
 export const confirmRide = async (req, res) => {
   const { passengerRideId, driverRideId } = req.params;
@@ -586,11 +727,10 @@ export const confirmRide = async (req, res) => {
 
     return res.status(200).json({ success: true, message: "Ride confirmed" });
   } catch (err) {
-    console.error("Error confirming ride:", err);
+    console.error("Error confirming ride backend:", err);
     return res.status(500).json({ error: "Failed to confirm ride" });
   }
 };
-
 
 export const acceptedOrConfirmed = async (req, res) => {
   const { driverRideId } = req.params;
@@ -614,28 +754,6 @@ export const acceptedOrConfirmed = async (req, res) => {
     res.status(500).json({ error: "Failed to fetch rides" });
   }
 };
-
-
-// Handle ride actions (Start, Cancel, Finish)
-// export const rideAction = async (req, res) => {
-//   const { driverRideId, action } = req.body;
-
-//   try {
-//     // Implement logic based on action
-//     if (action === "Start Ride") {
-//       // Update ride status to started or other logic
-//     } else if (action === "Cancel Ride") {
-//       // Cancel the ride
-//     } else if (action === "Finish Ride") {
-//       // Mark the ride as finished
-//     }
-    
-//     res.status(200).json({ success: true });
-//   } catch (err) {
-//     console.error("Error performing ride action:", err);
-//     res.status(500).json({ error: "Failed to perform ride action" });
-//   }
-// };
 
 export const rideAction = async (req, res) => {
   const { driverRideId, action } = req.body;
@@ -682,7 +800,6 @@ export const rideAction = async (req, res) => {
     res.status(500).json({ error: "Failed to perform ride action" });
   }
 };
-
 
 export const revokeRide = async (req, res) => {
   const { passengerRideId, driverRideId } = req.params;

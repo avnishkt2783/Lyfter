@@ -203,7 +203,7 @@ const Register = () => {
                   <div className="mb-3">
                     <label className="form-label">Phone No.:</label>
                     <input
-                      type="text"
+                      type="number"
                       className={`form-control ${
                         isDark ? "text-white" : "bg-white text-dark"
                       } border-secondary`}

@@ -3,6 +3,8 @@ import {
     offerRideDetails,
     requestRideDetails, 
     matchingRides, 
+    matchingPassengers,
+    createPassengerRide,
     getOfferedRides, 
     getRequestedRides, 
     getPendingRequests, 
@@ -19,6 +21,8 @@ const router = express.Router();
 router.post("/offerRideDetails", offerRideDetails);
 router.post("/requestRideDetails",requestRideDetails);
 router.post("/matchingRides", matchingRides);
+router.post("/matchingPassengers", matchingPassengers);
+router.post("/createPassengerRide", createPassengerRide);
 
 router.get("/yourofferedrides", getOfferedRides);  // Fetch all rides offered by a driver
 

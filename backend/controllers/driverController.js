@@ -83,16 +83,16 @@ import { cloudinary } from "../middleware/upload.js";
 export const requestDriver = async (req, res) => {
   try {
     const userId = req.user.userId;
-    console.log("req.user:", req.user);
+    // console.log("req.user:", req.user);
 if (!req.user) return res.status(401).json({ message: "Unauthorized" });
 
 
-console.log("req.file:", req.file);
+// console.log("req.file:", req.file);
 
     const { aadharNumber } = req.body;
 
-    console.log('""""""""""""""""""""""');
-    console.log(userId);    
+    // console.log('""""""""""""""""""""""');
+    // console.log(userId);    
 
     if (!req.file) {
       return res.status(400).json({ message: "Aadhaar photo is required" });
@@ -101,8 +101,8 @@ console.log("req.file:", req.file);
     const aadharImg = req.file.path;
     const aadharImgPublicId = req.file.filename;
 
-    console.log("aadharImg", aadharImg);
-    console.log("aadharImgPublicId", aadharImgPublicId);
+    // console.log("aadharImg", aadharImg);
+    // console.log("aadharImgPublicId", aadharImgPublicId);
     
 
     let driver = await Driver.findOne({ where: { userId } });
