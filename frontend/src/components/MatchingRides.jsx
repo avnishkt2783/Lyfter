@@ -147,19 +147,6 @@ const MatchingRides = () => {
 
   const confirmRide = async (ride) => {
     try {
-      // console.log("userId", userId);
-      // console.log(
-      //   "passengerNamePhoneNo.passengerName",
-      //   passengerNamePhoneNo.passengerName
-      // );
-      // console.log(
-      //   "passengerNamePhoneNo.passengerPhoneNo",
-      //   passengerNamePhoneNo.passengerPhoneNo
-      // );
-      // console.log("startLocation", startLocation);
-      // console.log("destination", destination);
-      // console.log("seatsRequired", seatsRequired);
-      // console.log("ride?.driverRideId", ride?.driverRideId);
       await axios.post(
         `${apiURL}/rides/requestRideDetails`,
         {

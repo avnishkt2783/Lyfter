@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
 import { useAuth } from "../AuthContext";
-import { Spinner, Card } from "react-bootstrap";
+import { Spinner, Card, Accordion } from "react-bootstrap";
 import {
   FaUser,
   FaPhone,
@@ -115,6 +115,10 @@ const YourRequestedRides = () => {
             try {
               const startCoords = JSON.parse(ride.driverRide?.startLocation);
               const endCoords = JSON.parse(ride.driverRide?.destination);
+              const pRstartCoords = JSON.parse(
+                ride.passengerRide?.startLocation
+              );
+              const pRendCoords = JSON.parse(ride.passengerRide?.destination);
 
               const startAddress = await geocodeLatLng(
                 startCoords.lat,
@@ -125,10 +129,21 @@ const YourRequestedRides = () => {
                 endCoords.lng
               );
 
+              const pRstartAddress = await geocodeLatLng(
+                pRstartCoords.lat,
+                pRstartCoords.lng
+              );
+              const pRendAddress = await geocodeLatLng(
+                pRendCoords.lat,
+                pRendCoords.lng
+              );
+
               return {
                 ...ride,
                 startLocation: startAddress,
                 destination: endAddress,
+                pRstartLocation: pRstartAddress,
+                pRdestination: pRendAddress,
               };
             } catch (err) {
               console.error("Error in geocoding:", err);
@@ -137,7 +152,9 @@ const YourRequestedRides = () => {
           })
         );
 
+        console.log("----------------------------");
         console.log(ridesData);
+        console.log("----------------------------");
 
         setRequestedRides(ridesData || []);
       } catch (error) {
@@ -389,13 +406,49 @@ const YourRequestedRides = () => {
                     <FaChair /> <strong>Seats Available:</strong>{" "}
                     {ride.driverRide?.seats || "N/A"}
                   </p>
-                  {/* <p>
-                    <FaMapMarkerAlt /> <strong>Start:</strong>{" "}
-                    {ride.startLocation}
-                  </p>
-                  <p>
-                    <FaRoute /> <strong>Destination:</strong> {ride.destination}
-                  </p> */}
+                  {/* <div>
+                    <hr />
+                    <strong>Driver Route:</strong>
+                    <p>
+                      <FaMapMarkerAlt /> <strong>From:</strong>{" "}
+                      {ride.startLocation}
+                    </p>
+                    <p>
+                      <FaMapMarkerAlt /> <strong>To:</strong> {ride.destination}
+                    </p>
+                  </div> */}
+                  <Accordion defaultActiveKey={null} className="my-3">
+                    <Accordion.Item eventKey="0">
+                      <Accordion.Header>Route</Accordion.Header>
+                      <Accordion.Body>
+                        <div>
+                          <strong>Driver Route:</strong>
+                          <p>
+                            <FaMapMarkerAlt className="me-2" />
+                            <strong>From:</strong> {ride.startLocation}
+                          </p>
+                          <p>
+                            <FaMapMarkerAlt className="me-2" />
+                            <strong>To:</strong> {ride.destination}
+                          </p>
+                        </div>
+
+                        <hr />
+
+                        <div>
+                          <strong>Passenger Route:</strong>
+                          <p>
+                            <FaMapMarkerAlt className="me-2" />
+                            <strong>From:</strong> {ride.pRstartLocation}
+                          </p>
+                          <p>
+                            <FaMapMarkerAlt className="me-2" />
+                            <strong>To:</strong> {ride.pRdestination}
+                          </p>
+                        </div>
+                      </Accordion.Body>
+                    </Accordion.Item>
+                  </Accordion>
                   <p>
                     <FaMoneyBillWave /> <strong>One Seat @ </strong> ₹
                     {ride.driverRide?.fare || "N/A"}

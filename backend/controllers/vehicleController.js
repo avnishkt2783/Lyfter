@@ -133,6 +133,14 @@ export const getVehicles = async (req, res) => {
     // console.log("-----");
 
     const driver =  await Driver.findOne({ where: { userId: userId }});
+
+    if (!driver) {
+  return res.status(200).json({
+    isDriver: false,
+    vehicles: [],
+  }); // just an empty array
+}
+
     
     const vehicles = await Vehicle.findAll({ where: { driverId: driver.driverId } });
     
@@ -140,7 +148,10 @@ export const getVehicles = async (req, res) => {
     // console.log(vehicles);
     // console.log("-----");
     
-    res.json(vehicles);
+    res.status(200).json({
+      isDriver: true,
+      vehicles,
+    });
   } catch (err) {
     console.error("Error fetching vehicles:", err);
     res.status(500).json({ message: "Failed to fetch vehicles" });

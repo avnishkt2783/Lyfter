@@ -8,18 +8,46 @@ A full-stack ride-sharing platform that allows users to request and offer rides,
 
 ### 🔧 Work in progress...
 
+- [ ] BUG: Reverse Lyfter Logic - Number of seats is not filtered in backend logic.
+- [ ] BUG: Start End Address of Passenger/Driver - Addresses on yourRequestedRides.
+- [ ] BUG: Profile Page - Missing Gender Info, Role Badge ??
+- [ ] BUG: token expired error when logout or backend delete. something like that.
+- [ ] 
+- [ ] 
+- [ ] 
+- [ ] 
+- [ ] 
+- [ ] 
+
+- [ ] Add Filter for Rides in someway?
+- [ ] Can I send Notification through website.
+- [ ] Use email nodemailer to enhance UX. send mail whenever required.
+- [ ] Show on Map button integrated with google maps for map path, and feature buttons.
+- [ ] Admin Manage page to manage admins. static superuser or based on some otp login.
+- [ ] loading animation for better UI/UX wherever required.
+- [ ] 
+- [ ] 
+- [ ] 
+- [ ] 
+- [ ] 
+- [ ] 
+
 - [ ] Landing Page & About Page.
-- [ ] Reverse Lyfter Logic
 - [ ] Regex For all pages. any element. deep search.
 - [ ] Clean Code & Deploy
 - [ ] Report + PPT + Video PPT
 - [ ] Favicon for LYFTER, remove VITE logo.
 - [ ] LYFTER per alphabet vehicle symbol. (stylised banner for marketing)
 - [ ] Check Group for ERRORS and BUGS provided by our Expert Testers.
+- [ ] 
+- [ ] 
+- [ ] 
+- [ ] 
 
 ---
 
 ### ☑️ Completed tasks
+- [x] Reverse Lyfter Logic
 - [x] making code work and seamlessly for the codes we want to do. 
 - [x] CSS and BS, pathing for all codes from arobh and simran. 
 - [x] Page reload checking for newly added pages.
