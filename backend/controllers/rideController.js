@@ -272,9 +272,6 @@ export const matchingRides = async (req, res) => {
 export const matchingPassengers = async (req, res) => {
   const { driverRideId } = req.body;
 
-  console.log("----------");
-  console.log("driverRideId", driverRideId);  
-
   if (!driverRideId) {
     return res.status(400).json({ success: false, message: "Missing driverRideId" });
   }
@@ -295,18 +292,11 @@ export const matchingPassengers = async (req, res) => {
       ]
     });
 
-  // console.log("----------");
-  // console.log("driverRide", driverRide);
-
     if (!driverRide) {
       return res.status(404).json({ success: false, message: "Driver ride not found" });
     }
 
     const driverUserId = driverRide.driver?.user?.userId;
-    // console.log("----------");
-    // console.log("driverUserId", driverUserId);
-    // console.log("----------");
-    // console.dir(driverRide.toJSON(), { depth: null });
 
     if (!driverUserId) {
       return res.status(500).json({ success: false, message: "Driver's user ID not found" });
@@ -316,11 +306,6 @@ export const matchingPassengers = async (req, res) => {
     let route;
     try {
       route = JSON.parse(driverRide.routePath);
-
-  // console.log("----------");
-  //     console.log("route", route);
-  // console.log("----------");
-  //     console.log("!Array.isArray(route)", !Array.isArray(route));
 
       if (!Array.isArray(route)) throw new Error();
     } catch (e) {
@@ -339,22 +324,12 @@ export const matchingPassengers = async (req, res) => {
       }]
     });
 
-  // console.log("----------");
-  //   console.log("allPassengerRides", allPassengerRides); // i get all rides till here. 
   // 3. Build Set A: PassengerRides that match the route
   const setA = new Set();
   
   allPassengerRides.forEach((passengerRide) => {
-      // const start = passengerRide.startLocation;
-      // const end = passengerRide.destination;
       const start = JSON.parse(passengerRide.startLocation);
       const end = JSON.parse(passengerRide.destination);
-      
-      
-      // console.log("----------");
-      // console.log("start", start);
-      // console.log("end", end);
-      
 
       if (!start || !end) return;
 
@@ -383,14 +358,6 @@ export const matchingPassengers = async (req, res) => {
       },
     });
 
-
-    console.log("----------");
-console.log("A",setA);
-
-  console.log("----------");
-    console.log("prdrEntries", prdrEntries);
-
-
     // 5. Create Set B and Set C
     const setB = new Set(); // status: requested, accepted
     const setC = new Set(); // status: confirmed, finished
@@ -404,12 +371,6 @@ console.log("A",setA);
       }
     });
 
-    
-    console.log("----------");
-console.log("B",setB);
-    console.log("----------");
-console.log("C",setC);
-
     // 6. Compute (A - C) ∪ B
     const finalSet = new Set();
 
@@ -422,11 +383,10 @@ console.log("C",setC);
 
     // ∪ B
     setB.forEach((id) => finalSet.add(id));    
-    
-    console.log("----------");
-console.log("finalSet",finalSet);
 
     // 7. Fetch relevant PassengerRide data for result
+    const driverAvailableSeats = driverRide.seats;
+    
     const matchedPassengerRides = await PassengerRide.findAll({
       where: {
         passengerRideId: {
@@ -441,22 +401,16 @@ console.log("finalSet",finalSet);
         }]
       }]
     });
-
-  // console.log("----------");
-  // console.log("matchedPassengerRides", matchedPassengerRides[0].passenger?.);
   
   // 8. Filter out passenger rides where passenger userId matches the driver userId
-  
-  // console.log("----------");
-  // console.log("driverUserId", driverUserId);  
-  // console.log("EQUALS OR NOT EQUALS");
-  // console.log("matchedPassengerRides[0].Passenger?.User?.userId", matchedPassengerRides[0].Passenger?.User?.userId);
   const filteredRides = matchedPassengerRides.filter(
-      (ride) => ride.passenger?.user?.userId !== driverUserId
+      (ride) => {
+        // ride.passenger?.user?.userId !== driverUserId
+        const isNotSameUser = ride.passenger?.user?.userId !== driverUserId;
+        const seatsOkay = ride.seatsRequired <= driverAvailableSeats;
+        return isNotSameUser && seatsOkay;
+      }
     );
-
-  // console.log("----------");
-  //   console.log("filteredRides", filteredRides);
 
     res.status(200).json({ success: true, passengers: filteredRides });
   } catch (err) {

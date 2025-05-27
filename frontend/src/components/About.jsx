@@ -172,7 +172,10 @@ const About = () => {
             Whether you’re a rider or driver, Lyfter brings the world closer.
             Sign up now and be part of the journey.
           </p>
-          <a href="/dashboard" className="btn btn-outline-light btn-lg">
+          <a
+            href="/dashboard"
+            className={`btn ${isDark ? "btn-light" : "btn-dark"}`}
+          >
             Get Started
           </a>
         </section>

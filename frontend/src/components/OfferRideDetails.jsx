@@ -62,26 +62,28 @@ const OfferRideDetails = () => {
 
   // Fetch vehicles owned by the driver
   useEffect(() => {
+    if (!user.userId) return;
+
     const fetchVehicles = async () => {
       try {
-        console.log(user.userId);
-
         const res = await axios.get(`${apiURL}/vehicle/getvehicles`, {
           headers: { Authorization: `Bearer ${token}` },
         });
 
-        // console.log("-------------------");
-        // console.log(res.data);
-        // console.log("-------------------");
+        if (!res.data.isDriver) {
+          console.log("res.isDriver", res.isDriver); //undefined ?
+          navigate("/become-driver");
+          return;
+        }
 
-        setVehicles(res.data);
+        setVehicles(res.data.vehicles);
       } catch (err) {
         console.error("Error fetching vehicles:", err);
         alert("Failed to load vehicles.");
       }
     };
     fetchVehicles();
-  }, []);
+  }, [user.userId]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -163,41 +165,6 @@ const OfferRideDetails = () => {
           />
         </div>
 
-        {/* <div className="mb-3">
-          <label className="form-label">
-            <FaCar className="me-2" /> Mode of Transport:
-          </label>
-          <select
-            className="form-select"
-            value={mode}
-            onChange={(e) => setMode(e.target.value)}
-            required
-          >
-            <option value="Car">Car 🚗</option>
-            <option value="Bike">Bike 🏍️</option>
-            <option value="Auto">Auto 🚖</option>
-            <option value="Van">Van 🚐</option>
-          </select>
-        </div> */}
-
-        {/* Dropdown to select the vehicle */}
-        {/* <div className="mb-3">
-          <label className="form-label">Mode of Transport:</label>
-          <select
-            value={selectedVehicle}
-            onChange={(e) => setSelectedVehicle(e.target.value)}
-            required
-            className="form-control"
-          >
-            <option value="">Select Your Vehicle</option>
-            {vehicles.map((vehicle) => (
-              <option key={vehicle.vehicleId} value={vehicle.vehicleId}>
-                {vehicle.brand} {vehicle.model} ({vehicle.plateNumber})
-              </option>
-            ))}
-          </select>
-        </div> */}
-
         <div className="mb-3">
           <label className="form-label">Mode of Transport:</label>
           <div className="d-flex align-items-center gap-2">
@@ -209,11 +176,12 @@ const OfferRideDetails = () => {
               style={{ flex: 1 }}
             >
               <option value="">Select Your Vehicle</option>
-              {vehicles.map((vehicle) => (
-                <option key={vehicle.vehicleId} value={vehicle.vehicleId}>
-                  {vehicle.brand} {vehicle.model} ({vehicle.plateNumber})
-                </option>
-              ))}
+              {Array.isArray(vehicles) &&
+                vehicles.map((vehicle) => (
+                  <option key={vehicle.vehicleId} value={vehicle.vehicleId}>
+                    {vehicle.brand} {vehicle.model} ({vehicle.plateNumber})
+                  </option>
+                ))}
             </select>
 
             <Link

@@ -18,7 +18,7 @@ const Footer = () => {
       className={`pb-3 ${
         isDark ? "bg-dark text-white" : "bg-light text-dark"
       } ${
-        isDark ? "text-white border-light" : "text-dark border-dark"
+        isDark ? "text-white border-secondary" : "text-dark border-dark"
       } border-top pt-3`}
     >
       <div className="container text-center">

@@ -27,6 +27,7 @@ import AddVehicleForm from "./components/AddVehicleForm";
 import AadhaarDriversList from "./components/AadhaarDriversList";
 import AdminDashboard from "./components/AdminDashboard";
 import DriverPage from "./components/DriverPage";
+import ManageAdmins from "./components/ManageAdmins";
 import AdminRoute from "./AdminRoute";
 
 import "bootstrap/dist/css/bootstrap.min.css";
@@ -100,6 +101,7 @@ function App() {
               }
             />
             <Route path="/driver-dashboard" element={<DriverPage />} />
+            <Route path="/manage-admins" element={<ManageAdmins />} />
           </Route>
         </Routes>
       </main>

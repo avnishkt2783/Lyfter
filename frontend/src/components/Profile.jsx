@@ -12,6 +12,9 @@ import {
   FaSave,
   FaUpload,
   FaPencilAlt,
+  FaMars,
+  FaVenus,
+  FaTransgenderAlt,
 } from "react-icons/fa";
 import "bootstrap/dist/css/bootstrap.min.css";
 import "./Profile.css";
@@ -258,6 +261,47 @@ const Profile = () => {
             name="phoneNo"
             value={formData.phoneNo || ""}
             onChange={handleChange}
+          />
+        </div>
+
+        {/* <div className="form-group mb-3">
+          <label>
+            <FaPhone className="me-2" />
+            Gender
+            </label>
+          <input
+          className={`form-control ${
+            isDark ? "text-white border-1 border-light" : ""
+            }`}
+            name="gender"
+            value={formData.gender || ""}
+            onChange={handleChange}
+            disabled
+            />
+            </div> */}
+
+        <div className="form-group mb-3">
+          <label>
+            {/* <FaMars className="me-2" />
+            <FaVenus className="me-2" />
+            <FaTransgenderAlt className="me-2" /> */}
+            {formData.gender === "Male" ? (
+              <FaMars className="me-2" />
+            ) : formData.gender === "Female" ? (
+              <FaVenus className="me-2" />
+            ) : (
+              <FaTransgenderAlt className="me-2" />
+            )}
+            Gender
+          </label>
+          <input
+            className={`form-control ${
+              isDark ? "text-white border-1 border-light" : ""
+            }`}
+            name="gender"
+            value={formData.gender || ""}
+            onChange={handleChange}
+            disabled
           />
         </div>
 

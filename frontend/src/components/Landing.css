@@ -1,55 +1,69 @@
-/* Top Carousel */
-.landing-carousel {
-  height: 80vh;
-  /* background: linear-gradient(to right, #343a40, #212529); */
-}
-
-.carousel-placeholder {
-  height: 100%;
-}
-
-/* CTA Button */
-.landing-btn-cta {
-  padding: 0.75rem 2rem;
-}
-
-/* Testimonials */
-.testimonial {
-  border-radius: 0.5rem;
-  /* background-color: #f8f9fa; */
-}
-
-/* Final CTA */
-.landing-cta-section {
-  background-image: linear-gradient(to right, #007bff, #0056b3);
-}
-
-/* Stats */
-.landing-stats-section h3 {
-  font-size: 2.5rem;
-}
-
-.landing-carousel {
-  max-height: 90vh;
+/* Carousel Section */
+.landing-carousel-section {
+  width: 100%;
+  margin: 0;
+  padding: 0;
   overflow: hidden;
 }
 
-.landing-carousel-section {
-  /* width: 100%; */
-  margin: 10px;
-  padding: 0;
+/* Carousel Container */
+.carousel-inner {
+  display: flex;
+  align-items: center;
 }
 
+/* Each Slide */
+.carousel-item {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  transition: transform 0.6s ease-in-out;
+}
+
+/* Carousel Image */
 .landing-carousel-img {
   width: 100%;
-  height: auto;
+  /* height: 65vh; */
   object-fit: cover;
-  display: block;
-  cursor: pointer;
+  border-radius: 15px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+  transition: transform 0.5s ease-in-out;
 }
 
-.carousel-caption {
-  /* background-color: rgba(0, 0, 0, 0.4); */
-  padding: 1rem 2rem;
-  border-radius: 10px;
+/* Active Slide Scaling on Large Screens */
+@media (min-width: 768px) {
+  .carousel-item:not(.active) .landing-carousel-img {
+    transform: scale(0.92);
+    opacity: 0.7;
+  }
+
+  .carousel-item.active .landing-carousel-img {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+/* Prevent scaling/cropping on small screens */
+@media (max-width: 767px) {
+  .landing-carousel-img {
+    /* height: 55vh; */
+    object-fit: contain;
+  }
+
+  .carousel-item:not(.active) .landing-carousel-img {
+    transform: none;
+    opacity: 1;
+  }
+}
+
+/* Control buttons — always visible */
+.carousel-control-prev,
+.carousel-control-next {
+  width: 5%;
+  opacity: 0.8;
+}
+
+.carousel-control-prev-icon,
+.carousel-control-next-icon {
+  background-size: 100% 100%;
 }
