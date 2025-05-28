@@ -4,7 +4,7 @@ import axios from "axios";
 import { useTheme } from "../ThemeContext";
 import { getRegex } from "../utils/Regex";
 import "bootstrap/dist/css/bootstrap.min.css";
-// import "./BecomeDriverForm.css"; // Optional: Add this for custom scoped styles
+import { Spinner } from "react-bootstrap";
 
 const BecomeDriverForm = () => {
   const navigate = useNavigate();
@@ -16,6 +16,7 @@ const BecomeDriverForm = () => {
   const [aadharPhoto, setAadharPhoto] = useState(null);
   const [error, setError] = useState("");
   const [successMsg, setSuccessMsg] = useState("");
+  const [loading, setLoading] = useState(false);
 
     const validateForm = () => {
     // REGEX
@@ -33,6 +34,7 @@ const BecomeDriverForm = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setLoading(true);
 
     if (!aadharPhoto) {
       setError("Upload your Aadhaar photo");
@@ -57,6 +59,7 @@ const BecomeDriverForm = () => {
         },
       });
 
+      setLoading(false);
       setSuccessMsg("Driver request submitted successfully!");
       setError("");
       setTimeout(() => navigate("/driver-dashboard"), 1500);
@@ -123,17 +126,44 @@ const BecomeDriverForm = () => {
           <input
             type="file"
             id="aadharPhoto"
-            accept="image/*"
-            onChange={(e) => setAadharPhoto(e.target.files[0])}
+            accept=".jpg,.jpeg,.png"
+            onChange={(e) => {
+              const file = e.target.files[0];
+              if (file) {
+                const allowedTypes = ["image/jpeg", "image/png"];
+                const maxSizeInBytes = 2 * 1024 * 1024; // 2MB
+
+                if (!allowedTypes.includes(file.type)) {
+                  alert("Only JPG, JPEG, or PNG files are allowed.");
+                  e.target.value = null;
+                  return;
+                }
+
+                if (file.size > maxSizeInBytes) {
+                  alert("File size should not exceed 2MB.");
+                  e.target.value = null;
+                  return;
+                }
+
+                setAadharPhoto(file); // Valid file
+              }
+            }}
             className={`form-control ${
               isDark ? "text-white border-light" : ""
             }`}
             required
           />
+          <small className="text-muted">
+            Only JPG, JPEG, or PNG formats allowed. Max file size: 2MB.
+          </small>
         </div>
 
         <button type="submit" className="btn btn-primary w-100 fw-bold">
-          Submit Request
+          {loading ? (
+            <Spinner animation="border" variant={isDark ? "light" : "light"} />
+          ) : (
+            "Submit Request"
+          )}
         </button>
       </form>
     </div>

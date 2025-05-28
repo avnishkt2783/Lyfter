@@ -33,10 +33,12 @@ export const getPlatformStats = async (req, res) => {
       where: {
         status: { [Op.in]: ["Finished", "Confirmed"] },
       },
-      include: {
-        model: PassengerRide,
-        attributes: ["seatsRequired"],
-      },
+      include: [
+        {
+          model: PassengerRide,
+          attributes: ["seatsRequired"],
+        },
+      ],
     });
 
     // Aggregate seat-based stats
@@ -44,12 +46,31 @@ export const getPlatformStats = async (req, res) => {
     let passengersInLyft = 0;
 
     passengerRideDriverRides.forEach((prdr) => {
-      const seats = prdr.PassengerRide?.seatsRequired || 0;
+      const seats = prdr.passengerRide?.seatsRequired || 0;
+
+      // console.log("⚠️⚠️⚠️");
+
+      // // console.log("prdr.status: ", prdr.status);
+      // // console.log("prdr: ", prdr); //undefined
+
+      // console.log("⚠️⚠️⚠️");
       if (prdr.status === "Finished") passengersLyfted += seats;
       if (prdr.status === "Confirmed") passengersInLyft += seats;
     });
 
     // Send response
+
+    console.log("totalUsers:", totalUsers);
+    console.log("totalDrivers:", totalDrivers);
+    console.log("totalPassengers:", totalPassengers);
+    console.log("totalDriverRides:", totalDriverRides);
+    console.log("totalPassengerRides:", totalPassengerRides);
+    console.log("ongoingRides:", ongoingRides);
+    console.log("completedRides:", completedRides);
+    console.log("passengersLyfted:", passengersLyfted);
+    console.log("passengersInLyft:", passengersInLyft);
+    console.log("-------------------------");
+
     res.status(200).json({
       totalUsers,
       totalDrivers,

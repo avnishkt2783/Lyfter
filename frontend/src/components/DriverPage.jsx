@@ -242,7 +242,7 @@ const DriverPage = () => {
           </div>
 
           {/* License Submission */}
-          {(!licenseNumber || !licensePhoto) && (
+          {/* {(!licenseNumber || !licensePhoto) && (
             <form
               onSubmit={handleLicenseSubmit}
               className="mt-4 border-top pt-3"
@@ -281,6 +281,65 @@ const DriverPage = () => {
   </div>
 )}
 
+            </form>
+          )} */}
+
+          {/* License Submission */}
+          {(!licenseNumber || !licensePhoto) && (
+            <form
+              onSubmit={handleLicenseSubmit}
+              className="mt-4 border-top pt-3"
+            >
+              <h6>Submit License Info</h6>
+              <div className="mb-2">
+                <input
+                  type="text"
+                  className="form-control"
+                  placeholder="License Number"
+                  value={licenseNumberInput}
+                  onChange={(e) => setLicenseNumberInput(e.target.value)}
+                  required
+                />
+              </div>
+              <div className="mb-3">
+                <input
+                  type="file"
+                  accept=".jpg,.jpeg,.png"
+                  onChange={(e) => {
+                    const file = e.target.files[0];
+                    const maxSize = 2 * 1024 * 1024; // 2MB
+                    const allowedTypes = ["image/jpeg", "image/png"];
+
+                    if (file) {
+                      if (!allowedTypes.includes(file.type)) {
+                        alert("Only JPG, JPEG, or PNG formats are allowed.");
+                        e.target.value = null;
+                        return;
+                      }
+
+                      if (file.size > maxSize) {
+                        alert("File size should not exceed 2MB.");
+                        e.target.value = null;
+                        return;
+                      }
+
+                      setLicensePhotoFile(file); // Valid file
+                    }
+                  }}
+                  className="form-control"
+                  required
+                />
+                <small className="text-muted">
+                  Only JPG, JPEG, or PNG formats allowed. Max file size: 2MB.
+                </small>
+              </div>
+              <button
+                type="submit"
+                className="btn btn-warning"
+                disabled={uploading}
+              >
+                {uploading ? "Uploading..." : "Submit License Info"}
+              </button>
             </form>
           )}
         </div>

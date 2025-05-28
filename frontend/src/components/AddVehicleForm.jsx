@@ -2,6 +2,7 @@ import React, { useState, useContext } from "react";
 import axios from "axios";
 import { ThemeContext } from "../ThemeContext";
 import { getRegex } from "../utils/Regex";
+import { Spinner } from "react-bootstrap";
 
 const AddVehicleForm = () => {
   const [formData, setFormData] = useState({
@@ -15,8 +16,12 @@ const AddVehicleForm = () => {
 
   const { theme } = useContext(ThemeContext);
   const isDark = theme === "dark";
+
   const [error, setError] = useState("");
    const [success, setSuccess] = useState("");
+
+  const [loading, setLoading] = useState(false);
+
   const [message, setMessage] = useState("");
   const apiURL = import.meta.env.VITE_API_URL;
 
@@ -66,6 +71,7 @@ console.log("token:", token);
     form.append("plateNumber", formData.plateNumber);
     form.append("vehiclePhoto", formData.vehiclePhoto);
 
+    setLoading(true);
     try {
       const res = await axios.post(`${apiURL}/vehicle/add`, form, {
         headers: {
@@ -74,11 +80,13 @@ console.log("token:", token);
         },
       });
       alert(res.data.message);
+      setLoading(false);
       setMessage("");
     } catch (err) {
       const errorMessage =
         err.response?.data?.message || "Failed to add vehicle.";
       alert(errorMessage);
+      setLoading(false);
       setMessage("");
     }
   };
@@ -179,23 +187,55 @@ console.log("token:", token);
         </div>
 
         {/* Vehicle photo */}
-        <div className="col-12">
-          <label className="form-label fw-semibold">
+        <div className="col-12 mb-3">
+          <label htmlFor="vehiclePhoto" className="form-label fw-semibold">
             Upload Vehicle Photo:
           </label>
           <input
             type="file"
+            id="vehiclePhoto"
             name="vehiclePhoto"
-            accept="image/*"
-            onChange={handleChange}
+            accept="image/png, image/jpeg, image/jpg"
+            onChange={(e) => {
+              const file = e.target.files[0];
+              const maxSize = 2 * 1024 * 1024; // 2MB
+              const allowedTypes = ["image/jpeg", "image/png", "image/jpg"];
+
+              if (file) {
+                if (!allowedTypes.includes(file.type)) {
+                  alert("Only JPG, JPEG, or PNG formats are allowed.");
+                  e.target.value = null;
+                  return;
+                }
+
+                if (file.size > maxSize) {
+                  alert("File size should not exceed 2MB.");
+                  e.target.value = null;
+                  return;
+                }
+
+                handleChange(e); // Proceed only if valid
+              }
+            }}
             className="form-control"
             required
           />
+          <small className="text-muted">
+            Only JPG, JPEG, or PNG formats allowed. Max file size: 2MB.
+          </small>
         </div>
 
         <div className="col-12 d-grid">
           <button type="submit" className="btn btn-primary btn-lg">
-            Submit Vehicle
+            {/* Submit Vehicle */}
+            {loading ? (
+              <Spinner
+                animation="border"
+                variant={isDark ? "light" : "light"}
+              />
+            ) : (
+              "Submit Vehicle"
+            )}
           </button>
         </div>
           {error && (
