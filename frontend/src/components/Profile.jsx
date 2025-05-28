@@ -3,6 +3,7 @@ import axios from "axios";
 import { useAuth } from "../AuthContext";
 import { useTheme } from "../ThemeContext"; // import your ThemeContext
 import { Link } from "react-router-dom";
+import { Spinner } from "react-bootstrap";
 import {
   FaUser,
   FaEnvelope,
@@ -10,7 +11,6 @@ import {
   FaCalendar,
   FaMapMarkerAlt,
   FaSave,
-  FaUpload,
   FaPencilAlt,
   FaMars,
   FaVenus,
@@ -19,7 +19,10 @@ import {
 import "bootstrap/dist/css/bootstrap.min.css";
 import "./Profile.css";
 
+// const age = 0;
 const calculateAge = (dob) => {
+  console.log("⚡ INSIDE calculateAge (dob)");
+
   const birthDate = new Date(dob);
   const today = new Date();
   let age = today.getFullYear() - birthDate.getFullYear();
@@ -32,6 +35,9 @@ const calculateAge = (dob) => {
   ) {
     age--;
   }
+
+  console.log("AGE AFTER SETTING UP: ", age);
+
   return age;
 };
 
@@ -47,6 +53,8 @@ const Profile = () => {
   const [previewImg, setPreviewImg] = useState(null);
   const [error, setError] = useState("");
   const [successMsg, setSuccessMsg] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [age, setAge] = useState(null);
 
   const fetchProfile = async () => {
     try {
@@ -54,6 +62,11 @@ const Profile = () => {
         headers: { Authorization: `Bearer ${token}` },
       });
       setProfile(res.data);
+
+      // console.log("AJSHDKAHKSJDHAKJSD");
+
+      console.log(res.data);
+
       setFormData({
         ...res.data,
         addressAddress: res.data.address?.address || "",
@@ -63,8 +76,19 @@ const Profile = () => {
         addressCountry: res.data.address?.country || "",
         dob: res.data.dob || "",
       });
+
+      console.log("res.data.dob", res.data.dob);
+
+      try {
+        const calculatedAge = res.data.dob ? calculateAge(res.data.dob) : null;
+        setAge(calculatedAge);
+        console.log("AGE INSIDE FETCH PROFILE: ", calculatedAge);
+      } catch (err) {
+        console.log("Age calculation error", err);
+      }
     } catch (err) {
-      setError(err?.response?.data?.message || "Failed to load profile");
+      setError(err?.response?.data?.message);
+      console.log("Profile fetch error");
     }
   };
 
@@ -85,6 +109,9 @@ const Profile = () => {
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
+
+    // if (name == "dob") {
+    // }
   };
 
   const handleImageChange = (e) => {
@@ -97,6 +124,7 @@ const Profile = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setLoading(true);
     try {
       const data = new FormData();
       Object.entries(formData).forEach(([key, value]) => {
@@ -115,9 +143,11 @@ const Profile = () => {
       });
 
       await fetchProfile(); // Re-fetch to get the fresh and correct data
+      setLoading(false);
       setSuccessMsg("Profile updated successfully!");
       // setProfile(res.data);
     } catch (err) {
+      setLoading(false);
       setError(err?.response?.data?.message || "Failed to update profile");
     }
   };
@@ -125,7 +155,7 @@ const Profile = () => {
   if (error) return <p className="text-danger text-center">{error}</p>;
   if (!profile) return <p className="text-center">Loading profile...</p>;
 
-  const age = formData.dob ? calculateAge(formData.dob) : null;
+  // age = formData.dob ? calculateAge(formData.dob) : null;
 
   return (
     <div
@@ -209,9 +239,29 @@ const Profile = () => {
             <input
               id="profileImageInput"
               type="file"
-              accept="image/*"
+              accept=".jpg,.jpeg,.png"
               hidden
-              onChange={handleImageChange}
+              onChange={(e) => {
+                const file = e.target.files[0];
+                const maxSize = 2 * 1024 * 1024; // 2MB
+                const allowedTypes = ["image/jpeg", "image/png"];
+
+                if (file) {
+                  if (!allowedTypes.includes(file.type)) {
+                    alert("Only JPG, JPEG, or PNG formats are allowed.");
+                    e.target.value = null;
+                    return;
+                  }
+
+                  if (file.size > maxSize) {
+                    alert("File size should not exceed 2MB.");
+                    e.target.value = null;
+                    return;
+                  }
+
+                  handleImageChange(e); // Only call if valid
+                }
+              }}
             />
           </label>
         </div>
@@ -332,7 +382,7 @@ const Profile = () => {
             className={`form-control ${
               isDark ? "text-white border-1 border-light" : ""
             }`}
-            value={age || ""}
+            value={age || "0"}
             disabled
           />
         </div>
@@ -403,8 +453,19 @@ const Profile = () => {
         </div>
 
         <button type="submit" className={`btn btn-success w-100`}>
-          <FaSave className="me-2" />
-          Save Profile
+          {loading ? (
+            <>
+              <Spinner
+                animation="border"
+                variant={isDark ? "light" : "light"}
+              />
+            </>
+          ) : (
+            <>
+              <FaSave className="me-2" />
+              Save Profile
+            </>
+          )}
         </button>
       </form>
     </div>

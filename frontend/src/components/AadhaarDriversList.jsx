@@ -2,12 +2,15 @@ import React, { useEffect, useState, useContext } from "react";
 import { useNavigate } from "react-router-dom"; // ✅ Make sure this is imported
 import axios from "axios";
 import { ThemeContext } from "../ThemeContext";
+import { Spinner } from "react-bootstrap";
 
 const AadhaarDriversList = () => {
   const navigate = useNavigate(); // ✅ You need this
   const [drivers, setDrivers] = useState([]);
   const { theme } = useContext(ThemeContext);
   const apiURL = import.meta.env.VITE_API_URL;
+  const [loadingV, setLoadingV] = useState(false);
+  const [loadingR, setLoadingR] = useState(false);
 
   const fetchDrivers = async () => {
     try {
@@ -28,6 +31,7 @@ const AadhaarDriversList = () => {
   };
 
   const verifyDriver = async (driverId) => {
+    setLoadingV(true);
     try {
       const token = localStorage.getItem("token");
       await axios.put(
@@ -35,6 +39,7 @@ const AadhaarDriversList = () => {
         {},
         { headers: { Authorization: `Bearer ${token}` } }
       );
+      setLoadingV(false);
       alert("Aadhaar verified successfully.");
       setDrivers((prev) => prev.filter((d) => d.driverId !== driverId));
     } catch (err) {
@@ -51,6 +56,7 @@ const AadhaarDriversList = () => {
     )
       return;
 
+    setLoadingR(true);
     try {
       const token = localStorage.getItem("token");
       await axios.put(
@@ -58,6 +64,7 @@ const AadhaarDriversList = () => {
         {},
         { headers: { Authorization: `Bearer ${token}` } }
       );
+      setLoadingR(false);
       alert("Aadhaar rejected and data deleted.");
       setDrivers((prev) => prev.filter((d) => d.driverId !== driverId));
     } catch (err) {
@@ -73,7 +80,7 @@ const AadhaarDriversList = () => {
   return (
     <div
       className={`container py-4 ${
-        theme === "dark" ? "bg-dark text-light" : "bg-light text-dark"
+        theme === "dark" ? "bg-dark text-light" : "text-dark"
       }`}
     >
       <button
@@ -144,13 +151,29 @@ const AadhaarDriversList = () => {
                       onClick={() => verifyDriver(d.driverId)}
                       className="btn btn-success"
                     >
-                      Verify
+                      {/* Verify */}
+                      {loadingV ? (
+                        <Spinner
+                          animation="border"
+                          variant={theme === "dark" ? "light" : "light"}
+                        />
+                      ) : (
+                        "Verify"
+                      )}
                     </button>
                     <button
                       onClick={() => rejectAadhaar(d.driverId)}
                       className="btn btn-danger"
                     >
-                      Reject
+                      {/* Reject */}
+                      {loadingR ? (
+                        <Spinner
+                          animation="border"
+                          variant={theme === "dark" ? "light" : "light"}
+                        />
+                      ) : (
+                        "Reject"
+                      )}
                     </button>
                   </td>
                 </tr>
