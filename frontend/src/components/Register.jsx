@@ -3,6 +3,7 @@ import React, { useEffect, useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { useAuth } from "../AuthContext";
 import { useTheme } from "../ThemeContext";
+import { getRegex } from "../utils/Regex";
 
 const Register = () => {
   const apiURL = import.meta.env.VITE_API_URL;
@@ -72,9 +73,26 @@ const Register = () => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
-  // const validateForm = () => {
-  //   // REGEX
-  // }
+  const validateForm = () => {
+    // REGEX
+      const phoneRegex = getRegex("phone");
+  const passwordRegex = getRegex("password");
+
+  if (!phoneRegex.test(formData.phoneNo)) {
+    setError("Invalid Phone number");
+    return false;
+  }
+
+  if (!passwordRegex.test(formData.password)) {
+    setError(
+      "Password must be at least 8 characters, include a number and special character"
+    );
+    return false;
+  }
+ setError("");
+  return true;
+
+  }
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -84,6 +102,11 @@ const Register = () => {
       setSuccess("");
       return;
     }
+
+      if (!validateForm()) {
+    setSuccess("");
+    return;
+  }
 
     const { confirmPassword, ...dataToSend } = formData;
 

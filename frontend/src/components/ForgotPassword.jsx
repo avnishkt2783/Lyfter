@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+import { getRegex } from "../utils/Regex";
 
 const ForgotPassword = () => {
   const [step, setStep] = useState(1); // 1: Email → 2: OTP + New Password
@@ -8,6 +9,8 @@ const ForgotPassword = () => {
   const [newPassword, setNewPassword] = useState("");
   const [message, setMessage] = useState("");
   const [countdown, setCountdown] = useState(0);
+  const [error, setError] = useState("");
+  const [success, setSuccess] = useState("");
 
   const API_URL = import.meta.env.VITE_API_URL;
   const navigate = useNavigate();
@@ -40,8 +43,32 @@ const ForgotPassword = () => {
     }
   };
 
+    const validateForm = () => {
+        // REGEX
+          // const phoneRegex = getRegex("password");
+      const passwordRegex = getRegex("password");
+    
+      if (!passwordRegex.test(newPassword)) {
+       setError(
+      "Password must be at least 8 characters, include a number and special character"
+    );
+        return false;
+      }
+    
+    
+     setError("");
+      return true;
+    
+      }
+    
+
   const handleResetPassword = async (e) => {
     e.preventDefault();
+
+      if (!validateForm()) {
+    setSuccess("");
+    return;
+  }
     try {
       const res = await fetch(`${API_URL}/reset-password`, {
         method: "POST",
@@ -123,6 +150,12 @@ const ForgotPassword = () => {
               {String(countdown % 60).padStart(2, "0")} minutes
             </p>
           )}
+
+           {error && (
+  <div className="alert alert-danger mt-3">
+    {error}
+  </div>
+)}
         </form>
       )}
     </div>

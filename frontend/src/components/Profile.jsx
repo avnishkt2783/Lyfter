@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import axios from "axios";
 import { useAuth } from "../AuthContext";
 import { useTheme } from "../ThemeContext"; // import your ThemeContext
+import { getRegex } from "../utils/Regex";
 import { Link } from "react-router-dom";
 import { Spinner } from "react-bootstrap";
 import {
@@ -122,8 +123,32 @@ const Profile = () => {
     }
   };
 
+   const validateForm = () => {
+        // REGEX
+          const phoneRegex = getRegex("phone");
+      // const passwordRegex = getRegex("password");
+    
+      if (!phoneRegex.test(formData.phoneNo)) {
+        setError("Invalid Phone number");
+        return false;
+      }
+    
+    
+     setError("");
+      return true;
+    
+      }
+
   const handleSubmit = async (e) => {
     e.preventDefault();
+
+
+       if (!validateForm()) {
+    setSuccessMsg("");
+    return;
+  }
+
+
     setLoading(true);
     try {
       const data = new FormData();
@@ -152,7 +177,7 @@ const Profile = () => {
     }
   };
 
-  if (error) return <p className="text-danger text-center">{error}</p>;
+  // if (error) return <p className="text-danger text-center">{error}</p>;
   if (!profile) return <p className="text-center">Loading profile...</p>;
 
   // age = formData.dob ? calculateAge(formData.dob) : null;
@@ -182,7 +207,7 @@ const Profile = () => {
       <hr />
       <h2 className="text-center mb-4">Profile Page</h2>
       {/* <hr /> */}
-      {successMsg && (
+      {/* {successMsg && (
         <div
           className={`alert ${
             isDark
@@ -203,7 +228,7 @@ const Profile = () => {
         >
           {error}
         </div>
-      )}
+      )} */}
 
       <form onSubmit={handleSubmit} encType="multipart/form-data">
         {/* Profile image with pencil overlay */}
@@ -467,7 +492,32 @@ const Profile = () => {
             </>
           )}
         </button>
-      </form>
+
+            {successMsg && (
+        <div
+          className={`alert ${
+            isDark
+              ? "alert-success bg-success bg-opacity-25 text-white"
+              : "alert-success"
+          } mt-3`}
+        >
+          {successMsg}
+        </div>
+      )}
+      {error && (
+        <div
+          className={`alert ${
+            isDark
+              ? "alert-danger bg-danger bg-opacity-25 text-white"
+              : "alert-danger"
+          } mt-3`}
+        >
+          {error}
+        </div>
+      )}
+        </form>
+
+        
     </div>
   );
 };

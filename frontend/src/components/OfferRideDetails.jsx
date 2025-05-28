@@ -3,6 +3,7 @@ import axios from "axios";
 import { useAuth } from "../AuthContext";
 import { useNavigate } from "react-router-dom";
 import { useTheme } from "../ThemeContext";
+import { getRegex } from "../utils/Regex";
 import { Link } from "react-router-dom";
 import {
   FaUser,
@@ -30,7 +31,8 @@ const OfferRideDetails = () => {
   const [departureTime, setDepartureTime] = useState("");
   const [name, setName] = useState("");
   const [phone, setPhone] = useState("");
-
+  const [error, setError] = useState("");
+  const [success, setSuccess] = useState("");
   const startLocation = localStorage.getItem("startLocationCoordinatesA");
   const destination = localStorage.getItem("destinationCoordinatesB");
   const startLocationText = localStorage.getItem("startLocation");
@@ -85,8 +87,29 @@ const OfferRideDetails = () => {
     fetchVehicles();
   }, [user.userId]);
 
-  const handleSubmit = async (e) => {
+   const validateForm = () => {
+      // REGEX
+        const phoneRegex = getRegex("phone");
+    // const passwordRegex = getRegex("password");
+  
+    if (!phoneRegex.test(phone)) {
+      setError("Invalid Phone number");
+      return false;
+    }
+  
+  
+   setError("");
+    return true;
+  
+    }
+  
+   const handleSubmit = async (e) => {
     e.preventDefault();
+
+        if (!validateForm()) {
+    setSuccess("");
+    return;
+  }
 
     if (
       !name ||
@@ -263,6 +286,12 @@ const OfferRideDetails = () => {
           <FaHandshake className="me-2" />
           Offer Ride
         </button>
+
+          {error && (
+  <div className="alert alert-danger mt-3">
+    {error}
+  </div>
+)}
       </form>
     </div>
   );
