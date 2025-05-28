@@ -1,12 +1,15 @@
 import React, { useEffect, useState, useContext } from "react";
-import { useNavigate } from "react-router-dom"; // ✅ Make sure this is imported
+import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import { ThemeContext } from "../ThemeContext";
-import "./PendingDriversList.css"; // Optional: Scoped styles if needed
+import { Spinner } from "react-bootstrap";
+import "./PendingDriversList.css";
 
 const PendingDriversList = () => {
-  const navigate = useNavigate(); // ✅ You need this
+  const navigate = useNavigate();
   const [drivers, setDrivers] = useState([]);
+  const [loadingVerifyId, setLoadingVerifyId] = useState(null);
+  const [loadingRejectId, setLoadingRejectId] = useState(null);
   const apiURL = import.meta.env.VITE_API_URL;
   const { theme } = useContext(ThemeContext);
   const isDark = theme === "dark";
@@ -24,6 +27,7 @@ const PendingDriversList = () => {
   };
 
   const verifyDriver = async (driverId) => {
+    setLoadingVerifyId(driverId);
     try {
       const token = localStorage.getItem("token");
       await axios.put(
@@ -38,6 +42,8 @@ const PendingDriversList = () => {
     } catch (err) {
       console.error("Verification failed:", err);
       alert("Failed to verify driver.");
+    } finally {
+      setLoadingVerifyId(null);
     }
   };
 
@@ -49,6 +55,7 @@ const PendingDriversList = () => {
     )
       return;
 
+    setLoadingRejectId(driverId);
     try {
       const token = localStorage.getItem("token");
       await axios.put(
@@ -63,6 +70,8 @@ const PendingDriversList = () => {
     } catch (err) {
       console.error("Rejection failed:", err);
       alert("Failed to reject driver.");
+    } finally {
+      setLoadingRejectId(null);
     }
   };
 
@@ -73,7 +82,7 @@ const PendingDriversList = () => {
   return (
     <div
       className={`container py-4 ${
-        isDark ? "bg-dark text-light" : "bg-light text-dark"
+        isDark ? "bg-dark text-light" : "text-dark"
       }`}
     >
       <button
@@ -147,14 +156,30 @@ const PendingDriversList = () => {
                     <button
                       onClick={() => verifyDriver(d.driverId)}
                       className="btn btn-success"
+                      disabled={loadingVerifyId === d.driverId}
                     >
-                      Verify
+                      {loadingVerifyId === d.driverId ? (
+                        <Spinner
+                          animation="border"
+                          variant={isDark ? "light" : "light"}
+                        />
+                      ) : (
+                        "Verify"
+                      )}
                     </button>
                     <button
                       onClick={() => rejectDriver(d.driverId)}
                       className="btn btn-danger"
+                      disabled={loadingRejectId === d.driverId}
                     >
-                      Reject
+                      {loadingRejectId === d.driverId ? (
+                        <Spinner
+                          animation="border"
+                          variant={isDark ? "light" : "light"}
+                        />
+                      ) : (
+                        "Reject"
+                      )}
                     </button>
                   </td>
                 </tr>

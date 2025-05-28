@@ -17,6 +17,9 @@ const ManageAdmins = () => {
   const { user } = useAuth();
   const currentUserId = user?.userId;
 
+  const [promotingUserId, setPromotingUserId] = useState(null);
+  const [revokingUserId, setRevokingUserId] = useState(null);
+
   const fetchUsers = async () => {
     try {
       const res = await axios.get(`${apiURL}/admin/users`, {
@@ -34,6 +37,7 @@ const ManageAdmins = () => {
   };
 
   const promoteToAdmin = async (userId) => {
+    setPromotingUserId(userId);
     try {
       await axios.patch(
         `${apiURL}/admin/promote/${userId}`,
@@ -45,10 +49,13 @@ const ManageAdmins = () => {
     } catch (err) {
       console.error(err);
       setMessage(err.response?.data?.message || "Failed to promote user.");
+    } finally {
+      setPromotingUserId(null);
     }
   };
 
   const revokeAdmin = async (userId) => {
+    setRevokingUserId(userId);
     try {
       await axios.patch(
         `${apiURL}/admin/demote/${userId}`,
@@ -60,6 +67,8 @@ const ManageAdmins = () => {
     } catch (err) {
       console.error(err);
       setMessage(err.response?.data?.message || "Failed to revoke admin.");
+    } finally {
+      setRevokingUserId(null);
     }
   };
 
@@ -104,7 +113,7 @@ const ManageAdmins = () => {
   return (
     <div
       className={`container py-4 ${
-        theme === "dark" ? "bg-dark text-light" : "bg-light text-dark"
+        theme === "dark" ? "bg-dark text-light" : "text-dark"
       }`}
     >
       <button
@@ -184,9 +193,20 @@ const ManageAdmins = () => {
                                   : "btn-danger"
                               }`}
                               onClick={() => revokeAdmin(u.userId)}
-                              // disabled={u.userId === currentUserId}
+                              disabled={
+                                u.userId === currentUserId ||
+                                revokingUserId === u.userId
+                              }
                             >
-                              Revoke Admin
+                              {revokingUserId === u.userId ? (
+                                <span
+                                  className="spinner-border spinner-border-sm text-light"
+                                  role="status"
+                                  aria-hidden="true"
+                                ></span>
+                              ) : (
+                                "Revoke Admin"
+                              )}
                             </button>
                           </td>
                         </tr>
@@ -241,8 +261,17 @@ const ManageAdmins = () => {
                             <button
                               className="btn btn-sm btn-success"
                               onClick={() => promoteToAdmin(u.userId)}
+                              disabled={promotingUserId === u.userId}
                             >
-                              Promote to Admin
+                              {promotingUserId === u.userId ? (
+                                <span
+                                  className="spinner-border spinner-border-sm text-light"
+                                  role="status"
+                                  aria-hidden="true"
+                                ></span>
+                              ) : (
+                                "Promote to Admin"
+                              )}
                             </button>
                           </td>
                         </tr>

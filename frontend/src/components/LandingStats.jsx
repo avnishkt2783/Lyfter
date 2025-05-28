@@ -85,19 +85,32 @@ const LandingStats = () => {
     },
     {
       label: "Ongoing Rides",
-      value: stats.passengersCurrentlyInLyft,
+      value: stats.ongoingRides,
       icon: <FaClock />,
       color: "#ffc107",
     },
     {
       label: "Completed Rides",
-      value: stats.passengersLyfted,
+      value: stats.completedRides,
       icon: <FaCheckCircle />,
       color: "#198754",
+    },
+    {
+      label: "Total Passengers Lyfted",
+      value: stats.passengersLyfted,
+      icon: <FaUserFriends />,
+      color: "#aa8724",
+    },
+    {
+      label: "Passengers In Lyft",
+      value: stats.passengersInLyft,
+      icon: <FaUserFriends />,
+      color: "#11aaaa",
     },
   ];
 
   const userPieData = [
+    { name: "Users", value: stats.totalUsers },
     { name: "Drivers", value: stats.totalDrivers },
     { name: "Passengers", value: stats.totalPassengers },
   ];
@@ -105,8 +118,8 @@ const LandingStats = () => {
   const rideBarData = [
     {
       name: "Rides",
-      Ongoing: stats.passengersCurrentlyInLyft,
-      Completed: stats.passengersLyfted,
+      Ongoing: stats.ongoingRides,
+      Completed: stats.completedRides,
     },
   ];
 
@@ -127,7 +140,9 @@ const LandingStats = () => {
             <div className="col-md-6 col-lg-3" key={idx}>
               <div
                 className={`p-4 rounded shadow h-100 text-center ${
-                  isDark ? "bg-secondary text-light" : "bg-white text-dark"
+                  isDark
+                    ? "border border-secondary text-light"
+                    : "bg-white text-dark"
                 }`}
               >
                 <div className="mb-3 fs-1" style={{ color: card.color }}>
@@ -145,7 +160,9 @@ const LandingStats = () => {
           <div className="col-md-6 mb-4">
             <div
               className={`p-4 rounded shadow ${
-                isDark ? "bg-secondary text-light" : "bg-white text-dark"
+                isDark
+                  ? "border border-secondary text-light"
+                  : "bg-white text-dark"
               }`}
             >
               <h5 className="text-center mb-4">User Distribution</h5>
@@ -178,7 +195,9 @@ const LandingStats = () => {
           <div className="col-md-6 mb-4">
             <div
               className={`p-4 rounded shadow ${
-                isDark ? "bg-secondary text-light" : "bg-white text-dark"
+                isDark
+                  ? "border border-secondary text-light"
+                  : "bg-white text-dark"
               }`}
             >
               <h5 className="text-center mb-4">Ride Status Overview</h5>
