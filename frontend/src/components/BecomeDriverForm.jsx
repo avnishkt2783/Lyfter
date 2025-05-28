@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { useNavigate } from "react-router-dom"; // ✅ Make sure this is imported
 import axios from "axios";
 import { useTheme } from "../ThemeContext";
+import { getRegex } from "../utils/Regex";
 import "bootstrap/dist/css/bootstrap.min.css";
 // import "./BecomeDriverForm.css"; // Optional: Add this for custom scoped styles
 
@@ -16,6 +17,20 @@ const BecomeDriverForm = () => {
   const [error, setError] = useState("");
   const [successMsg, setSuccessMsg] = useState("");
 
+    const validateForm = () => {
+    // REGEX
+      const aadharNumberRegex = getRegex("aadharNumber");
+
+  if (!aadharNumberRegex.test(aadharNumber)) {
+    setError("Invalid Aadhaar number. Use format: 1234 5678 9012");
+    return false;
+  }
+ setError("");
+  return true;
+
+  }
+
+
   const handleSubmit = async (e) => {
     e.preventDefault();
 
@@ -23,6 +38,10 @@ const BecomeDriverForm = () => {
       setError("Upload your Aadhaar photo");
       return;
     }
+        if (!validateForm()) {
+    setSuccessMsg("");
+    return;
+  }
 
     const formData = new FormData();
     formData.append("aadharNumber", aadharNumber);
@@ -86,7 +105,7 @@ const BecomeDriverForm = () => {
             Aadhaar Number
           </label>
           <input
-            type="number"
+            type="text"
             id="aadharNumber"
             value={aadharNumber}
             onChange={(e) => setAadharNumber(e.target.value)}

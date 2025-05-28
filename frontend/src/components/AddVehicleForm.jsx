@@ -1,6 +1,7 @@
 import React, { useState, useContext } from "react";
 import axios from "axios";
 import { ThemeContext } from "../ThemeContext";
+import { getRegex } from "../utils/Regex";
 
 const AddVehicleForm = () => {
   const [formData, setFormData] = useState({
@@ -14,7 +15,8 @@ const AddVehicleForm = () => {
 
   const { theme } = useContext(ThemeContext);
   const isDark = theme === "dark";
-
+  const [error, setError] = useState("");
+   const [success, setSuccess] = useState("");
   const [message, setMessage] = useState("");
   const apiURL = import.meta.env.VITE_API_URL;
 
@@ -27,11 +29,32 @@ const AddVehicleForm = () => {
     }
   };
 
+   const validateForm = () => {
+      // REGEX
+        const licensePlateNumberRegex = getRegex("licensePlateNumber");
+   
+    if (!licensePlateNumberRegex.test(formData.plateNumber)) {
+      setError(
+        "Invalid license plate number. Format should be like 'MH12 AB 1234'"
+      );
+      return false;
+    }
+   setError("");
+    return true;
+  
+    }
+
   const handleSubmit = async (e) => {
     e.preventDefault();
 
+       if (!validateForm()) {
+    setSuccess("");
+    return;
+  }
+
     const token = localStorage.getItem("token");
     if (!token) return alert("Please log in");
+console.log("token:", token);
 
     const form = new FormData();
     const modelToSave =
@@ -147,7 +170,7 @@ const AddVehicleForm = () => {
           <input
             type="text"
             name="plateNumber"
-            placeholder="e.g. BR12AB3456"
+            placeholder="e.g. MH12AB 3456"
             value={formData.plateNumber}
             onChange={handleChange}
             className="form-control"
@@ -175,6 +198,11 @@ const AddVehicleForm = () => {
             Submit Vehicle
           </button>
         </div>
+          {error && (
+  <div className="alert alert-danger mt-3">
+    {error}
+  </div>
+)}
       </form>
     </div>
   );

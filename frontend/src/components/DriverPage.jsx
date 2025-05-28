@@ -2,6 +2,7 @@ import React, { useEffect, useState, useContext } from "react";
 import axios from "axios";
 import { useNavigate, Link } from "react-router-dom";
 import { useTheme } from "../ThemeContext"; // import your ThemeContext
+import { getRegex } from "../utils/Regex";
 // import styles from "./DriverPage.module.css"; // CSS module for scoped styles
 
 const DriverPage = () => {
@@ -13,6 +14,8 @@ const DriverPage = () => {
   const [licenseNumberInput, setLicenseNumberInput] = useState("");
   const [licensePhotoFile, setLicensePhotoFile] = useState(null);
   const [uploading, setUploading] = useState(false);
+  const [error, setError] = useState("");
+  const [successMsg, setSuccessMsg] = useState("");
 
   const apiURL = import.meta.env.VITE_API_URL;
   const apiHost = apiURL.replace(/\/api\/?$/, "");
@@ -62,12 +65,32 @@ const DriverPage = () => {
     }
   };
 
+   const validateForm = () => {
+    // REGEX
+     const licenseNumberRegex = getRegex("drivingLicenseNumber");
+
+  if (!licenseNumberRegex.test(licenseNumberInput)) {
+     setError(
+      "Invalid License number format. Expected format: 'DL01 12345678901' (2 uppercase letters, 2 digits, space, then 11 digits)"
+    );
+    return false;
+  }
+  setError(""); // Clear error if validation passes
+
+   return true;
+
+  }
+
   const handleLicenseSubmit = async (e) => {
     e.preventDefault();
     if (!licenseNumberInput || !licensePhotoFile) {
       alert("Please provide both license number and photo.");
       return;
     }
+          if (!validateForm()) {
+    setSuccessMsg("");
+    return;
+  }
 
     setUploading(true);
     const formData = new FormData();
@@ -251,6 +274,13 @@ const DriverPage = () => {
               >
                 {uploading ? "Uploading..." : "Submit License Info"}
               </button>
+
+              {error && (
+  <div className="alert alert-danger mt-3">
+    {error}
+  </div>
+)}
+
             </form>
           )}
         </div>
