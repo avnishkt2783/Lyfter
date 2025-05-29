@@ -1,12 +1,10 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
 import { useAuth } from "../AuthContext";
-import { Spinner, Card, Accordion } from "react-bootstrap";
+import { Spinner, Accordion } from "react-bootstrap";
 import {
-  FaUser,
   FaPhone,
   FaMapMarkerAlt,
-  FaRoute,
   FaMoneyBillWave,
   FaChair,
   FaInfoCircle,
@@ -458,30 +456,6 @@ const YourRequestedRides = () => {
                     <strong>Expected Departure:</strong>{" "}
                     {new Date(ride.driverRide?.departureTime).toLocaleString()}
                   </p>
-                  {/*                   
-                  <hr />
-                  <h6 className="mt-3">
-                    <strong>Vehicle Information</strong>
-                  </h6>
-                  <p className="card-text">
-                    <strong>Vehicle: </strong>
-                    {ride.driverRide?.vehicle?.brand || "N/A"}{" "}
-                    {ride.driverRide?.vehicle?.model || "N/A"} <br />
-                    <strong>Color:</strong>{" "}
-                    {ride.driverRide?.vehicle?.color || "N/A"} <br />
-                    <strong>Plate:</strong>{" "}
-                    {ride.driverRide?.vehicle?.plateNumber || "N/A"}
-                  </p>
-                  {ride.driverRide?.vehicle?.vehiclePhoto && (
-                    <div className="text-center mb-2">
-                      <img
-                        src={ride.driverRide.vehicle.vehiclePhoto}
-                        alt="Vehicle"
-                        className="img-fluid rounded"
-                        style={{ maxHeight: "120px", objectFit: "cover" }}
-                      />
-                    </div>
-                  )} */}
 
                   <div className="card mt-3">
                     <div className="card-body">
