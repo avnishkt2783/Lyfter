@@ -87,29 +87,27 @@ const OfferRideDetails = () => {
     fetchVehicles();
   }, [user.userId]);
 
-   const validateForm = () => {
-      // REGEX
-        const phoneRegex = getRegex("phone");
+  const validateForm = () => {
+    // REGEX
+    const phoneRegex = getRegex("phone");
     // const passwordRegex = getRegex("password");
-  
+
     if (!phoneRegex.test(phone)) {
       setError("Invalid Phone number");
       return false;
     }
-  
-  
-   setError("");
+
+    setError("");
     return true;
-  
-    }
-  
-   const handleSubmit = async (e) => {
+  };
+
+  const handleSubmit = async (e) => {
     e.preventDefault();
 
-        if (!validateForm()) {
-    setSuccess("");
-    return;
-  }
+    if (!validateForm()) {
+      setSuccess("");
+      return;
+    }
 
     if (
       !name ||
@@ -172,6 +170,7 @@ const OfferRideDetails = () => {
             value={name}
             onChange={(e) => setName(e.target.value)}
             required
+            disabled
           />
         </div>
 
@@ -185,6 +184,7 @@ const OfferRideDetails = () => {
             value={phone}
             onChange={(e) => setPhone(e.target.value)}
             required
+            disabled
           />
         </div>
 
@@ -287,11 +287,7 @@ const OfferRideDetails = () => {
           Offer Ride
         </button>
 
-          {error && (
-  <div className="alert alert-danger mt-3">
-    {error}
-  </div>
-)}
+        {error && <div className="alert alert-danger mt-3">{error}</div>}
       </form>
     </div>
   );

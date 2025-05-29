@@ -6,13 +6,73 @@ import { useTheme } from "../ThemeContext";
 import {
   FaCar,
   FaPhone,
-  FaUser,
+  FaMapMarkerAlt,
   FaCheckCircle,
   FaMoneyBillWave,
   FaClock,
   FaChair,
   FaCarSide,
 } from "react-icons/fa";
+
+// Function to convert coordinates to address
+const geocodeLatLng = async (lat, lng) => {
+  return new Promise((resolve, reject) => {
+    if (!window.google) {
+      reject("Google Maps API not loaded.");
+      return;
+    }
+
+    const geocoder = new window.google.maps.Geocoder();
+    const latLng = { lat: parseFloat(lat), lng: parseFloat(lng) };
+
+    geocoder.geocode({ location: latLng }, (results, status) => {
+      if (status === "OK" && results[0]) {
+        resolve(results[0].formatted_address);
+      } else {
+        reject("Geocode failed: " + status);
+      }
+    });
+  });
+};
+
+// Function to load Google Maps API script
+const loadGoogleMapsScript = () => {
+  return new Promise((resolve, reject) => {
+    if (window.google && window.google.maps) return resolve();
+
+    // Check if a script with the same source already exists in the document
+    const existingScript = document.querySelector(
+      `script[src*="maps.googleapis.com/maps/api/js"]`
+    );
+    if (existingScript) {
+      existingScript.onload = resolve;
+      existingScript.onerror = reject;
+      return;
+    }
+
+    // Create a new script element to load the Google Maps API
+    const script = document.createElement("script");
+    script.src = `https://maps.googleapis.com/maps/api/js?key=${
+      import.meta.env.VITE_GOOGLE_MAPS_API_KEY
+    }&libraries=places`;
+    script.async = true;
+    script.defer = true;
+    // script.onload = resolve;
+    // script.onerror = reject;
+
+    // Resolve or reject based on script load
+    script.onload = () => {
+      console.log("Google Maps script loaded successfully.");
+      resolve();
+    };
+    script.onerror = (err) => {
+      console.error("Error loading Google Maps script:", err);
+      reject(err);
+    };
+
+    document.head.appendChild(script);
+  });
+};
 
 const MatchingRides = () => {
   const navigate = useNavigate();
@@ -72,8 +132,50 @@ const MatchingRides = () => {
     }
   };
 
+  // const fetchMatchingRides = async () => {
+  //   // console.log("🚀 Fetching matching rides...");
+  //   const start = JSON.parse(startLocation);
+  //   const dest = JSON.parse(destination);
+
+  //   if (!start || !dest) {
+  //     console.error("Start or destination coordinates are missing.");
+  //     setLoading(false);
+  //     return;
+  //   }
+
+  //   try {
+  //     const response = await axios.post(
+  //       `${apiURL}/rides/matchingRides`,
+  //       {
+  //         passengerStart: start,
+  //         passengerEnd: dest,
+  //         seatsRequired,
+  //         currentUserId: userId,
+  //       },
+  //       {
+  //         headers: {
+  //           Authorization: `Bearer ${token}`,
+  //         },
+  //       }
+  //     );
+
+  //     console.log("response: ", response.data.rides);
+
+  //     setRides(
+  //       response.data.success && Array.isArray(response.data.rides)
+  //         ? response.data.rides
+  //         : []
+  //     );
+  //   } catch (error) {
+  //     console.error("❌ Error fetching matching rides:", error);
+  //     setRides([]);
+  //   } finally {
+  //     console.log("🟢 fetchMatchingRides() completed.");
+  //     setLoading(false);
+  //   }
+  // };
+
   const fetchMatchingRides = async () => {
-    // console.log("🚀 Fetching matching rides...");
     const start = JSON.parse(startLocation);
     const dest = JSON.parse(destination);
 
@@ -84,6 +186,8 @@ const MatchingRides = () => {
     }
 
     try {
+      await loadGoogleMapsScript(); // Ensure Maps API is loaded
+
       const response = await axios.post(
         `${apiURL}/rides/matchingRides`,
         {
@@ -99,10 +203,37 @@ const MatchingRides = () => {
         }
       );
 
+      const ridesData = await Promise.all(
+        response.data.rides.map(async (ride) => {
+          try {
+            const driverStart = JSON.parse(ride.startLocation);
+            const driverEnd = JSON.parse(ride.destination);
+
+            const startAddress = await geocodeLatLng(
+              driverStart.lat,
+              driverStart.lng
+            );
+            const endAddress = await geocodeLatLng(
+              driverEnd.lat,
+              driverEnd.lng
+            );
+
+            return {
+              ...ride,
+              startLocation: startAddress,
+              destination: endAddress,
+            };
+          } catch (err) {
+            console.error("Error in geocoding ride:", err);
+            return ride; // fallback to raw ride if conversion fails
+          }
+        })
+      );
+
+      // console.log("check true or false: ", Array.isArray(ridesData));
+
       setRides(
-        response.data.success && Array.isArray(response.data.rides)
-          ? response.data.rides
-          : []
+        response.data.success && Array.isArray(ridesData) ? ridesData : []
       );
     } catch (error) {
       console.error("❌ Error fetching matching rides:", error);
@@ -278,6 +409,14 @@ const MatchingRides = () => {
                           Call
                         </a>
                       )}
+                    </p>
+                    <p className="card-text">
+                      <FaMapMarkerAlt className="me-2" />
+                      <strong>From:</strong> {ride.startLocation}
+                    </p>
+                    <p className="card-text">
+                      <FaMapMarkerAlt className="me-2" />
+                      <strong>To:</strong> {ride.destination}
                     </p>
                     <p className="card-text">
                       <FaChair className="me-2" />
