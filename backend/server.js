@@ -33,7 +33,7 @@ const app = express();
 
 app.use(
   cors({
-    origin: "https://lyfter.vercel.app",
+    origin: "https://lyfter-mgcub.vercel.app",
     credentials: true,
   })
 );
