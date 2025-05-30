@@ -20,9 +20,7 @@ import {
 } from "react-icons/fa";
 import { useTheme } from "../ThemeContext";
 import "./YourOfferedRides.css";
-import { Link } from "react-router-dom";
 
-// Function to convert coordinates to address
 const geocodeLatLng = async (lat, lng) => {
   return new Promise((resolve, reject) => {
     if (!window.google) {
@@ -43,12 +41,10 @@ const geocodeLatLng = async (lat, lng) => {
   });
 };
 
-// Function to load Google Maps API script
 const loadGoogleMapsScript = () => {
   return new Promise((resolve, reject) => {
     if (window.google && window.google.maps) return resolve();
 
-    // Check if a script with the same source already exists in the document
     const existingScript = document.querySelector(
       `script[src*="maps.googleapis.com/maps/api/js"]`
     );
@@ -58,7 +54,6 @@ const loadGoogleMapsScript = () => {
       return;
     }
 
-    // Create a new script element to load the Google Maps API
     const script = document.createElement("script");
     script.src = `https://maps.googleapis.com/maps/api/js?key=${
       import.meta.env.VITE_GOOGLE_MAPS_API_KEY
@@ -66,7 +61,6 @@ const loadGoogleMapsScript = () => {
     script.async = true;
     script.defer = true;
     script.onload = () => {
-      console.log("Google Maps script loaded successfully.");
       resolve();
     };
     script.onerror = (err) => {
@@ -80,29 +74,23 @@ const loadGoogleMapsScript = () => {
 
 const YourOfferedRides = () => {
   const [rides, setRides] = useState([]);
-  // const [passengers, setPassengers] = useState([]);
   const [showModal, setShowModal] = useState(false);
   const [showModalFP, setShowModalFP] = useState(false);
-  const [selectedRequest, setSelectedRequest] = useState([]); // <-- This must not be null
-  const [selectedRequestFP, setSelectedRequestFP] = useState([]); // <-- This must not be null
+  const [selectedRequest, setSelectedRequest] = useState([]);
+  const [selectedRequestFP, setSelectedRequestFP] = useState([]);
   const [loading, setLoading] = useState(true);
   const apiURL = import.meta.env.VITE_API_URL;
   const { token } = useAuth();
 
   const { theme } = useTheme();
   const isDark = theme === "dark";
-  // console.log(token)
-  // Fetch the offered rides for the driver
-
   const fetchOfferedRides = async () => {
     try {
       await loadGoogleMapsScript();
 
       const response = await axios.get(`${apiURL}/rides/yourofferedrides`, {
         headers: { Authorization: `Bearer ${token}` },
-      }); // API to get offered rides
-      console.log(response);
-      // Convert coordinates to text addresses
+      });
       const ridesData = await Promise.all(
         response.data.rides.map(async (ride) => {
           try {
@@ -118,7 +106,6 @@ const YourOfferedRides = () => {
               endCoords.lng
             );
 
-            // Fetch accepted or confirmed rides
             const acceptedRidesResponse = await axios.get(
               `${apiURL}/rides/acceptedorconfirmed/${ride.driverRideId}`,
               {
@@ -182,7 +169,6 @@ const YourOfferedRides = () => {
         })
       );
 
-      // setRides(response.data.rides);
       setRides(ridesData);
 
       setLoading(false);
@@ -197,8 +183,6 @@ const YourOfferedRides = () => {
   }, []);
 
   const handleFindPassenger = async (driverRideId) => {
-    // console.log(driverRideId);
-
     try {
       const response = await axios.post(
         `${apiURL}/rides/matchingPassengers`,
@@ -211,8 +195,6 @@ const YourOfferedRides = () => {
           },
         }
       );
-
-      // console.log("matchingPassengers", response);
 
       const requests = response.data?.passengers;
 
@@ -248,14 +230,10 @@ const YourOfferedRides = () => {
             };
           } catch (err) {
             console.error("Error in geocoding:", err);
-            return ride; // Return ride without changes if geocoding fails
+            return ride;
           }
         })
       );
-
-      console.log("FIND PASSENGER DATA");
-      console.log(requestsData);
-
       setSelectedRequestFP(requestsData);
       setShowModalFP(true);
     } catch (error) {
@@ -264,7 +242,6 @@ const YourOfferedRides = () => {
     }
   };
 
-  // Handle clicking on the badge to show pending requests
   const handleBadgeClick = async (driverRideId) => {
     try {
       const response = await axios.get(
@@ -272,16 +249,12 @@ const YourOfferedRides = () => {
         {
           headers: { Authorization: `Bearer ${token}` },
         }
-      ); // API to get pending requests for a ride
-      console.log("Pending Requests Response:", response.data);
+      );
       const requestsData = await Promise.all(
         response.data.requests.map(async (ride) => {
           try {
             const startCoords = JSON.parse(ride.startLocation);
             const endCoords = JSON.parse(ride.destination);
-            console.log(startCoords);
-            console.log(endCoords);
-
             const startAddress = await geocodeLatLng(
               startCoords.lat,
               startCoords.lng
@@ -290,9 +263,6 @@ const YourOfferedRides = () => {
               endCoords.lat,
               endCoords.lng
             );
-            console.log(startAddress);
-            console.log(endAddress);
-
             return {
               ...ride,
               driverRideId,
@@ -301,12 +271,11 @@ const YourOfferedRides = () => {
             };
           } catch (err) {
             console.error("Error in geocoding:", err);
-            return ride; // Return ride without changes if geocoding fails
+            return ride;
           }
         })
       );
 
-      // setSelectedRequest(response.data.requests);
       setSelectedRequest(requestsData);
       setShowModal(true);
     } catch (error) {
@@ -319,10 +288,6 @@ const YourOfferedRides = () => {
     driverRideId,
     status
   ) => {
-    console.log("inside handle request status change");
-    console.log("PRID: ", passengerRideId);
-    console.log("DRID: ", driverRideId);
-
     try {
       const response = await axios.post(
         `${apiURL}/rides/updaterequeststatus`,
@@ -342,7 +307,7 @@ const YourOfferedRides = () => {
           if (selectedRequestFP) {
             setSelectedRequestFP((prevRequests) =>
               prevRequests.filter(
-                (request) => !(request.passengerRideId === passengerRideId) // MAY NOT BE CORRECT ACCESSING
+                (request) => !(request.passengerRideId === passengerRideId)
               )
             );
           }
@@ -362,7 +327,6 @@ const YourOfferedRides = () => {
           }
         }
 
-        // Update ride's pendingRequests count
         setRides((prevRides) =>
           prevRides.map((ride) => {
             if (ride.driverRideId === driverRideId) {
@@ -374,15 +338,12 @@ const YourOfferedRides = () => {
             return ride;
           })
         );
-
-        console.log(`Request ${status} successfully.`);
       }
     } catch (error) {
       console.error("Error updating request status:", error);
     }
   };
 
-  // Start, Cancel, and Finish Ride buttons logic
   const handleRideAction = async (driverRideId, action) => {
     try {
       const response = await axios.post(
@@ -393,14 +354,12 @@ const YourOfferedRides = () => {
         },
         {
           headers: {
-            Authorization: `Bearer ${token}`, // Make sure yourToken is retrieved from localStorage or context
+            Authorization: `Bearer ${token}`,
           },
         }
       );
       if (response.data.success) {
-        // Optionally, handle UI changes like ride status update
-        console.log(`${action} action successfully performed`);
-        fetchOfferedRides(); // Re-fetch the updated ride list
+        fetchOfferedRides();
       }
     } catch (error) {
       console.error(`Error performing ${action} action:`, error);
@@ -526,7 +485,6 @@ const YourOfferedRides = () => {
                   </p>
                 </Card.Text>
 
-                {/* Pending Requests Badge */}
                 {ride.pendingRequests > 0 && (
                   <Badge
                     bg="warning"
@@ -539,13 +497,11 @@ const YourOfferedRides = () => {
                   </Badge>
                 )}
 
-                {/* Ride Action Buttons */}
                 <div className="your-offered-ride-buttons mt-3 d-flex flex-wrap gap-2">
                   {ride.status === "Waiting" && (
                     <>
                       <Button
                         variant="primary"
-                        // size="sm"
                         onClick={() =>
                           handleRideAction(ride.driverRideId, "Start Ride")
                         }
@@ -554,7 +510,6 @@ const YourOfferedRides = () => {
                       </Button>
                       <Button
                         variant="danger"
-                        // size="sm"
                         onClick={() =>
                           handleRideAction(ride.driverRideId, "Cancel Ride")
                         }
@@ -567,7 +522,6 @@ const YourOfferedRides = () => {
                   {ride.status === "Started" && (
                     <Button
                       variant="success"
-                      // size="sm"
                       onClick={() =>
                         handleRideAction(ride.driverRideId, "Finish Ride")
                       }
@@ -583,7 +537,6 @@ const YourOfferedRides = () => {
                   )}
                 </div>
 
-                {/* Accepted Passengers Accordion */}
                 {ride.acceptedRides?.length > 0 && (
                   <Accordion className="your-offered-accordion mt-3">
                     <Accordion.Item eventKey="0">
@@ -645,7 +598,6 @@ const YourOfferedRides = () => {
         </div>
       )}
 
-      {/* Pending Requests Modal */}
       <Modal
         show={showModal}
         onHide={() => {
@@ -699,7 +651,6 @@ const YourOfferedRides = () => {
                 <div className="d-flex gap-2 mt-2">
                   <Button
                     variant="success"
-                    // size="sm"
                     onClick={() =>
                       handleRequestStatusChange(
                         request.passengerRideId,
@@ -731,7 +682,6 @@ const YourOfferedRides = () => {
         </Modal.Body>
       </Modal>
 
-      {/* Find Passengers Modal */}
       <Modal
         show={showModalFP}
         onHide={() => {

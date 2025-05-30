@@ -9,7 +9,6 @@ import {
   FaUser,
   FaPhone,
   FaPlus,
-  FaMotorcycle,
   FaUsers,
   FaMoneyBillAlt,
   FaClock,
@@ -24,8 +23,8 @@ const OfferRideDetails = () => {
   const isDark = theme === "dark";
 
   const [user, setUser] = useState({});
-  const [vehicles, setVehicles] = useState([]); // To store vehicles fetched from the database
-  const [selectedVehicle, setSelectedVehicle] = useState(""); // To store the selected vehicle ID
+  const [vehicles, setVehicles] = useState([]);
+  const [selectedVehicle, setSelectedVehicle] = useState("");
   const [seats, setSeats] = useState(1);
   const [fare, setFare] = useState("");
   const [departureTime, setDepartureTime] = useState("");
@@ -62,7 +61,6 @@ const OfferRideDetails = () => {
       .catch((err) => console.error("Error fetching user:", err));
   }, []);
 
-  // Fetch vehicles owned by the driver
   useEffect(() => {
     if (!user.userId) return;
 
@@ -73,7 +71,6 @@ const OfferRideDetails = () => {
         });
 
         if (!res.data.isDriver) {
-          console.log("res.isDriver", res.isDriver); //undefined ?
           navigate("/become-driver");
           return;
         }
@@ -88,9 +85,7 @@ const OfferRideDetails = () => {
   }, [user.userId]);
 
   const validateForm = () => {
-    // REGEX
     const phoneRegex = getRegex("phone");
-    // const passwordRegex = getRegex("password");
 
     if (!phoneRegex.test(phone)) {
       setError("Invalid Phone number");

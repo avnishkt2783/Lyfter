@@ -6,7 +6,7 @@ import {
   FaMapMarkedAlt,
   FaSearch,
   FaTimes,
-} from "react-icons/fa"; // react-icons for icons
+} from "react-icons/fa";
 
 const GoogleMapView = () => {
   const mapRef = useRef(null);
@@ -56,10 +56,7 @@ const GoogleMapView = () => {
   useEffect(() => {
     loadGoogleMapsScript()
       .then(() => {
-        console.log("origin-outside", origin);
-
         const initializeMap = (origin) => {
-          console.log("origin-inside", origin);
           const mapInstance = new window.google.maps.Map(mapRef.current, {
             zoom: 14,
             center: origin,
@@ -285,23 +282,6 @@ const GoogleMapView = () => {
               lng: coord.lng(),
             }));
             localStorage.setItem("routePath", JSON.stringify(path));
-
-            //DO NOT DELETE ... ⚠️⚠️⚠️
-            // Optional: Save full steps
-            // const steps = route.legs[0].steps.map(step => ({
-            //   instruction: step.instructions,
-            //   distance: step.distance.text,
-            //   duration: step.duration.text,
-            //   start_location: {
-            //     lat: step.start_location.lat(),
-            //     lng: step.start_location.lng(),
-            //   },
-            //   end_location: {
-            //     lat: step.end_location.lat(),
-            //     lng: step.end_location.lng(),
-            //   },
-            // }));
-            // localStorage.setItem("routeSteps", JSON.stringify(steps));
           } else {
             console.error("Directions failed:", status);
           }
@@ -313,15 +293,9 @@ const GoogleMapView = () => {
     } else {
       const geocoder = new window.google.maps.Geocoder();
       geocoder.geocode({ address: startLocation }, (results, status) => {
-        console.log(useCurrentLocation);
-        console.log(startCoords);
-        console.log(status);
         if (status === "OK") {
           geocodeAndRoute(results[0].geometry.location);
         } else {
-          console.log(useCurrentLocation);
-          console.log(startCoords);
-          console.log(status);
           console.error("Geocoding failed:", status);
         }
       });
@@ -413,9 +387,6 @@ const GoogleMapView = () => {
 
   return (
     <div className="container py-4">
-      {/* <h3 className="text-center mb-4">Plan Your Route</h3> */}
-
-      {/* Start Location */}
       <div className="mb-3 row align-items-center">
         <label
           htmlFor="start-location"
@@ -480,7 +451,6 @@ const GoogleMapView = () => {
         </div>
       </div>
 
-      {/* Action Buttons */}
       <div className="d-flex justify-content-center gap-3 mt-4">
         <button
           className="btn btn-success d-flex align-items-center"
@@ -496,7 +466,6 @@ const GoogleMapView = () => {
         </button>
       </div>
 
-      {/* Map Display */}
       <div
         ref={mapRef}
         className="mt-4 rounded shadow"

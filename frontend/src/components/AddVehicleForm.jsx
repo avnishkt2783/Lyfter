@@ -18,7 +18,7 @@ const AddVehicleForm = () => {
   const isDark = theme === "dark";
 
   const [error, setError] = useState("");
-   const [success, setSuccess] = useState("");
+  const [success, setSuccess] = useState("");
 
   const [loading, setLoading] = useState(false);
 
@@ -34,32 +34,29 @@ const AddVehicleForm = () => {
     }
   };
 
-   const validateForm = () => {
-      // REGEX
-        const licensePlateNumberRegex = getRegex("licensePlateNumber");
-   
+  const validateForm = () => {
+    const licensePlateNumberRegex = getRegex("licensePlateNumber");
+
     if (!licensePlateNumberRegex.test(formData.plateNumber)) {
       setError(
         "Invalid license plate number. Format should be like 'MH12 AB 1234'"
       );
       return false;
     }
-   setError("");
+    setError("");
     return true;
-  
-    }
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-       if (!validateForm()) {
-    setSuccess("");
-    return;
-  }
+    if (!validateForm()) {
+      setSuccess("");
+      return;
+    }
 
     const token = localStorage.getItem("token");
     if (!token) return alert("Please log in");
-console.log("token:", token);
 
     const form = new FormData();
     const modelToSave =
@@ -103,7 +100,6 @@ console.log("token:", token);
       <h2 className="mb-4 text-center">Add Vehicle</h2>
 
       <form onSubmit={handleSubmit} className="row g-3">
-        {/* Brand */}
         <div className="col-12">
           <label className="form-label fw-semibold">
             Vehicle Brand and Name:
@@ -119,7 +115,6 @@ console.log("token:", token);
           />
         </div>
 
-        {/* Model */}
         <div className="col-12">
           <label className="form-label fw-semibold">Type of Vehicle</label>
           <select
@@ -141,7 +136,6 @@ console.log("token:", token);
           </select>
         </div>
 
-        {/* Custom model */}
         {formData.model === "Other" && (
           <div className="col-12">
             <input
@@ -156,7 +150,6 @@ console.log("token:", token);
           </div>
         )}
 
-        {/* Color */}
         <div className="col-12">
           <label className="form-label fw-semibold">Color:</label>
           <input
@@ -170,7 +163,6 @@ console.log("token:", token);
           />
         </div>
 
-        {/* Plate number */}
         <div className="col-12">
           <label className="form-label fw-semibold">
             License Plate Number:
@@ -186,7 +178,6 @@ console.log("token:", token);
           />
         </div>
 
-        {/* Vehicle photo */}
         <div className="col-12 mb-3">
           <label htmlFor="vehiclePhoto" className="form-label fw-semibold">
             Upload Vehicle Photo:
@@ -198,7 +189,7 @@ console.log("token:", token);
             accept="image/png, image/jpeg, image/jpg"
             onChange={(e) => {
               const file = e.target.files[0];
-              const maxSize = 2 * 1024 * 1024; // 2MB
+              const maxSize = 2 * 1024 * 1024;
               const allowedTypes = ["image/jpeg", "image/png", "image/jpg"];
 
               if (file) {
@@ -214,7 +205,7 @@ console.log("token:", token);
                   return;
                 }
 
-                handleChange(e); // Proceed only if valid
+                handleChange(e);
               }
             }}
             className="form-control"
@@ -227,7 +218,6 @@ console.log("token:", token);
 
         <div className="col-12 d-grid">
           <button type="submit" className="btn btn-primary btn-lg">
-            {/* Submit Vehicle */}
             {loading ? (
               <Spinner
                 animation="border"
@@ -238,11 +228,7 @@ console.log("token:", token);
             )}
           </button>
         </div>
-          {error && (
-  <div className="alert alert-danger mt-3">
-    {error}
-  </div>
-)}
+        {error && <div className="alert alert-danger mt-3">{error}</div>}
       </form>
     </div>
   );

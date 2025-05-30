@@ -9,7 +9,6 @@ const About = () => {
   return (
     <div className={`about-page py-5`}>
       <div className="container">
-        {/* Header Section */}
         <header className="text-center mb-5">
           <h1 className="display-4 fw-bold about-header animate-fade-in">
             Welcome to
@@ -24,7 +23,6 @@ const About = () => {
           <p className="lead">Revolutionizing the way you ride.</p>
         </header>
 
-        {/* Mission Section */}
         <section className="row align-items-center mb-5">
           <div className="col-md-6">
             <img
@@ -44,7 +42,6 @@ const About = () => {
           </div>
         </section>
 
-        {/* Why Choose Us */}
         <section className="mb-5">
           <h2 className="text-center fw-bold mb-4">Why Choose Lyfter?</h2>
           <div className="row text-center">
@@ -100,38 +97,6 @@ const About = () => {
             </div>
           </div>
         </section>
-
-        {/* Team Section */}
-        {/* <section className="mb-5">
-          <h2 className="text-center fw-bold mb-4">Meet Our Team</h2>
-          <div className="row text-center">
-            {[
-              { name: "Arobh Kumar", role: "Developer", img: "arobh.jpg" },
-              { name: "Avnish Kumar", role: "Developer", img: "avnish.jpg" },
-              {
-                name: "Simran Sahiwal",
-                role: "Developer",
-                img: "simran.jpg",
-              },
-            ].map((member, idx) => (
-              <div className="col-md-4 mb-4" key={idx}>
-                <div className="card h-100 about-team-card shadow-sm">
-                  <img
-                    src={member.img}
-                    className="card-img-top"
-                    alt={member.name}
-                  />
-                  <div className="card-body">
-                    <h5 className="card-title">{member.name}</h5>
-                    <p className="card-text text-muted">{member.role}</p>
-                  </div>
-                </div>
-              </div>
-            ))}
-          </div>
-        </section> */}
-
-        {/* Team Section */}
         <section className="mb-5">
           <h2 className="text-center fw-bold mb-4">Meet Our Team</h2>
           <div className="row justify-content-center text-center">
@@ -163,7 +128,6 @@ const About = () => {
           </div>
         </section>
 
-        {/* Call to Action */}
         <section className="text-center">
           <h3 className="fw-bold mb-3">
             Join the Lyfter Movement, Move with us!

@@ -1,5 +1,5 @@
 import { createContext, useContext, useState, useEffect } from "react";
-import { jwtDecode } from "jwt-decode"; // fix import (not destructured)
+import { jwtDecode } from "jwt-decode";
 
 const AuthContext = createContext();
 
@@ -7,12 +7,11 @@ export const AuthProvider = ({ children }) => {
   const [token, setToken] = useState(localStorage.getItem("token"));
   const [user, setUser] = useState(null);
   const [theme, setTheme] = useState(localStorage.getItem("theme"));
-  const [authLoading, setAuthLoading] = useState(true); // <-- new loading state
+  const [authLoading, setAuthLoading] = useState(true);
 
   useEffect(() => {
     const initializeAuth = async () => {
       if (token) {
-        // localStorage.setItem("token", token);
         try {
           const decoded = jwtDecode(token);
           setUser(decoded);
@@ -31,7 +30,7 @@ export const AuthProvider = ({ children }) => {
         localStorage.removeItem("token");
         setUser(null);
       }
-      setAuthLoading(false); // <-- done initializing
+      setAuthLoading(false);
     };
 
     initializeAuth();
@@ -40,7 +39,7 @@ export const AuthProvider = ({ children }) => {
   const login = (newToken) => {
     setAuthLoading(true);
     setToken(newToken);
-    localStorage.setItem("token", newToken); // <-- only here
+    localStorage.setItem("token", newToken);
   };
 
   const logout = () => {

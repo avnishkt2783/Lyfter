@@ -1,11 +1,11 @@
 import React, { useEffect, useState, useContext } from "react";
-import { useNavigate } from "react-router-dom"; // ✅ Make sure this is imported
+import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import { ThemeContext } from "../ThemeContext";
 import { Spinner } from "react-bootstrap";
 
 const AadhaarDriversList = () => {
-  const navigate = useNavigate(); // ✅ You need this
+  const navigate = useNavigate();
   const [drivers, setDrivers] = useState([]);
   const { theme } = useContext(ThemeContext);
   const apiURL = import.meta.env.VITE_API_URL;
@@ -151,7 +151,6 @@ const AadhaarDriversList = () => {
                       onClick={() => verifyDriver(d.driverId)}
                       className="btn btn-success"
                     >
-                      {/* Verify */}
                       {loadingV ? (
                         <Spinner
                           animation="border"
@@ -165,7 +164,6 @@ const AadhaarDriversList = () => {
                       onClick={() => rejectAadhaar(d.driverId)}
                       className="btn btn-danger"
                     >
-                      {/* Reject */}
                       {loadingR ? (
                         <Spinner
                           animation="border"

@@ -23,10 +23,8 @@
 /* Carousel Image */
 .landing-carousel-img {
   width: 100%;
-  /* height: 65vh; */
   object-fit: cover;
   border-radius: 15px;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
   transition: transform 0.5s ease-in-out;
 }
 
@@ -46,7 +44,6 @@
 /* Prevent scaling/cropping on small screens */
 @media (max-width: 767px) {
   .landing-carousel-img {
-    /* height: 55vh; */
     object-fit: contain;
   }
 

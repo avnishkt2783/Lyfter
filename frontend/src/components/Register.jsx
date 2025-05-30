@@ -60,7 +60,7 @@ const Register = () => {
         clearInterval(interval);
         setTimeLeft("00:00");
         setError("OTP expired. Please resend OTP.");
-        setOtp(""); // Optionally clear the OTP input
+        setOtp("");
       } else {
         const minutes = String(Math.floor(secondsLeft / 60)).padStart(2, "0");
         const seconds = String(secondsLeft % 60).padStart(2, "0");
@@ -74,25 +74,23 @@ const Register = () => {
   };
 
   const validateForm = () => {
-    // REGEX
-      const phoneRegex = getRegex("phone");
-  const passwordRegex = getRegex("password");
+    const phoneRegex = getRegex("phone");
+    const passwordRegex = getRegex("password");
 
-  if (!phoneRegex.test(formData.phoneNo)) {
-    setError("Invalid Phone number");
-    return false;
-  }
+    if (!phoneRegex.test(formData.phoneNo)) {
+      setError("Invalid Phone number");
+      return false;
+    }
 
-  if (!passwordRegex.test(formData.password)) {
-    setError(
-      "Password must be at least 8 characters, include a number and special character"
-    );
-    return false;
-  }
- setError("");
-  return true;
-
-  }
+    if (!passwordRegex.test(formData.password)) {
+      setError(
+        "Password must be at least 8 characters, include a number and special character"
+      );
+      return false;
+    }
+    setError("");
+    return true;
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -103,10 +101,10 @@ const Register = () => {
       return;
     }
 
-      if (!validateForm()) {
-    setSuccess("");
-    return;
-  }
+    if (!validateForm()) {
+      setSuccess("");
+      return;
+    }
 
     const { confirmPassword, ...dataToSend } = formData;
 
@@ -272,7 +270,6 @@ const Register = () => {
 
               {step === 2 && (
                 <form onSubmit={handleOtpVerify}>
-                  {/* OTP Expiry Timer Display */}
                   {timeLeft && (
                     <div className="text-center mb-2 text-muted">
                       OTP expires in: <strong>{timeLeft}</strong>

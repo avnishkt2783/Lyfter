@@ -15,7 +15,6 @@ import {
 import { useTheme } from "../ThemeContext";
 import "./YourRequestedRides.css";
 
-// Function to convert coordinates to address
 const geocodeLatLng = async (lat, lng) => {
   return new Promise((resolve, reject) => {
     if (!window.google) {
@@ -36,12 +35,10 @@ const geocodeLatLng = async (lat, lng) => {
   });
 };
 
-// Function to load Google Maps API script
 const loadGoogleMapsScript = () => {
   return new Promise((resolve, reject) => {
     if (window.google && window.google.maps) return resolve();
 
-    // Check if a script with the same source already exists in the document
     const existingScript = document.querySelector(
       `script[src*="maps.googleapis.com/maps/api/js"]`
     );
@@ -51,19 +48,13 @@ const loadGoogleMapsScript = () => {
       return;
     }
 
-    // Create a new script element to load the Google Maps API
     const script = document.createElement("script");
     script.src = `https://maps.googleapis.com/maps/api/js?key=${
       import.meta.env.VITE_GOOGLE_MAPS_API_KEY
     }&libraries=places`;
     script.async = true;
     script.defer = true;
-    // script.onload = resolve;
-    // script.onerror = reject;
-
-    // Resolve or reject based on script load
     script.onload = () => {
-      console.log("Google Maps script loaded successfully.");
       resolve();
     };
     script.onerror = (err) => {
@@ -86,10 +77,10 @@ const YourRequestedRides = () => {
   const isDark = theme === "dark";
 
   useEffect(() => {
-    if (authLoading) return; // wait for auth to finish
+    if (authLoading) return;
 
     if (!userId || !token) {
-      setRequestedRides([]); // clear rides if no auth
+      setRequestedRides([]);
       return;
     }
 
@@ -107,7 +98,6 @@ const YourRequestedRides = () => {
           }
         );
 
-        // Convert coordinates to text addresses
         const ridesData = await Promise.all(
           response.data.rides.map(async (ride) => {
             try {
@@ -145,20 +135,16 @@ const YourRequestedRides = () => {
               };
             } catch (err) {
               console.error("Error in geocoding:", err);
-              return ride; // Return ride without changes if geocoding fails
+              return ride;
             }
           })
         );
-
-        console.log("----------------------------");
-        console.log(ridesData);
-        console.log("----------------------------");
 
         setRequestedRides(ridesData || []);
       } catch (error) {
         console.error("Error fetching requested rides:", error);
       } finally {
-        setLoading(false); // ✅ MAKE SURE THIS IS CALLED NO MATTER WHAT
+        setLoading(false);
       }
     };
     fetchRequestedRides();
@@ -226,7 +212,6 @@ const YourRequestedRides = () => {
         }
       );
 
-      // Success — update status
       setRequestedRides((prevRides) =>
         prevRides.map((ride) =>
           ride.passengerRide.passengerRideId === passengerRideId &&
@@ -235,8 +220,6 @@ const YourRequestedRides = () => {
             : ride
         )
       );
-
-      // alert("Ride confirmed successfully!");
     } catch (error) {
       if (
         error.response &&
@@ -247,9 +230,6 @@ const YourRequestedRides = () => {
           "Insufficient seats available. Click OK to revoke your request."
         );
         if (shouldRevoke) {
-          // const ride = requestedRides.find(
-          //   (r) => r.passengerRide.passengerRideId === rideId
-          // );
           const ride = requestedRides.find(
             (r) =>
               r.passengerRide.passengerRideId === passengerRideId &&
@@ -341,12 +321,7 @@ const YourRequestedRides = () => {
                 key={ride.passengerRide.passengerRideId}
               >
                 <div className="card-body">
-                  {/* <p>
-                    <FaUser /> <strong>Driver:</strong> {driverName}
-                  </p> */}
-
                   <h5 className="card-title d-flex align-items-center">
-                    {/* Profile Image */}
                     {profileImg ? (
                       <img
                         src={profileImg}
@@ -373,13 +348,11 @@ const YourRequestedRides = () => {
                       />
                     )}
 
-                    {/* Driver Name */}
                     {driverName || "Unknown Driver"}
 
-                    {/* Verified Badge */}
                     {ride.driverRide?.driver?.isVerified && (
                       <FaCheckCircle
-                        className={`ms-2 text-success `} // for tooltip
+                        className={`ms-2 text-success `}
                         style={{ fontSize: "1.5rem" }}
                       />
                     )}
@@ -404,17 +377,6 @@ const YourRequestedRides = () => {
                     <FaChair /> <strong>Seats Available:</strong>{" "}
                     {ride.driverRide?.seats || "N/A"}
                   </p>
-                  {/* <div>
-                    <hr />
-                    <strong>Driver Route:</strong>
-                    <p>
-                      <FaMapMarkerAlt /> <strong>From:</strong>{" "}
-                      {ride.startLocation}
-                    </p>
-                    <p>
-                      <FaMapMarkerAlt /> <strong>To:</strong> {ride.destination}
-                    </p>
-                  </div> */}
                   <Accordion defaultActiveKey={null} className="my-3">
                     <Accordion.Item eventKey="0">
                       <Accordion.Header>Route</Accordion.Header>

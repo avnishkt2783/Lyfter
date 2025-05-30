@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { getRegex } from "../utils/Regex";
 
 const ForgotPassword = () => {
-  const [step, setStep] = useState(1); // 1: Email → 2: OTP + New Password
+  const [step, setStep] = useState(1);
   const [email, setEmail] = useState("");
   const [otp, setOtp] = useState("");
   const [newPassword, setNewPassword] = useState("");
@@ -37,38 +37,33 @@ const ForgotPassword = () => {
 
       setMessage("OTP sent to your email.");
       setStep(2);
-      setCountdown(600); // 10 minutes countdown
+      setCountdown(600);
     } catch (err) {
       setMessage(err.message);
     }
   };
 
-    const validateForm = () => {
-        // REGEX
-          // const phoneRegex = getRegex("password");
-      const passwordRegex = getRegex("password");
-    
-      if (!passwordRegex.test(newPassword)) {
-       setError(
-      "Password must be at least 8 characters, include a number and special character"
-    );
-        return false;
-      }
-    
-    
-     setError("");
-      return true;
-    
-      }
-    
+  const validateForm = () => {
+    const passwordRegex = getRegex("password");
+
+    if (!passwordRegex.test(newPassword)) {
+      setError(
+        "Password must be at least 8 characters, include a number and special character"
+      );
+      return false;
+    }
+
+    setError("");
+    return true;
+  };
 
   const handleResetPassword = async (e) => {
     e.preventDefault();
 
-      if (!validateForm()) {
-    setSuccess("");
-    return;
-  }
+    if (!validateForm()) {
+      setSuccess("");
+      return;
+    }
     try {
       const res = await fetch(`${API_URL}/reset-password`, {
         method: "POST",
@@ -151,11 +146,7 @@ const ForgotPassword = () => {
             </p>
           )}
 
-           {error && (
-  <div className="alert alert-danger mt-3">
-    {error}
-  </div>
-)}
+          {error && <div className="alert alert-danger mt-3">{error}</div>}
         </form>
       )}
     </div>

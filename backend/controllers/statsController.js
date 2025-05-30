@@ -6,29 +6,22 @@ import PassengerRide from "../models/ride/passengerRide.js";
 import PassengerRideDriverRide from "../models/ride/passengerRideDriverRide.js";
 import { Op } from "sequelize";
 
-// Ensure associations are defined somewhere in your model setup:
-// PassengerRideDriverRide.belongsTo(PassengerRide, { foreignKey: "passengerRideId" });
-
 export const getPlatformStats = async (req, res) => {
   try {
-    // Basic counts
     const [totalUsers, totalDrivers, totalPassengers] = await Promise.all([
       User.count(),
       Driver.count(),
       Passenger.count(),
     ]);
 
-    // Driver ride stats
     const [totalDriverRides, ongoingRides, completedRides] = await Promise.all([
       DriverRide.count(),
       DriverRide.count({ where: { status: "Started" } }),
       DriverRide.count({ where: { status: "Finished" } }),
     ]);
 
-    // Passenger ride count
     const totalPassengerRides = await PassengerRide.count();
 
-    // Get finished and confirmed passenger ride-driver ride pairs with seats
     const passengerRideDriverRides = await PassengerRideDriverRide.findAll({
       where: {
         status: { [Op.in]: ["Finished", "Confirmed"] },
@@ -41,35 +34,15 @@ export const getPlatformStats = async (req, res) => {
       ],
     });
 
-    // Aggregate seat-based stats
     let passengersLyfted = 0;
     let passengersInLyft = 0;
 
     passengerRideDriverRides.forEach((prdr) => {
       const seats = prdr.passengerRide?.seatsRequired || 0;
 
-      // console.log("⚠️⚠️⚠️");
-
-      // // console.log("prdr.status: ", prdr.status);
-      // // console.log("prdr: ", prdr); //undefined
-
-      // console.log("⚠️⚠️⚠️");
       if (prdr.status === "Finished") passengersLyfted += seats;
       if (prdr.status === "Confirmed") passengersInLyft += seats;
     });
-
-    // Send response
-
-    console.log("totalUsers:", totalUsers);
-    console.log("totalDrivers:", totalDrivers);
-    console.log("totalPassengers:", totalPassengers);
-    console.log("totalDriverRides:", totalDriverRides);
-    console.log("totalPassengerRides:", totalPassengerRides);
-    console.log("ongoingRides:", ongoingRides);
-    console.log("completedRides:", completedRides);
-    console.log("passengersLyfted:", passengersLyfted);
-    console.log("passengersInLyft:", passengersInLyft);
-    console.log("-------------------------");
 
     res.status(200).json({
       totalUsers,
