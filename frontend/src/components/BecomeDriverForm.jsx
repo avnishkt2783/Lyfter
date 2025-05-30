@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { useNavigate } from "react-router-dom"; // ✅ Make sure this is imported
+import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import { useTheme } from "../ThemeContext";
 import { getRegex } from "../utils/Regex";
@@ -18,19 +18,17 @@ const BecomeDriverForm = () => {
   const [successMsg, setSuccessMsg] = useState("");
   const [loading, setLoading] = useState(false);
 
-    const validateForm = () => {
+  const validateForm = () => {
     // REGEX
-      const aadharNumberRegex = getRegex("aadharNumber");
+    const aadharNumberRegex = getRegex("aadharNumber");
 
-  if (!aadharNumberRegex.test(aadharNumber)) {
-    setError("Invalid Aadhaar number. Use format: 1234 5678 9012");
-    return false;
-  }
- setError("");
-  return true;
-
-  }
-
+    if (!aadharNumberRegex.test(aadharNumber)) {
+      setError("Invalid Aadhaar number. Use format: 1234 5678 9012");
+      return false;
+    }
+    setError("");
+    return true;
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -40,10 +38,10 @@ const BecomeDriverForm = () => {
       setError("Upload your Aadhaar photo");
       return;
     }
-        if (!validateForm()) {
-    setSuccessMsg("");
-    return;
-  }
+    if (!validateForm()) {
+      setSuccessMsg("");
+      return;
+    }
 
     const formData = new FormData();
     formData.append("aadharNumber", aadharNumber);
@@ -131,7 +129,7 @@ const BecomeDriverForm = () => {
               const file = e.target.files[0];
               if (file) {
                 const allowedTypes = ["image/jpeg", "image/png"];
-                const maxSizeInBytes = 2 * 1024 * 1024; // 2MB
+                const maxSizeInBytes = 2 * 1024 * 1024;
 
                 if (!allowedTypes.includes(file.type)) {
                   alert("Only JPG, JPEG, or PNG files are allowed.");
@@ -145,7 +143,7 @@ const BecomeDriverForm = () => {
                   return;
                 }
 
-                setAadharPhoto(file); // Valid file
+                setAadharPhoto(file);
               }
             }}
             className={`form-control ${

@@ -1,4 +1,3 @@
-// utils/ensureAdmin.js
 import User from "../models/user/user.js";
 import bcrypt from "bcrypt";
 
@@ -13,7 +12,7 @@ const ensureAdmin = async () => {
     const existing = await User.findOne({ where: { email: env_adminEmail } });
 
     if (existing) {
-      console.log("⚠️ Admin user already exists.");
+      // console.log("⚠️ Admin user already exists.");
       return;
     }
 
@@ -28,7 +27,7 @@ const ensureAdmin = async () => {
       role: env_adminRole,
     });
 
-    console.log("✅ Admin user created successfully.");
+    // console.log("✅ Admin user created successfully.");
   } catch (error) {
     console.error("❌ Error ensuring admin user exists:", error);
   }

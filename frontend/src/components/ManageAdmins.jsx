@@ -123,7 +123,6 @@ const ManageAdmins = () => {
         ← Back to Admin Dashboard
       </button>
 
-      {/* <div className="container"> */}
       <h2 className="mb-4">Manage Admins</h2>
 
       {message && <div className="alert alert-info text-center">{message}</div>}
@@ -146,7 +145,6 @@ const ManageAdmins = () => {
         <p className="text-center">Loading users...</p>
       ) : (
         <div className="accordion" id="userAccordion">
-          {/* Admins */}
           <div className="accordion-item">
             <h2 className="accordion-header" id="adminsHeader">
               <button
@@ -218,7 +216,6 @@ const ManageAdmins = () => {
             </div>
           </div>
 
-          {/* Non-admins */}
           <div className="accordion-item">
             <h2 className="accordion-header" id="usersHeader">
               <button
@@ -285,7 +282,6 @@ const ManageAdmins = () => {
         </div>
       )}
     </div>
-    // </div>
   );
 };
 

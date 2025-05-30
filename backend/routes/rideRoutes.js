@@ -1,49 +1,34 @@
 import express from "express";
-import { 
-    offerRideDetails,
-    requestRideDetails, 
-    matchingRides, 
-    matchingPassengers,
-    createPassengerRide,
-    getOfferedRides, 
-    getRequestedRides, 
-    getPendingRequests, 
-    updateRequestStatus,
-    confirmRide, 
-    acceptedOrConfirmed,
-    rideAction,
-    revokeRide,
+import {
+  offerRideDetails,
+  requestRideDetails,
+  matchingRides,
+  matchingPassengers,
+  createPassengerRide,
+  getOfferedRides,
+  getRequestedRides,
+  getPendingRequests,
+  updateRequestStatus,
+  confirmRide,
+  acceptedOrConfirmed,
+  rideAction,
+  revokeRide,
 } from "../controllers/rideController.js";
 
 const router = express.Router();
 
-// POST /api/rides
 router.post("/offerRideDetails", offerRideDetails);
-router.post("/requestRideDetails",requestRideDetails);
+router.post("/requestRideDetails", requestRideDetails);
 router.post("/matchingRides", matchingRides);
 router.post("/matchingPassengers", matchingPassengers);
 router.post("/createPassengerRide", createPassengerRide);
-
-router.get("/yourofferedrides", getOfferedRides);  // Fetch all rides offered by a driver
-
-// GET /api/rides/requestedRides/:userId
-router.get("/requestedRides/:userId", getRequestedRides);  // <-- Add this line
-
-// GET /api/rides/pending-requests/:driverRideId
-router.get("/pendingrequests/:driverRideId", getPendingRequests);  // Get pending requests for a ride
-
-// POST /api/rides/update-request-status
-router.post("/updaterequeststatus", updateRequestStatus);  // Update request status (Accepted or Rejected)
-// In your routes file
-// router.post("/confirm/:passengerRideId", confirmRide);
+router.get("/yourofferedrides", getOfferedRides);
+router.get("/requestedRides/:userId", getRequestedRides);
+router.get("/pendingrequests/:driverRideId", getPendingRequests);
+router.post("/updaterequeststatus", updateRequestStatus);
 router.post("/confirm/:passengerRideId/:driverRideId", confirmRide);
-
 router.get("/acceptedorconfirmed/:driverRideId", acceptedOrConfirmed);
-
-// POST /api/rides/ride-action
-router.post("/rideaction", rideAction);  // Action (Start, Cancel, Finish Ride)
-
-// routes/rides.js
-router.delete('/revoke/:passengerRideId/:driverRideId', revokeRide);
+router.post("/rideaction", rideAction);
+router.delete("/revoke/:passengerRideId/:driverRideId", revokeRide);
 
 export default router;

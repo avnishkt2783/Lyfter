@@ -1,9 +1,8 @@
 import React, { useEffect, useState, useContext } from "react";
 import axios from "axios";
 import { useNavigate, Link } from "react-router-dom";
-import { useTheme } from "../ThemeContext"; // import your ThemeContext
+import { useTheme } from "../ThemeContext";
 import { getRegex } from "../utils/Regex";
-// import styles from "./DriverPage.module.css"; // CSS module for scoped styles
 
 const DriverPage = () => {
   const { theme } = useTheme(); // get theme
@@ -14,12 +13,8 @@ const DriverPage = () => {
   const [licenseNumberInput, setLicenseNumberInput] = useState("");
   const [licensePhotoFile, setLicensePhotoFile] = useState(null);
   const [uploading, setUploading] = useState(false);
-  const [error, setError] = useState("");
-  const [successMsg, setSuccessMsg] = useState("");
 
   const apiURL = import.meta.env.VITE_API_URL;
-  const apiHost = apiURL.replace(/\/api\/?$/, "");
-  const photoBase = `${apiHost}/uploads`;
 
   const fetchProfile = async () => {
     try {
@@ -65,21 +60,19 @@ const DriverPage = () => {
     }
   };
 
-   const validateForm = () => {
-    // REGEX
-     const licenseNumberRegex = getRegex("drivingLicenseNumber");
+  const validateForm = () => {
+    const licenseNumberRegex = getRegex("drivingLicenseNumber");
 
-  if (!licenseNumberRegex.test(licenseNumberInput)) {
-     setError(
-      "Invalid License number format. Expected format: 'DL01 12345678901' (2 uppercase letters, 2 digits, space, then 11 digits)"
-    );
-    return false;
-  }
-  setError(""); // Clear error if validation passes
+    if (!licenseNumberRegex.test(licenseNumberInput)) {
+      setError(
+        "Invalid License number format. Expected format: 'DL01 12345678901' (2 uppercase letters, 2 digits, space, then 11 digits)"
+      );
+      return false;
+    }
+    setError("");
 
-   return true;
-
-  }
+    return true;
+  };
 
   const handleLicenseSubmit = async (e) => {
     e.preventDefault();
@@ -87,10 +80,10 @@ const DriverPage = () => {
       alert("Please provide both license number and photo.");
       return;
     }
-          if (!validateForm()) {
-    setSuccessMsg("");
-    return;
-  }
+    if (!validateForm()) {
+      setSuccessMsg("");
+      return;
+    }
 
     setUploading(true);
     const formData = new FormData();
@@ -139,11 +132,6 @@ const DriverPage = () => {
   const { fullName, email, phoneNo } = user;
 
   return (
-    // <div
-    //   className={`container py-5 ${
-    //     theme === "dark" ? "bg-dark text-light" : "bg-light text-dark"
-    //   } ${styles.driverPage}`}
-    // >
     <div
       className={`container profile-form my-4 p-4 rounded shadow ${
         isDark ? "bg-dark text-white border-secondary" : "bg-white border-dark"
@@ -168,7 +156,6 @@ const DriverPage = () => {
       <hr />
       <h2 className="text-center mb-4">Driver Dashboard</h2>
 
-      {/* Profile Info */}
       <div
         className={`card shadow-sm mb-5 ${
           theme === "dark" ? "bg-dark text-light" : ""
@@ -241,50 +228,6 @@ const DriverPage = () => {
             </div>
           </div>
 
-          {/* License Submission */}
-          {/* {(!licenseNumber || !licensePhoto) && (
-            <form
-              onSubmit={handleLicenseSubmit}
-              className="mt-4 border-top pt-3"
-            >
-              <h6>Submit License Info</h6>
-              <div className="mb-2">
-                <input
-                  type="text"
-                  className="form-control"
-                  placeholder="License Number"
-                  value={licenseNumberInput}
-                  onChange={(e) => setLicenseNumberInput(e.target.value)}
-                  required
-                />
-              </div>
-              <div className="mb-3">
-                <input
-                  type="file"
-                  accept="image/*"
-                  onChange={(e) => setLicensePhotoFile(e.target.files[0])}
-                  className="form-control"
-                  required
-                />
-              </div>
-              <button
-                type="submit"
-                className="btn btn-warning"
-                disabled={uploading}
-              >
-                {uploading ? "Uploading..." : "Submit License Info"}
-              </button>
-
-              {error && (
-  <div className="alert alert-danger mt-3">
-    {error}
-  </div>
-)}
-
-            </form>
-          )} */}
-
-          {/* License Submission */}
           {(!licenseNumber || !licensePhoto) && (
             <form
               onSubmit={handleLicenseSubmit}
@@ -307,7 +250,7 @@ const DriverPage = () => {
                   accept=".jpg,.jpeg,.png"
                   onChange={(e) => {
                     const file = e.target.files[0];
-                    const maxSize = 2 * 1024 * 1024; // 2MB
+                    const maxSize = 2 * 1024 * 1024;
                     const allowedTypes = ["image/jpeg", "image/png"];
 
                     if (file) {
@@ -323,7 +266,7 @@ const DriverPage = () => {
                         return;
                       }
 
-                      setLicensePhotoFile(file); // Valid file
+                      setLicensePhotoFile(file);
                     }
                   }}
                   className="form-control"
@@ -345,14 +288,12 @@ const DriverPage = () => {
         </div>
       </div>
 
-      {/* Add Vehicle Button */}
       <div className="text-end mb-4">
         <Link to="/add-vehicle" className="btn btn-primary">
           Add Vehicle
         </Link>
       </div>
 
-      {/* Vehicles List */}
       {vehicles.length > 0 && (
         <div
           className={`card shadow ${

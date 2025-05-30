@@ -14,7 +14,6 @@ import {
   FaCarSide,
 } from "react-icons/fa";
 
-// Function to convert coordinates to address
 const geocodeLatLng = async (lat, lng) => {
   return new Promise((resolve, reject) => {
     if (!window.google) {
@@ -35,12 +34,10 @@ const geocodeLatLng = async (lat, lng) => {
   });
 };
 
-// Function to load Google Maps API script
 const loadGoogleMapsScript = () => {
   return new Promise((resolve, reject) => {
     if (window.google && window.google.maps) return resolve();
 
-    // Check if a script with the same source already exists in the document
     const existingScript = document.querySelector(
       `script[src*="maps.googleapis.com/maps/api/js"]`
     );
@@ -50,19 +47,13 @@ const loadGoogleMapsScript = () => {
       return;
     }
 
-    // Create a new script element to load the Google Maps API
     const script = document.createElement("script");
     script.src = `https://maps.googleapis.com/maps/api/js?key=${
       import.meta.env.VITE_GOOGLE_MAPS_API_KEY
     }&libraries=places`;
     script.async = true;
     script.defer = true;
-    // script.onload = resolve;
-    // script.onerror = reject;
-
-    // Resolve or reject based on script load
     script.onload = () => {
-      console.log("Google Maps script loaded successfully.");
       resolve();
     };
     script.onerror = (err) => {
@@ -96,30 +87,16 @@ const MatchingRides = () => {
   const hasRun = useRef(false);
 
   const createPassengerRide = async () => {
-    // console.log("userId", userId);
-    // console.log(
-    //   "passengerNamePhoneNo.passengerName",
-    //   passengerNamePhoneNo.passengerName
-    // );
-    // console.log(
-    //   "passengerNamePhoneNo.passengerPhoneNo",
-    //   passengerNamePhoneNo.passengerPhoneNo
-    // );
-    // console.log("startLocation", startLocation);
-    // console.log("destination", destination);
-    // console.log("seatsRequired", seatsRequired);
     try {
       await axios.post(
         `${apiURL}/rides/createPassengerRide`,
         {
-          //input variables to send in backend
           userId,
           passengerName: passengerNamePhoneNo.passengerName,
           passengerPhoneNo: passengerNamePhoneNo.passengerPhoneNo,
           startLocation,
           destination,
           seatsRequired,
-          // driverRideId: ride?.driverRideId,
         },
         {
           headers: {
@@ -132,49 +109,6 @@ const MatchingRides = () => {
     }
   };
 
-  // const fetchMatchingRides = async () => {
-  //   // console.log("🚀 Fetching matching rides...");
-  //   const start = JSON.parse(startLocation);
-  //   const dest = JSON.parse(destination);
-
-  //   if (!start || !dest) {
-  //     console.error("Start or destination coordinates are missing.");
-  //     setLoading(false);
-  //     return;
-  //   }
-
-  //   try {
-  //     const response = await axios.post(
-  //       `${apiURL}/rides/matchingRides`,
-  //       {
-  //         passengerStart: start,
-  //         passengerEnd: dest,
-  //         seatsRequired,
-  //         currentUserId: userId,
-  //       },
-  //       {
-  //         headers: {
-  //           Authorization: `Bearer ${token}`,
-  //         },
-  //       }
-  //     );
-
-  //     console.log("response: ", response.data.rides);
-
-  //     setRides(
-  //       response.data.success && Array.isArray(response.data.rides)
-  //         ? response.data.rides
-  //         : []
-  //     );
-  //   } catch (error) {
-  //     console.error("❌ Error fetching matching rides:", error);
-  //     setRides([]);
-  //   } finally {
-  //     console.log("🟢 fetchMatchingRides() completed.");
-  //     setLoading(false);
-  //   }
-  // };
-
   const fetchMatchingRides = async () => {
     const start = JSON.parse(startLocation);
     const dest = JSON.parse(destination);
@@ -186,7 +120,7 @@ const MatchingRides = () => {
     }
 
     try {
-      await loadGoogleMapsScript(); // Ensure Maps API is loaded
+      await loadGoogleMapsScript();
 
       const response = await axios.post(
         `${apiURL}/rides/matchingRides`,
@@ -225,12 +159,10 @@ const MatchingRides = () => {
             };
           } catch (err) {
             console.error("Error in geocoding ride:", err);
-            return ride; // fallback to raw ride if conversion fails
+            return ride;
           }
         })
       );
-
-      // console.log("check true or false: ", Array.isArray(ridesData));
 
       setRides(
         response.data.success && Array.isArray(ridesData) ? ridesData : []
@@ -239,7 +171,6 @@ const MatchingRides = () => {
       console.error("❌ Error fetching matching rides:", error);
       setRides([]);
     } finally {
-      console.log("🟢 fetchMatchingRides() completed.");
       setLoading(false);
     }
   };
@@ -250,31 +181,6 @@ const MatchingRides = () => {
     createPassengerRide();
     fetchMatchingRides();
   }, [user]);
-
-  // useEffect(() => {
-  //   if (hasRun.current) return; // If it has already run, exit early
-  //   hasRun.current = true;
-  //   createPassengerRide();
-  //   fetchMatchingRides();
-  // }, []);
-
-  // useEffect(() => {
-  //   createPassengerRide()
-  //     .then(() => fetchMatchingRides())
-  //     .catch((error) => {
-  //       console.error("Error in ride creation or fetching:", error);
-  //     });
-  // }, []);
-
-  // useEffect(() => {
-
-  //   const executeAsync = async () => {
-  //     await createPassengerRide();
-  //     await fetchMatchingRides();
-  //   };
-
-  //   executeAsync();
-  // }, []);
 
   const confirmRide = async (ride) => {
     try {
@@ -348,7 +254,6 @@ const MatchingRides = () => {
                 >
                   <div className="card-body">
                     <h5 className="card-title d-flex align-items-center">
-                      {/* Profile Image */}
                       {profileImg ? (
                         <img
                           src={profileImg}
@@ -375,29 +280,15 @@ const MatchingRides = () => {
                         />
                       )}
 
-                      {/* Driver Name */}
                       {driverName || "Unknown Driver"}
 
-                      {/* Verified Badge */}
                       {ride.driver?.isVerified && (
                         <FaCheckCircle
-                          className={`ms-2 text-success `} // for tooltip
+                          className={`ms-2 text-success `}
                           style={{ fontSize: "1.5rem" }}
                         />
                       )}
                     </h5>
-                    {/* <h5 className="card-title d-flex align-items-center">
-                      <FaUser className="me-2" />
-                      {driverName || "Unknown Driver"}
-                      {ride.driver?.isVerified && (
-                        <FaCheckCircle
-                          className="ms-2 text-success"
-                          title="Verified Driver"
-                          style={{ fontSize: "1.3rem" }}
-                        />
-                      )}
-                    </h5> */}
-
                     <p className="card-text">
                       <FaPhone className="me-2" />
                       <strong>Phone:</strong> {driverPhone || "N/A"}

@@ -17,7 +17,6 @@ const ThemeToggle = () => {
         { theme: newTheme },
         { headers: { Authorization: `Bearer ${token}` } }
       );
-      console.log("Theme updated successfully in the database");
     } catch (error) {
       console.error("Failed to save theme to the database:", error);
     }
@@ -26,7 +25,7 @@ const ThemeToggle = () => {
   const handleToggle = () => {
     const newTheme = isDark ? "light" : "dark";
     toggleTheme(newTheme);
-    saveThemeToDatabase(newTheme);  
+    saveThemeToDatabase(newTheme);
   };
   useEffect(() => {
     document.body.classList.remove(isDark ? "light" : "dark");
@@ -35,7 +34,10 @@ const ThemeToggle = () => {
 
   return (
     <div className="theme-toggle-wrapper d-flex justify-content-center my-2">
-      <div className={`theme-switch ${isDark ? "dark" : "light"}`} onClick={handleToggle}>
+      <div
+        className={`theme-switch ${isDark ? "dark" : "light"}`}
+        onClick={handleToggle}
+      >
         <div className="toggle-thumb">
           {isDark ? <FaMoon size={14} /> : <FaSun size={14} />}
         </div>

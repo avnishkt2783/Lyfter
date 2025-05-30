@@ -15,12 +15,8 @@ const Login = () => {
 
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
-
   const { login } = useAuth();
-
-  console.log("Theme context:", useTheme());
   const { theme, toggleTheme } = useTheme();
-
   const isDark = theme === "dark";
 
   const handleChange = (e) => {

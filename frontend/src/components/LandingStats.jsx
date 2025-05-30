@@ -41,14 +41,13 @@ const LandingStats = () => {
           },
         });
         setStats(res.data);
-        console.log("Fetched platform stats:", res.data);
       } catch (err) {
         console.error("Stats fetch error:", err);
       }
     };
 
     fetchStats();
-  }, []); // Include apiURL in dependency array
+  }, []);
 
   if (!stats) return null;
 
@@ -134,7 +133,6 @@ const LandingStats = () => {
       <div className="container">
         <h2 className="fw-bold text-center mb-5">🚘 Lyfter in Numbers</h2>
 
-        {/* Stat Cards */}
         <div className="row g-4 mb-5 px-5">
           {cardData.map((card, idx) => (
             <div className="col-md-6 col-lg-3" key={idx}>
@@ -156,7 +154,6 @@ const LandingStats = () => {
         </div>
 
         <div className="row">
-          {/* Pie Chart */}
           <div className="col-md-6 mb-4">
             <div
               className={`p-4 rounded shadow ${
@@ -191,7 +188,6 @@ const LandingStats = () => {
             </div>
           </div>
 
-          {/* Bar Chart */}
           <div className="col-md-6 mb-4">
             <div
               className={`p-4 rounded shadow ${

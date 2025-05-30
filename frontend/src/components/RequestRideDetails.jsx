@@ -19,7 +19,7 @@ const RequestRideDetails = () => {
   const [seats, setSeats] = useState(1);
   const [passengerName, setPassengerName] = useState("");
   const [passengerPhoneNo, setPassengerPhoneNo] = useState("");
-   const [error, setError] = useState("");
+  const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
 
   const startLocation = localStorage.getItem("startLocationCoordinatesA");
@@ -44,27 +44,25 @@ const RequestRideDetails = () => {
       .catch((err) => console.error("Error fetching user:", err));
   }, []);
 
-   const validateForm = () => {
-        // REGEX
-          const phoneRegex = getRegex("phone");
-         
-      if (!phoneRegex.test(passengerPhoneNo)) {
-        setError("Invalid Phone number");
-        return false;
-      }
-    
-         setError("");
-      return true;
-    
-      }
+  const validateForm = () => {
+    const phoneRegex = getRegex("phone");
+
+    if (!phoneRegex.test(passengerPhoneNo)) {
+      setError("Invalid Phone number");
+      return false;
+    }
+
+    setError("");
+    return true;
+  };
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    
-        if (!validateForm()) {
-    setSuccess("");
-    return;
-  }
+
+    if (!validateForm()) {
+      setSuccess("");
+      return;
+    }
     if (
       !passengerName ||
       !passengerPhoneNo ||
@@ -177,24 +175,12 @@ const RequestRideDetails = () => {
               />
             </div>
             <div className="text-center">
-              {/* <button
-                type="button"
-                className="btn btn-secondary px-4 me-3"
-                onClick={handleRequestOnly}
-              >
-                <FaSearch className="me-2" />
-                Request Only
-              </button> */}
               <button type="submit" className="btn btn-primary px-4">
                 <FaSearch className="me-2" />
                 Request & Find Rides
               </button>
             </div>
-                {error && (
-  <div className="alert alert-danger mt-3">
-    {error}
-  </div>
-)}
+            {error && <div className="alert alert-danger mt-3">{error}</div>}
           </form>
         </div>
       </div>

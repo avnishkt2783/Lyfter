@@ -3,15 +3,12 @@
   position: relative;
   transition: all 0.3s ease;
   padding: 0.5rem 1rem;
-  border-radius: 0.375rem; /* Rounded hover background */
+  border-radius: 0.375rem; 
   font-size: 18px;
 }
 
 /* Hover effect with full background color */
 .navbar-nav .nav-link:hover {
-  /* background-color: #0d6efd !important; */
-  /* color: #ffffff !important; */
-  /* font-weight: 500; */
   margin-left: 10px;
   margin-right: 10px;
 }
@@ -70,8 +67,6 @@
 /* Profile image: use background effect on nav-link, not border on image */
 .navbar-nav .nav-item .rounded-circle {
   transition: transform 0.3s ease;
-  /* margin-left: 10px; */
-  /* margin-right: 10px; */
 }
 
 .navbar-nav .nav-item .rounded-circle:hover {
@@ -80,7 +75,5 @@
 
 /* Profile nav-link hover: match rest of nav items */
 .navbar-nav .nav-item .nav-link:hover {
-  /* background-color: #0d6efd !important; */
-  /* color: #ffffff !important; */
   border-radius: 0.375rem;
 }

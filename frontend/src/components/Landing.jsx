@@ -14,7 +14,6 @@ const Landing = () => {
         isDark ? "bg-dark text-light" : "bg-white text-dark"
       }`}
     >
-      {/* Header Section */}
       <header className="text-center mb-5">
         <h1 className="display-4 fw-bold about-header animate-fade-in">
           Welcome to
@@ -27,9 +26,7 @@ const Landing = () => {
         <p className="lead">Revolutionizing the way you ride.</p>
       </header>
 
-      {/* Carousel Section */}
-
-      <section className="landing-carousel-section">
+      <section className="landing-carousel-section px-3">
         <div
           id="lyfterCarousel"
           className="carousel slide"
@@ -47,7 +44,7 @@ const Landing = () => {
                   className="landing-carousel-img"
                   alt={`Slide ${i + 1}`}
                   onClick={() => {
-                    const links = ["/#", "/#", "/#"];
+                    const links = ["/#", "/dashboard", "/driver-dashboard"];
                     window.location.href = links[i];
                   }}
                 />
@@ -55,7 +52,6 @@ const Landing = () => {
             ))}
           </div>
 
-          {/* Prev and Next buttons — always visible */}
           <button
             className="carousel-control-prev"
             type="button"
@@ -83,10 +79,8 @@ const Landing = () => {
         </div>
       </section>
 
-      {/* Stats Section */}
       <LandingStats />
 
-      {/* Testimonials */}
       <section
         className={`landing-testimonials py-5 text-center ${
           isDark ? "bg-dark text-light" : "bg-white text-dark"
@@ -125,7 +119,6 @@ const Landing = () => {
         </div>
       </section>
 
-      {/* About Us CTA */}
       <section
         className={`landing-about-cta py-5 text-center ${
           isDark ? "bg-dark text-light" : "bg-white text-dark"
@@ -145,7 +138,6 @@ const Landing = () => {
         </Link>
       </section>
 
-      {/* Final CTA */}
       <section
         className={`landing-cta-section text-center py-5 ${
           isDark ? "text-light" : "text-dark"

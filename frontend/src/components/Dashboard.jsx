@@ -68,7 +68,6 @@ const Dashboard = () => {
         <div className="card-header">
           <h5 className="mb-0">Plan a route</h5>
         </div>
-        {/* <div className="card-body p-0" style={{ height: "400px" }}> */}
         <div className="flex-grow-1 d-flex flex-column">
           <GoogleMapView />
         </div>

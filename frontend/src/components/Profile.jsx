@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
 import { useAuth } from "../AuthContext";
-import { useTheme } from "../ThemeContext"; // import your ThemeContext
+import { useTheme } from "../ThemeContext";
 import { getRegex } from "../utils/Regex";
 import { Link } from "react-router-dom";
 import { Spinner } from "react-bootstrap";
@@ -20,10 +20,7 @@ import {
 import "bootstrap/dist/css/bootstrap.min.css";
 import "./Profile.css";
 
-// const age = 0;
 const calculateAge = (dob) => {
-  console.log("⚡ INSIDE calculateAge (dob)");
-
   const birthDate = new Date(dob);
   const today = new Date();
   let age = today.getFullYear() - birthDate.getFullYear();
@@ -36,16 +33,13 @@ const calculateAge = (dob) => {
   ) {
     age--;
   }
-
-  console.log("AGE AFTER SETTING UP: ", age);
-
   return age;
 };
 
 const Profile = () => {
   const apiURL = import.meta.env.VITE_API_URL;
   const { token } = useAuth();
-  const { theme } = useTheme(); // get theme
+  const { theme } = useTheme();
   const isDark = theme === "dark";
 
   const [profile, setProfile] = useState(null);
@@ -63,11 +57,6 @@ const Profile = () => {
         headers: { Authorization: `Bearer ${token}` },
       });
       setProfile(res.data);
-
-      // console.log("AJSHDKAHKSJDHAKJSD");
-
-      console.log(res.data);
-
       setFormData({
         ...res.data,
         addressAddress: res.data.address?.address || "",
@@ -78,18 +67,15 @@ const Profile = () => {
         dob: res.data.dob || "",
       });
 
-      console.log("res.data.dob", res.data.dob);
-
       try {
         const calculatedAge = res.data.dob ? calculateAge(res.data.dob) : null;
         setAge(calculatedAge);
-        console.log("AGE INSIDE FETCH PROFILE: ", calculatedAge);
       } catch (err) {
-        console.log("Age calculation error", err);
+        console.error("Age calculation error", err);
       }
     } catch (err) {
       setError(err?.response?.data?.message);
-      console.log("Profile fetch error");
+      console.error("Profile fetch error", err);
     }
   };
 
@@ -110,9 +96,6 @@ const Profile = () => {
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
-
-    // if (name == "dob") {
-    // }
   };
 
   const handleImageChange = (e) => {
@@ -123,31 +106,25 @@ const Profile = () => {
     }
   };
 
-   const validateForm = () => {
-        // REGEX
-          const phoneRegex = getRegex("phone");
-      // const passwordRegex = getRegex("password");
-    
-      if (!phoneRegex.test(formData.phoneNo)) {
-        setError("Invalid Phone number");
-        return false;
-      }
-    
-    
-     setError("");
-      return true;
-    
-      }
+  const validateForm = () => {
+    const phoneRegex = getRegex("phone");
+
+    if (!phoneRegex.test(formData.phoneNo)) {
+      setError("Invalid Phone number");
+      return false;
+    }
+
+    setError("");
+    return true;
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-
-       if (!validateForm()) {
-    setSuccessMsg("");
-    return;
-  }
-
+    if (!validateForm()) {
+      setSuccessMsg("");
+      return;
+    }
 
     setLoading(true);
     try {
@@ -167,20 +144,16 @@ const Profile = () => {
         },
       });
 
-      await fetchProfile(); // Re-fetch to get the fresh and correct data
+      await fetchProfile();
       setLoading(false);
       setSuccessMsg("Profile updated successfully!");
-      // setProfile(res.data);
     } catch (err) {
       setLoading(false);
       setError(err?.response?.data?.message || "Failed to update profile");
     }
   };
 
-  // if (error) return <p className="text-danger text-center">{error}</p>;
   if (!profile) return <p className="text-center">Loading profile...</p>;
-
-  // age = formData.dob ? calculateAge(formData.dob) : null;
 
   return (
     <div
@@ -206,32 +179,8 @@ const Profile = () => {
       </div>
       <hr />
       <h2 className="text-center mb-4">Profile Page</h2>
-      {/* <hr /> */}
-      {/* {successMsg && (
-        <div
-          className={`alert ${
-            isDark
-              ? "alert-success bg-success bg-opacity-25 text-white"
-              : "alert-success"
-          }`}
-        >
-          {successMsg}
-        </div>
-      )}
-      {error && (
-        <div
-          className={`alert ${
-            isDark
-              ? "alert-danger bg-danger bg-opacity-25 text-white"
-              : "alert-danger"
-          }`}
-        >
-          {error}
-        </div>
-      )} */}
 
       <form onSubmit={handleSubmit} encType="multipart/form-data">
-        {/* Profile image with pencil overlay */}
         <div className="text-center mb-3">
           <label
             htmlFor="profileImageInput"
@@ -268,7 +217,7 @@ const Profile = () => {
               hidden
               onChange={(e) => {
                 const file = e.target.files[0];
-                const maxSize = 2 * 1024 * 1024; // 2MB
+                const maxSize = 2 * 1024 * 1024;
                 const allowedTypes = ["image/jpeg", "image/png"];
 
                 if (file) {
@@ -284,14 +233,13 @@ const Profile = () => {
                     return;
                   }
 
-                  handleImageChange(e); // Only call if valid
+                  handleImageChange(e);
                 }
               }}
             />
           </label>
         </div>
 
-        {/* Input fields */}
         <div className="form-group mb-3">
           <label>
             <FaUser className="me-2" />
@@ -339,27 +287,8 @@ const Profile = () => {
           />
         </div>
 
-        {/* <div className="form-group mb-3">
-          <label>
-            <FaPhone className="me-2" />
-            Gender
-            </label>
-          <input
-          className={`form-control ${
-            isDark ? "text-white border-1 border-light" : ""
-            }`}
-            name="gender"
-            value={formData.gender || ""}
-            onChange={handleChange}
-            disabled
-            />
-            </div> */}
-
         <div className="form-group mb-3">
           <label>
-            {/* <FaMars className="me-2" />
-            <FaVenus className="me-2" />
-            <FaTransgenderAlt className="me-2" /> */}
             {formData.gender === "Male" ? (
               <FaMars className="me-2" />
             ) : formData.gender === "Female" ? (
@@ -493,31 +422,29 @@ const Profile = () => {
           )}
         </button>
 
-            {successMsg && (
-        <div
-          className={`alert ${
-            isDark
-              ? "alert-success bg-success bg-opacity-25 text-white"
-              : "alert-success"
-          } mt-3`}
-        >
-          {successMsg}
-        </div>
-      )}
-      {error && (
-        <div
-          className={`alert ${
-            isDark
-              ? "alert-danger bg-danger bg-opacity-25 text-white"
-              : "alert-danger"
-          } mt-3`}
-        >
-          {error}
-        </div>
-      )}
-        </form>
-
-        
+        {successMsg && (
+          <div
+            className={`alert ${
+              isDark
+                ? "alert-success bg-success bg-opacity-25 text-white"
+                : "alert-success"
+            } mt-3`}
+          >
+            {successMsg}
+          </div>
+        )}
+        {error && (
+          <div
+            className={`alert ${
+              isDark
+                ? "alert-danger bg-danger bg-opacity-25 text-white"
+                : "alert-danger"
+            } mt-3`}
+          >
+            {error}
+          </div>
+        )}
+      </form>
     </div>
   );
 };
