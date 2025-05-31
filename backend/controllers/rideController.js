@@ -665,35 +665,89 @@ export const getPendingRequests = async (req, res) => {
   }
 };
 
+// export const updateRequestStatus = async (req, res) => {
+//   const { passengerRideId, driverRideId, status } = req.body;
+
+//   try {
+//     if (!passengerRideId || !driverRideId) {
+//       return res
+//         .status(400)
+//         .json({ error: "passengerRideId and driverRideId are required" });
+//     }
+
+//     await PassengerRideDriverRide.update(
+//       { status },
+//       {
+//         where: {
+//           passengerRideId,
+//           driverRideId,
+//         },
+//       }
+//     );
+
+//     res.status(200).json({
+//       success: true,
+//       message: `Ride ${status.toLowerCase()} successfully`,
+//     });
+//   } catch (err) {
+//     console.error("Error updating request status:", err);
+//     res.status(500).json({ error: "Failed to update request status" });
+//   }
+// };
+
 export const updateRequestStatus = async (req, res) => {
   const { passengerRideId, driverRideId, status } = req.body;
 
   try {
-    if (!passengerRideId || !driverRideId) {
-      return res
-        .status(400)
-        .json({ error: "passengerRideId and driverRideId are required" });
+    if (!passengerRideId || !driverRideId || !status) {
+      return res.status(400).json({
+        error: "passengerRideId, driverRideId, and status are required",
+      });
     }
 
-    await PassengerRideDriverRide.update(
-      { status },
-      {
-        where: {
-          passengerRideId,
-          driverRideId,
-        },
-      }
-    );
-
-    res.status(200).json({
-      success: true,
-      message: `Ride ${status.toLowerCase()} successfully`,
+    // Check if the entry exists
+    let existingEntry = await PassengerRideDriverRide.findOne({
+      where: { passengerRideId, driverRideId },
     });
+
+    if (existingEntry) {
+      // Update existing entry
+      await PassengerRideDriverRide.update(
+        { status },
+        {
+          where: {
+            passengerRideId,
+            driverRideId,
+          },
+        }
+      );
+
+      return res.status(200).json({
+        success: true,
+        message: `Ride ${status.toLowerCase()} successfully`,
+      });
+    } else {
+      // Create new entry
+      const newEntry = await PassengerRideDriverRide.create({
+        passengerRideId,
+        driverRideId,
+        status,
+      });
+
+      return res.status(201).json({
+        success: true,
+        message: `Ride request created with status '${status}'`,
+        data: newEntry,
+      });
+    }
   } catch (err) {
-    console.error("Error updating request status:", err);
-    res.status(500).json({ error: "Failed to update request status" });
+    console.error("Error updating or creating request status:", err);
+    res.status(500).json({
+      error: "Failed to update or create request status",
+    });
   }
 };
+
 
 export const confirmRide = async (req, res) => {
   const { passengerRideId, driverRideId } = req.params;
