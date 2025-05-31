@@ -175,11 +175,27 @@ const MatchingRides = () => {
     }
   };
 
+  // useEffect(() => {
+  //   if (!user || hasRun.current) return;
+  //   hasRun.current = true;
+  //   createPassengerRide();
+  //   fetchMatchingRides();
+  // }, [user]);
+
   useEffect(() => {
-    if (!user || hasRun.current) return;
-    hasRun.current = true;
-    createPassengerRide();
-    fetchMatchingRides();
+    const runOnce = async () => {
+      if (!user || hasRun.current) return;
+      hasRun.current = true;
+  
+      try {
+        await createPassengerRide(); // Wait for this to finish
+        await fetchMatchingRides();  // Then do this
+      } catch (error) {
+        console.error("Error during ride setup:", error);
+      }
+    };
+  
+    runOnce();
   }, [user]);
 
   const confirmRide = async (ride) => {
