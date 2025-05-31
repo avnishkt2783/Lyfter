@@ -58,47 +58,105 @@ export const offerRideDetails = async (req, res) => {
   }
 };
 
+// export const createPassengerRide = async (req, res) => {
+//   const {
+//     userId,
+//     passengerName,
+//     passengerPhoneNo,
+//     startLocation,
+//     destination,
+//     seatsRequired,
+//   } = req.body;
+
+//   let passenger = await Passenger.findOne({ where: { userId } });
+//   if (!passenger) {
+//     passenger = await Passenger.create({ userId });
+//   }
+//   const passengerId = passenger.passengerId;
+
+//   const passengerRide = await PassengerRide.findOne({
+//     where: {
+//       passengerId,
+//       passengerName,
+//       passengerPhoneNo,
+//       startLocation,
+//       destination,
+//       seatsRequired,
+//     },
+//   });
+
+//   var savedPassengerRide;
+//   if (passengerRide) {
+//     savedPassengerRide = passengerRide;
+//   } else {
+//     savedPassengerRide = await PassengerRide.create({
+//       passengerId,
+//       passengerName,
+//       passengerPhoneNo,
+//       startLocation,
+//       destination,
+//       seatsRequired,
+//     });
+//   }
+// };
+
 export const createPassengerRide = async (req, res) => {
-  const {
-    userId,
-    passengerName,
-    passengerPhoneNo,
-    startLocation,
-    destination,
-    seatsRequired,
-  } = req.body;
-
-  let passenger = await Passenger.findOne({ where: { userId } });
-  if (!passenger) {
-    passenger = await Passenger.create({ userId });
-  }
-  const passengerId = passenger.passengerId;
-
-  const passengerRide = await PassengerRide.findOne({
-    where: {
-      passengerId,
+  try {
+    const {
+      userId,
       passengerName,
       passengerPhoneNo,
       startLocation,
       destination,
       seatsRequired,
-    },
-  });
+    } = req.body;
 
-  var savedPassengerRide;
-  if (passengerRide) {
-    savedPassengerRide = passengerRide;
-  } else {
-    savedPassengerRide = await PassengerRide.create({
-      passengerId,
-      passengerName,
-      passengerPhoneNo,
-      startLocation,
-      destination,
-      seatsRequired,
+    let passenger = await Passenger.findOne({ where: { userId } });
+    if (!passenger) {
+      passenger = await Passenger.create({ userId });
+    }
+    const passengerId = passenger.passengerId;
+
+    const passengerRide = await PassengerRide.findOne({
+      where: {
+        passengerId,
+        passengerName,
+        passengerPhoneNo,
+        startLocation,
+        destination,
+        seatsRequired,
+      },
+    });
+
+    let savedPassengerRide;
+    if (passengerRide) {
+      savedPassengerRide = passengerRide;
+    } else {
+      savedPassengerRide = await PassengerRide.create({
+        passengerId,
+        passengerName,
+        passengerPhoneNo,
+        startLocation,
+        destination,
+        seatsRequired,
+      });
+    }
+
+    // ✅ Success response
+    return res.status(200).json({
+      message: "Passenger ride created or found successfully",
+      data: savedPassengerRide,
+    });
+
+  } catch (error) {
+    console.error("Error creating passenger ride:", error);
+    return res.status(500).json({
+      message: "An error occurred while creating the passenger ride",
+      error: error.message,
     });
   }
 };
+
 
 export const requestRideDetails = async (req, res) => {
   const {
