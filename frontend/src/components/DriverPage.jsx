@@ -10,6 +10,7 @@ const DriverPage = () => {
   const navigate = useNavigate();
   const [profile, setProfile] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
   const [licenseNumberInput, setLicenseNumberInput] = useState("");
   const [licensePhotoFile, setLicensePhotoFile] = useState(null);
   const [uploading, setUploading] = useState(false);
