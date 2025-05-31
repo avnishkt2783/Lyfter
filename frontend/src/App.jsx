@@ -26,6 +26,7 @@ import AdminDashboard from "./components/AdminDashboard";
 import DriverPage from "./components/DriverPage";
 import ManageAdmins from "./components/ManageAdmins";
 import AdminRoute from "./AdminRoute";
+import RedirectExternal from "./components/RedirectExternal";
 
 import "bootstrap/dist/css/bootstrap.min.css";
 import "bootstrap/dist/js/bootstrap.bundle.min.js";
@@ -50,6 +51,7 @@ function App() {
           <Route path="/register" element={<Register />} />
           <Route path="/logout" element={<LogoutButton />} />
           <Route path="/forgot-password" element={<ForgotPassword />} />
+          <Route path="/lyfter-video-ppt" element={<RedirectExternal />} />
 
           <Route element={<RequireAuth />}>
             <Route path="/dashboard" element={<Dashboard />} />
