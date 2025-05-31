@@ -189,7 +189,7 @@ const MatchingRides = () => {
   
       try {
         await createPassengerRide(); // Wait for this to finish
-        // await fetchMatchingRides();  // Then do this
+        await fetchMatchingRides();  // Then do this
       } catch (error) {
         console.error("Error during ride setup:", error);
       }
