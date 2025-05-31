@@ -64,53 +64,111 @@ Lyfter/
 │   ├── controllers/
 │   │   ├── rideController.js       # Ride-related logic
 │   │   └── userController.js       # User-related logic
+│   │   ├── adminController.js
+│   │   ├── driverController.js
+│   │   ├── statsController.js
+│   │   └── vehicleController.js
 │   ├── middleware/
 │   │   ├── authenticate.js         # Auth middleware
 │   │   └── upload.js               # Image upload handler
+│   │   ├── isAdmin.js
 │   ├── models/                     # Sequelize models (by domain)
 │   │   ├── auth/
 │   │   │   └── auth.js
 │   │   ├── driver/
 │   │   │   └── driver.js
+│   │   │   └── vehicle.js
+│   │   ├── OTPVerification/
+│   │   │   └── OTPVerification.js
 │   │   ├── passenger/
 │   │   │   └── passenger.js
 │   │   ├── ride/
 │   │   │   ├── driverRide.js   
 │   │   │   └── passengerRide.js
+│   │   │   └── passengerRideDriverRide.js
 │   │   └── user/
 │   │       └── user.js
 │   ├── routes/
+│   │   ├── adminRoutes.js
+│   │   ├── driverRoutes.js
 │   │   ├── rideRoutes.js
-│   │   └── userRoutes.js
+│   │   ├── stats.js
+│   │   ├── userRoutes.js
+│   │   └── vehicleRoutes.js
+│   ├── utils/
+│   │   ├── ensureAdmin.js
+│   │   └── sendMail.js
 │   ├── .env                        # Environment variables
 │   ├── package.json
 │   └── server.js                   # Entry point for backend
 ├── frontend/                       # Frontend (React + Vite)
+│   ├── public/
+│   │   ├── arobh.jpg
+│   │   ├── avnish.jpg
+│   │   ├── carpool_waze.gif
+│   │   ├── default.jpg
+│   │   ├── Lyfter_Banner_1.png
+│   │   ├── Lyfter_Banner_2.png
+│   │   ├── Lyfter_Banner_3.png
+│   │   ├── lyfter_favicon_black.png
+│   │   ├── lyfter_favicon_white.png
+│   │   ├── lyfter_text.svg
+│   │   ├── lyfter_text_black.png
+│   │   ├── lyfter_text_white.png
+│   │   └── simran.jpg
 │   ├── src/
-│   │   ├── assets/                 # Static assets
 │   │   ├── components/             # React components
+│   │   │   ├── AadhaarDriversList.jsx
+│   │   │   ├── About.css
+│   │   │   ├── About.jsx
+│   │   │   ├── AddVehicleForm.jsx
+│   │   │   ├── AdminDashboard.jsx
+│   │   │   ├── BecomeDriverForm.jsx
 │   │   │   ├── Dashboard.jsx
-│   │   │   ├── Footer.jsx / Footer.css
+│   │   │   ├── DriverPage.jsx
+│   │   │   ├── Footer.css
+│   │   │   ├── Footer.jsx
+│   │   │   ├── ForgotPassword.jsx
 │   │   │   ├── GoogleMapView.jsx
+│   │   │   ├── Landing.css
 │   │   │   ├── Landing.jsx
-│   │   │   ├── Login.jsx / LogoutButton.jsx / Register.jsx
+│   │   │   ├── LandingStats.jsx
+│   │   │   ├── Login.jsx
+│   │   │   ├── LogoutButton.jsx
+│   │   │   ├── ManageAdmins.jsx
 │   │   │   ├── MatchingRides.jsx
-│   │   │   ├── Navbar.jsx / Navbar.css
+│   │   │   ├── Navbar.css
+│   │   │   ├── Navbar.jsx
 │   │   │   ├── OfferRideDetails.jsx
+│   │   │   ├── PendingDriversList.css
+│   │   │   ├── PendingDriversList.jsx
+│   │   │   ├── Profile.css
 │   │   │   ├── Profile.jsx
+│   │   │   ├── Register.jsx
 │   │   │   ├── RequestRideDetails.jsx
-│   │   │   ├── ThemeToggle.jsx / ThemeToggle.css
-│   │   └── utils/                  # Contexts and global logic
-│   │       ├── App.jsx / App.css
-│   │       ├── AuthContext.jsx
-│   │       ├── index.css
-│   │       ├── main.jsx
-│   │       └── ThemeContext.jsx
+│   │   │   ├── ThemeToggle.css
+│   │   │   ├── ThemeToggle.jsx
+│   │   │   ├── YourOfferedRides.css
+│   │   │   ├── YourOfferedRides.jsx
+│   │   │   └── YourRequestedRides.jsx
+│   │   ├── utils/
+│   │   │   ├── MapStyles.jsx
+│   │   │   ├── Regex.jsx
+│   │   │   └── RequireAuth.jsx
+│   │   ├── AdminRoute.jsx
+│   │   ├── App.css
+│   │   ├── App.jsx
+│   │   ├── AuthContext.jsx
+│   │   ├── index.css
+│   │   ├── main.jsx
+│   │   └── ThemeContext.jsx
 │   ├── .env
-│   ├── index.html                  # Root HTML
+│   ├── .gitignore
+│   ├── eslint.config.js
+│   ├── index.html
 │   ├── package.json
-│   ├── README.md
-│   └── vite.config.js              # Vite bundler config
+│   ├── vercel.json
+│   └── vite.config.js
 └── README.md                       # This file
 ```
 ---
